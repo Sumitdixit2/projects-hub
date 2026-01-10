@@ -1,64 +1,29 @@
-import express, { Request, Response } from "express";
-import cors from "cors";
-import { Pool } from 'pg';
-const app = express();
+import { Request, Response, NextFunction } from "express";
+import dotenv from 'dotenv';
+import app from "./app";
+import { get_age } from "./routes/agency/getAgency";
 
-app.use(cors())
-app.use(express.json())
+dotenv.config()
 
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error("There seems to be an error:", err.message);
+  res.status(500).json({
+    success: false,
+    message: "Internal Server Error",
+    error: err.message,
+  });
+});
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-})
-
-console.log("let's see if this console works or not");
-
-app.listen(5000, () => {
-  console.log("app is listening at port 5000 and updates are being showed");
-})
-
-
-
-app.get("/", (_req, res) => {
-  res.send("Server is running!");
-})
-
-app.get("/check", async (_req: Request, res: Response) => {
+const Listen = async () => {
   try {
-    return res.json({
-      success: true,
-      message: "Working!"
+    app.listen(process.env.PORT || 5000, () => {
+      console.log("App listening on Port : ", process.env.PORT);
     })
-  } catch (error: any) {
-    console.error("error while checking: ", error.message)
-    res.json({
-      success: false,
-      error: error.message
-    })
+  } catch (error) {
+    console.error("Error at calling the DB function: ", error);
   }
+}
 
-})
+app.get('/api/v1/agency', get_age)
 
-app.post("/create-user", async (req: Request, res: Response) => {
-  try {
-    const { description } = req.body;
-    console.log("RUNNING INSERT WITH RETURNING");
-    const create_user = await pool.query('INSERT INTO test (description) VALUES ($1) RETURNING *', [description]);
-    return res.status(201).json({
-      success: true,
-      message: create_user.rows[0]
-    });
-  } catch (error: any) {
-    console.error("there is an error: ", error.message);
-    res.json({
-      success: false,
-      error: error.message
-    })
-  }
-})
-
-
+Listen();
