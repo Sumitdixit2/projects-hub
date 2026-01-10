@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import dotenv from 'dotenv';
 import app from "./app";
-import { get_age } from "./routes/agency/getAgency";
 
 dotenv.config()
 
@@ -24,6 +23,5 @@ const Listen = async () => {
   }
 }
 
-app.get('/api/v1/agency', get_age)
 
 Listen();

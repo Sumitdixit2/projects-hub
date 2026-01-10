@@ -2,6 +2,7 @@ import { pool } from '../../../postgress-config';
 import { get_agency } from '../../queries'
 import { Request, Response } from "express"
 
+
 export const get_age = async (req: Request, res: Response) => {
   try {
     const response = await pool.query(get_agency);
