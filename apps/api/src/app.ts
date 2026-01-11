@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import userRouter from "./routes/agency/agency.routes";
+import agencyRouter from "./routes/agency/agency.routes";
 
 const app = express();
 
@@ -18,6 +18,6 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-app.use('/api/v1/agency', userRouter)
+app.use('/api/v1/agency', agencyRouter)
 
 export default app;

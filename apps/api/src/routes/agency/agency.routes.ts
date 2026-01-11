@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { registerAgency } from "../../controllers/agency/agency.controller";
+import { getAgencies, registerAgency } from "../../controllers/agency/agency.controller";
 
-const userRouter = Router();
+const agencyRouter = Router();
 
-userRouter.route('/registerAgency').post(registerAgency);
+agencyRouter.route('/registerAgency').post(registerAgency);
+agencyRouter.route('/get-agency').get(getAgencies);
 
-export default userRouter;
+export default agencyRouter;

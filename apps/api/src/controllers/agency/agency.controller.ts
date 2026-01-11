@@ -1,9 +1,14 @@
 import { pool } from '../../../postgress-config';
-import { Request, Response, NextFunction } from "express"
+import bcrypt from "bcrypt"
 import ApiError from '../../utils/apiError';
 import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken';
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
+import { Resend } from "resend";
+import { response } from 'express';
+import { generateOtp } from '../../utils/otpGenerator';
+import { hashOtp } from '../../utils/hashOtp';
+
 
 
 const generateAccessAndRefreshToken = async (userId: string) => {
@@ -11,36 +16,77 @@ const generateAccessAndRefreshToken = async (userId: string) => {
   const user = response.rows[0];
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    throw new ApiError(404, "Agency not found");
   }
 
   const AccessToken = generateAccessToken(user);
   const RefreshToken = generateRefreshToken(user);
+  const hashToken = await bcrypt.hash(RefreshToken, 10);
 
-  await pool.query('UPDATE agency SET  refreshtoken = $1 WHERE id = $2 RETURNING *', [RefreshToken, userId]);
+  await pool.query('UPDATE agency SET  refreshtoken = $1 WHERE id = $2 RETURNING *', [hashToken, userId]);
 
 
   return { AccessToken, RefreshToken };
 
 }
 
+export const getAgencies = asyncHandler(async (req, res) => {
+
+  const response = await pool.query("SELECT name FROM agency");
+
+  let result = [];
+  result = response.rows;
+  return res.json(new ApiResponse(200, result, "fetched all agencies name"))
+
+})
+
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+const sendOtpToEmail = async (email: string) => {
+  const otp = generateOtp();
+  const hashedOtp = hashOtp(otp);
+
+  await pool.query('UPDATE agency SET verify_code = $1 WHERE email = $2', [hashedOtp, email]);
+
+  await resend.emails.send({
+    from: "Acme <onboarding@resend.dev>",
+    to: [`${email}`],
+    subject: "verification code for project-hub",
+    html: `<strong>${otp}</strong>`,
+  });
+
+
+}
+
+
+type registerType = {
+  name: string | null;
+  email: string | null;
+  password: string | null;
+  phone?: string | null;
+  website?: string | null;
+  description?: string | null;
+}
+
 export const registerAgency = asyncHandler(async (req, res) => {
-  const { name, email, password, phone, website, description } = req.body;
+  const { name, email, password, phone, website, description }: registerType = req.body;
 
   if (!name || !email || !password) {
-    throw new ApiError(403, "Enter all the required fields");
+    throw new ApiError(400, "Enter all the required fields");
   }
 
   const find = await pool.query('SELECT EXISTS (SELECT 1 FROM agency WHERE email = $1)', [email]);
 
   if (find.rows[0].exists) {
-    throw new ApiError(402, "agency already exists");
+    throw new ApiError(409, "agency already exists");
   }
 
-  const response = await pool.query('INSERT INTO agency (name , email , password , phone , website , description ) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *', [name, email, password, phone, website, description])
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const response = await pool.query('INSERT INTO agency (name , email , password , phone , website , description ) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *', [name, email, hashedPassword, phone, website, description])
   const add_agency = response.rows[0]
 
-  console.log("I AM A RETARD!")
 
   if (!add_agency) {
 
@@ -48,10 +94,16 @@ export const registerAgency = asyncHandler(async (req, res) => {
 
   }
 
-  return res.json(new ApiResponse(201, add_agency, "agency created successfully"));
+  await sendOtpToEmail(email);
 
+  res.json(new ApiResponse(201, add_agency, "agency created successfully"));
 
 });
 
+const verifyCode = asyncHandler(async (req, res) => {
+  const { Code } = req.body;
+
+  const hashedOtp = await pool.query('SELECT verif')
+})
 
 
