@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
 
-export function hashOtp(otp: string) {
-  return bcrypt.hash(otp, 10);
+export async function hashOtp(otp: string) {
+  return await bcrypt.hash(otp, 10);
 }

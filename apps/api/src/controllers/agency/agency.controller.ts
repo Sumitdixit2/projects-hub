@@ -45,9 +45,9 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendOtpToEmail = async (email: string) => {
   const otp = generateOtp();
-  const hashedOtp = hashOtp(otp);
+  const hashedOtp = await hashOtp(otp);
 
-  await pool.query('UPDATE agency SET verify_code = $1 WHERE email = $2', [hashedOtp, email]);
+  const response = await pool.query('UPDATE agency SET verify_code = $1 WHERE email = $2 RETURNING *', [hashedOtp, email]);
 
   await resend.emails.send({
     from: "Acme <onboarding@resend.dev>",
@@ -56,7 +56,7 @@ const sendOtpToEmail = async (email: string) => {
     html: `<strong>${otp}</strong>`,
   });
 
-
+  return response.rows[0];
 }
 
 
@@ -94,16 +94,36 @@ export const registerAgency = asyncHandler(async (req, res) => {
 
   }
 
-  await sendOtpToEmail(email);
+  const result = await sendOtpToEmail(email);
 
-  res.json(new ApiResponse(201, add_agency, "agency created successfully"));
+  res.json(new ApiResponse(201, result, "agency created successfully"));
 
 });
 
-const verifyCode = asyncHandler(async (req, res) => {
-  const { Code } = req.body;
+export const verifyCode = asyncHandler(async (req, res) => {
+  const { Code, email } = req.body;
 
-  const hashedOtp = await pool.query('SELECT verif')
+  if (!Code || !email) {
+    throw new ApiError(400, "Code and email are both required!")
+  }
+
+  const response = await pool.query('SELECT verify_code FROM agency WHERE email = $1', [email]);
+  const hashedOtp = response.rows[0].verify_code;
+  console.log("2hashedOtp is : ", hashedOtp)
+
+  if (!hashedOtp) {
+    throw new ApiError(404, "email not found");
+  }
+
+  const match = await bcrypt.compare(Code, hashedOtp);
+
+  if (!match) {
+    throw new ApiError(400, "invalid OTP");
+  }
+  const is_verified = true;
+  await pool.query('UPDATE agency SET is_verified = $1 WHERE email = $2 ', [is_verified, email])
+
+  return res.json(new ApiResponse(200, match, "verified successfully!"));
 })
 
 
