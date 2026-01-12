@@ -46,8 +46,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const sendOtpToEmail = async (email: string) => {
   const otp = generateOtp();
   const hashedOtp = await hashOtp(otp);
+  const OTP_EXPIRY_MINUTES = 10;
+  const codeExpiry = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
 
-  const response = await pool.query('UPDATE agency SET verify_code = $1 WHERE email = $2 RETURNING *', [hashedOtp, email]);
+  const response = await pool.query('UPDATE agency SET verify_code = $1,code_expiry = $2 WHERE email = $3 RETURNING *', [hashedOtp, codeExpiry, email]);
 
   await resend.emails.send({
     from: "Acme <onboarding@resend.dev>",
@@ -103,17 +105,18 @@ export const registerAgency = asyncHandler(async (req, res) => {
 export const verifyCode = asyncHandler(async (req, res) => {
   const { Code, email } = req.body;
 
+
   if (!Code || !email) {
-    throw new ApiError(400, "Code and email are both required!")
+    throw new ApiError(400, "Code and email and are both required!")
   }
 
-  const response = await pool.query('SELECT verify_code FROM agency WHERE email = $1', [email]);
+  const response = await pool.query('SELECT verify_code,is_verified FROM agency WHERE email = $1 AND code_expiry > NOW()', [email]);
+
+  if (!response.rowCount) throw new ApiError(400, "OTP expired or email not found")
+
+  if (response.rows[0].is_verified) throw new ApiError(400, "Agency already verified");
+
   const hashedOtp = response.rows[0].verify_code;
-  console.log("2hashedOtp is : ", hashedOtp)
-
-  if (!hashedOtp) {
-    throw new ApiError(404, "email not found");
-  }
 
   const match = await bcrypt.compare(Code, hashedOtp);
 
@@ -126,4 +129,16 @@ export const verifyCode = asyncHandler(async (req, res) => {
   return res.json(new ApiResponse(200, match, "verified successfully!"));
 })
 
+export const renewCode = asyncHandler(async (req, res) => {
+  console.log("hey i am a fucking retard!")
 
+  const { email } = req.body;
+
+  if (!email) throw new ApiError(400, "email is required!")
+
+  const response = await sendOtpToEmail(email);
+
+  if (!response) throw new ApiError(500, "error while generating and sending OTP")
+
+  return res.json(new ApiResponse(201, "otp successfully renewed"))
+});
