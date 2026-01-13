@@ -56,6 +56,11 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     const agencyId = agency.rows[0].id;
     const hashedPassword = agency.rows[0].password;
 
+    const find = await pool.query('SELECT EXISTS (SELECT 1 FROM admin WHERE agency_id = $1 AND email = $2)', [agencyId, email]);
+
+
+    if (find.rows[0].exists) throw new ApiError(409, "admin already exists with the email")
+
     const check = await bcrypt.compare(agency_password, hashedPassword);
 
     if (!check) throw new ApiError(400, "wrong password");
