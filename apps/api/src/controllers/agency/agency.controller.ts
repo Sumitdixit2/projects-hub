@@ -1,7 +1,6 @@
 import { pool } from '../../../postgress-config';
 import bcrypt from "bcrypt"
 import ApiError from '../../utils/apiError';
-import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken';
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 import { Resend } from "resend";
@@ -10,25 +9,6 @@ import { generateOtp } from '../../utils/otpGenerator';
 import { hashOtp } from '../../utils/hashOtp';
 
 
-
-const generateAccessAndRefreshToken = async (userId: string) => {
-  const response = await pool.query('SELECT id,name,email FROM agency WHERE id = $1', [userId]);
-  const user = response.rows[0];
-
-  if (!user) {
-    throw new ApiError(404, "Agency not found");
-  }
-
-  const AccessToken = generateAccessToken(user);
-  const RefreshToken = generateRefreshToken(user);
-  const hashToken = await bcrypt.hash(RefreshToken, 10);
-
-  await pool.query('UPDATE agency SET  refreshtoken = $1 WHERE id = $2 RETURNING *', [hashToken, userId]);
-
-
-  return { AccessToken, RefreshToken };
-
-}
 
 export const getAgencies = asyncHandler(async (req, res) => {
 
@@ -130,7 +110,6 @@ export const verifyCode = asyncHandler(async (req, res) => {
 })
 
 export const renewCode = asyncHandler(async (req, res) => {
-  console.log("hey i am a fucking retard!")
 
   const { email } = req.body;
 
@@ -142,3 +121,20 @@ export const renewCode = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(201, "otp successfully renewed"))
 });
+
+export const resetPassword = asyncHandler(async (req, res) => {
+
+  const { email, newPassword } = req.body;
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+
+  if (!email || !newPassword) throw new ApiError(400, "Email and password both are required!");
+
+  const response = await pool.query('UPDATE agency SET password = $1 WHERE email = $2', [hashedPassword, email])
+
+  if (!response.rowCount) throw new ApiError(500, "password reset failed");
+
+  return res.json(new ApiResponse(201, response.rows[0], "password successfully changed"))
+
+})
