@@ -5,22 +5,29 @@ import bcrypt from "bcrypt"
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 
-const generateAccessAndRefreshToken = async (userId: string) => {
-  const response = await pool.query('SELECT id,name,email FROM agency WHERE id = $1', [userId]);
+enum user {
+  admin = 0,
+  client
+}
+
+const generateAccessAndRefreshToken = async (userId: string, userType: user) => {
+  const response = await pool.query('SELECT id,name,email FROM $1 WHERE id = $2', [userType, userId]);
   const user = response.rows[0];
 
   if (!user) {
-    throw new ApiError(404, "Agency not found");
+    throw new ApiError(400, "user not found");
   }
 
   const AccessToken = generateAccessToken(user);
   const RefreshToken = generateRefreshToken(user);
   const hashToken = await bcrypt.hash(RefreshToken, 10);
 
-  await pool.query('UPDATE agency SET  refreshtoken = $1 WHERE id = $2 RETURNING *', [hashToken, userId]);
+  const result = await pool.query('UPDATE $1 SET refreshtoken = $2 WHERE id = $3 ', [userType, hashToken, userId]);
+
+  if (!result.rowCount) throw new ApiError(500, "error while inserting refreshtoken")
 
 
-  return { AccessToken, RefreshToken };
+  return { AccessToken, RefreshToken, user };
 
 }
 
@@ -43,7 +50,16 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
     if (!response.rowCount) throw new ApiError(500, "Error , failed to insert admin");
 
-    return res.json(new ApiResponse(201, response.rows[0], "admin created!"))
+    const id = response.rows[0].id;
+
+    const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(id, 0);
+
+    const options = {
+      httpOnly: true,
+      secure: true
+    };
+
+    return res.json(new ApiResponse(201, user, "admin logged in successfully")).cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options);
 
   }
 
@@ -61,7 +77,17 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
     if (!response.rowCount) throw new ApiError(500, "error while inserting admin");
 
-    return res.json(new ApiResponse(201, response.rows[0], "admin inserted successfully"));
+    const id = response.rows[0].id;
+
+    const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(id, 0);
+
+    const options = {
+      httpOnly: true,
+      secure: true
+    };
+
+    return res.json(new ApiResponse(201, user, "admin logged in successfully")).cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options);
+
   }
 })
 
