@@ -12,11 +12,11 @@ import { hashOtp } from '../../utils/hashOtp';
 
 export const getAgencies = asyncHandler(async (req, res) => {
 
-  const response = await pool.query("SELECT name FROM agency");
+  const response = await pool.query("SELECT name , id FROM agency");
 
   let result = [];
   result = response.rows;
-  return res.json(new ApiResponse(200, result, "fetched all agencies name"))
+  return res.json(new ApiResponse(200, result, "fetched all agencies name and id"))
 
 })
 

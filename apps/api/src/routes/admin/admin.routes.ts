@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { loginAdmin } from "../../controllers/admin/admin.controller";
+import { createAdminKey, loginAdmin } from "../../controllers/admin/admin.controller";
 
 const adminRouter = Router();
 
 adminRouter.route('/login').post(loginAdmin);
+adminRouter.route('/generateAdminKey').post(createAdminKey);
+
 
 export default adminRouter;
