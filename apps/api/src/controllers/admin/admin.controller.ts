@@ -125,7 +125,9 @@ const createKey = (email: string, role: string) => {
 
 export const createAdminKey = asyncHandler(async (req, res) => {
 
-  const user = req.user;
+  const fish = req as any;
+
+  const user = fish.user;
   const { role, email } = req.body;
 
   if (user.admin_role != 'owner') throw new ApiError(400, "don't have the authroity perform this operation");
@@ -144,5 +146,4 @@ export const createAdminKey = asyncHandler(async (req, res) => {
   return res.json(new ApiResponse(201, result, "key generated successfully!"));
 
 });
-
 
