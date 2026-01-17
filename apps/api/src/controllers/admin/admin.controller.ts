@@ -5,6 +5,7 @@ import bcrypt from "bcrypt"
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 import crypto from "crypto";
+import { agency } from '../../types/agency.type';
 
 enum userType {
   admin = "admin",
@@ -18,7 +19,7 @@ enum role {
 }
 
 const generateAccessAndRefreshToken = async (userId: string) => {
-  const response = await pool.query('SELECT id,fullname,email,agency_id FROM admin WHERE id = $1', [userId]);
+  const response = await pool.query('SELECT id,fullname,email,agency_id,admin_role FROM admin WHERE id = $1', [userId]);
   const user = response.rows[0];
 
   if (!user) {
@@ -126,6 +127,7 @@ const createKey = (email: string, role: string) => {
 export const createAdminKey = asyncHandler(async (req, res) => {
 
   const fish = req as any;
+  console.log("req is : ", fish.user);
 
   const user = fish.user;
   const { role, email } = req.body;
