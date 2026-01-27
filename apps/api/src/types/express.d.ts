@@ -1,8 +1,9 @@
-import "express";
+import { SendUser } from "../types/user";
 
-declare module "express-serve-static-core" {
-  interface Request {
-    email?: string;
+declare global {
+  namespace Express {
+    interface Request {
+      user?: SendUser;
+    }
   }
 }
-

@@ -6,6 +6,8 @@ import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 import crypto from "crypto";
 import { agency } from '../../types/agency.type';
+import {Request , Response} from "express";
+import {UserForReq} from "../../types/user.types";
 
 enum userType {
   admin = "admin",
@@ -113,6 +115,8 @@ export const loginAdmin = asyncHandler(async (req, res) => {
   }
 });
 
+export const refreshToken = asyncHandler(async (req,res))
+
 const createKey = (email: string, role: string) => {
 
   const key = crypto
@@ -124,13 +128,12 @@ const createKey = (email: string, role: string) => {
   return key;
 }
 
-export const createAdminKey = asyncHandler(async (req, res) => {
 
-  const fish = req as any;
-  console.log("req is : ", fish.user);
+export const createAdminKey = asyncHandler(async (req:any, res:Response) => {
 
-  const user = fish.user;
   const { role, email } = req.body;
+  const user = (req as any).user;
+  console.log("my user is : ",user);
 
   if (user.admin_role != 'owner') throw new ApiError(400, "don't have the authroity perform this operation");
 

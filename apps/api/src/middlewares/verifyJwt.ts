@@ -5,7 +5,8 @@ import { ACCESS_TOKEN_SECRET } from "../types/env.config";
 import { pool } from "../../postgress-config";
 import { agency } from "../types/agency.type";
 import { AccessTokenJwtPayload } from "../types/payload.type";
-
+import {SendUser} from "../types/user.type";
+ 
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
@@ -26,7 +27,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       throw new ApiError(401, "Invalid Access Token");
     }
 
-    const user = response.rows[0];
+    const user:SendUser = response.rows[0];
 
     (req as any).user = user;
     next();
@@ -34,3 +35,4 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     throw new ApiError(401, error?.message || "Invalid Access Token");
   }
 })
+
