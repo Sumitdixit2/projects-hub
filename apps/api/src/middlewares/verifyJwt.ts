@@ -19,16 +19,21 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     }
 
     const decodedToken = jwt.verify(token, ACCESS_TOKEN_SECRET) as AccessTokenJwtPayload;
+    console.log("decodedToken: ",decodedToken);
     const userId = decodedToken.id;
+    console.log("user id: ",userId);
 
     const response = await pool.query('SELECT id , agency_id , fullname , admin_role , email FROM admin WHERE id = $1 AND NOW() > token_expiry', [userId]);
 
-    if (!response) {
-      throw new ApiError(401, "Invalid Access Token");
+    if (!response.rowCount) {
+      throw new ApiError(401, "Invalid Access Token or token expired");
     }
 
-    const user:SendUser = response.rows[0];
+    console.log("incoming response is :",response);
 
+    const user = response.rows[0];
+
+    console.log("user for jwt is :", user);
     (req as any).user = user;
     next();
   } catch (error: any) {

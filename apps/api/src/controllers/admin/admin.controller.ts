@@ -8,6 +8,9 @@ import crypto from "crypto";
 import { agency } from '../../types/agency.type';
 import {Request , Response} from "express";
 import {UserForReq} from "../../types/user.types";
+import jwt from "jsonwebtoken";
+import { AccessTokenJwtPayload } from "../../types/payload.type";
+import {REFRESH_TOKEN_SECRET} from "../../types/env.config";
 
 enum userType {
   admin = "admin",
@@ -34,7 +37,6 @@ const generateAccessAndRefreshToken = async (userId: string) => {
   const refreshTokenExpiry = new Date(
     Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
   );
-
   const result = await pool.query('UPDATE admin SET refreshtoken = $1 , token_expiry = $2 WHERE id = $3 ', [hashToken, refreshTokenExpiry, userId]);
 
   if (!result.rowCount) throw new ApiError(500, "error while inserting refreshtoken")
@@ -110,12 +112,36 @@ export const loginAdmin = asyncHandler(async (req, res) => {
       secure: true
     };
 
-    return res.json(new ApiResponse(201, user, "admin logged in successfully")).cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options);
-
+    return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(201, user, "token refreshed successfully"));
   }
 });
 
-export const refreshToken = asyncHandler(async (req,res))
+export const refreshAcessToken = asyncHandler(async (req,res) => {
+  
+  const incomingToken = req.body.refreshToken || req.cookies.refreshToken;
+
+  if (!incomingToken) throw new ApiError(400 , "no token received!");
+  
+  const decodeToken = jwt.verify(incomingToken,REFRESH_TOKEN_SECRET) as AccessTokenJwtPayload;
+
+
+  const findUser = await pool.query('SELECT refreshtoken FROM agency WHERE id = $1)',[decodeToken.id]);
+
+  if(!findUser.rows[0].exists) throw new ApiError(400 , "No user found for the token being provided"); 
+
+  const refreshToken = findUser.rows[0].refreshtoken;
+
+  if(refreshToken != decodeToken) throw new ApiError(400, "Invalid RefreshToken");
+
+  const {AccessToken , RefreshToken, user} = await generateAccessAndRefreshToken(decodeToken.id);
+
+  const options = {
+      httpOnly: true,
+      secure: true
+  };
+
+  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(201, user, "token refreshed successfully"));
+})
 
 const createKey = (email: string, role: string) => {
 
@@ -129,10 +155,11 @@ const createKey = (email: string, role: string) => {
 }
 
 
-export const createAdminKey = asyncHandler(async (req:any, res:Response) => {
+export const createAdminKey = asyncHandler(async (req:Request, res:Response) => {
 
   const { role, email } = req.body;
   const user = (req as any).user;
+  
   console.log("my user is : ",user);
 
   if (user.admin_role != 'owner') throw new ApiError(400, "don't have the authroity perform this operation");
