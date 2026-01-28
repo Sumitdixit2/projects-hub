@@ -12,7 +12,7 @@ import { hashOtp } from '../../utils/hashOtp';
 
 export const getAgencies = asyncHandler(async (req, res) => {
 
-  const response = await pool.query("SELECT name , id FROM agency");
+  const response = await pool.query("SELECT name , id FROM agency WHERE is_verified = true");
 
   let result = [];
   result = response.rows;

@@ -23,7 +23,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     const userId = decodedToken.id;
     console.log("user id: ",userId);
 
-    const response = await pool.query('SELECT id , agency_id , fullname , admin_role , email FROM admin WHERE id = $1 AND NOW() > token_expiry', [userId]);
+    const response = await pool.query('SELECT id , agency_id , fullname , admin_role , email FROM admin WHERE id = $1 AND NOW() < token_expiry', [userId]);
 
     if (!response.rowCount) {
       throw new ApiError(401, "Invalid Access Token or token expired");
