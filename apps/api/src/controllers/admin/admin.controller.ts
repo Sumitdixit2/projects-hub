@@ -93,15 +93,17 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
     if (!email || !inviteKey || !password) throw new ApiError(400, "email , password , inviteKey are required");
 
-    const find = await pool.query('SELECT agency_id FROM key WHERE key_hash = $1 AND email = $2)', [inviteKey, email]);
+    const find = await pool.query('SELECT agency_id FROM key WHERE key_hash = $1 AND email = $2 AND NOW() < key_expiry AND is_used = false AND agency_id = $3', [inviteKey, email , agency_id]);
 
-    if (!find.rowCount) throw new ApiError(400, "invalid email or inviteKey");
+    if (!find.rowCount) throw new ApiError(400, "invalid email,inviteKey,used key or key expired");
 
     const agencyId = find.rows[0].agency_id;
 
     const response = await pool.query('INSERT INTO admin(agency_id , fullname , admin_role , password , email) VALUES ($1 , $2 , $3 , $4 ,$5) RETURNING *', [agencyId, fullname, admin_role, password, email]);
 
     if (!response.rowCount) throw new ApiError(500, "error while inserting admin");
+
+    await pool.query('UPDATE key SET is_used = true WHERE key_hash = $1 AND email = $2 AND NOW() < key_expiry RETURNING *', [inviteKey , email]);
 
     const id = response.rows[0].id;
 
@@ -112,9 +114,10 @@ export const loginAdmin = asyncHandler(async (req, res) => {
       secure: true
     };
 
-    return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(201, user, "token refreshed successfully"));
+    return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(201, user, "login successful"));
   }
 });
+
 
 export const refreshAcessToken = asyncHandler(async (req,res) => {
   
