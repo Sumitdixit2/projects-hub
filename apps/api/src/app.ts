@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import agencyRouter from "./routes/agency/agency.routes";
 import adminRouter from "./routes/admin/admin.routes";
+import tokenRouter from "./routes/token/token.route"
 
 const app = express();
 
@@ -21,5 +22,6 @@ app.use(cookieParser());
 
 app.use('/api/v1/agency', agencyRouter)
 app.use('/api/v1/admin', adminRouter)
+app.use('/api/v1/token',tokenRouter)
 
 export default app;

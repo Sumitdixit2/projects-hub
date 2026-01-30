@@ -1,0 +1,36 @@
+import {generateAccessAndRefreshToken} from '../admin/admin.controller';
+import jwt from "jsonwebtoken";
+import { AccessTokenJwtPayload } from "../../types/payload.type";
+import {REFRESH_TOKEN_SECRET} from "../../types/env.config";
+import { pool } from '../../../postgress-config';
+import asyncHandler from '../../utils/asyncHandler';
+import { ApiResponse } from '../../utils/apiResponse';
+import ApiError from '../../utils/apiError';
+
+export const refreshAcessToken = asyncHandler(async (req,res) => {
+  
+  const incomingToken = req.body.refreshToken || req.cookies.refreshToken;
+
+  if (!incomingToken) throw new ApiError(400 , "no token received!");
+  
+  const decodeToken = jwt.verify(incomingToken,REFRESH_TOKEN_SECRET) as AccessTokenJwtPayload;
+
+  const findUser = await pool.query('SELECT refreshtoken FROM agency WHERE id = $1)',[decodeToken.id]);
+
+  if(!findUser.rows[0].exists) throw new ApiError(400 , "No user found for the token being provided"); 
+
+  const refreshToken = findUser.rows[0].refreshtoken;
+
+  if(refreshToken != decodeToken) throw new ApiError(400, "Invalid RefreshToken");
+
+  const {AccessToken , RefreshToken, user} = await generateAccessAndRefreshToken(decodeToken.id);
+
+  const options = {
+      httpOnly: true,
+      secure: true
+  };
+
+  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(201, user, "token refreshed successfully"));
+})
+
+

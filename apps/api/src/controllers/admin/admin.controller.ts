@@ -23,7 +23,7 @@ enum role {
   developer = "developer"
 }
 
-const generateAccessAndRefreshToken = async (userId: string) => {
+export const generateAccessAndRefreshToken = async (userId: string) => {
   const response = await pool.query('SELECT id,fullname,email,agency_id,admin_role FROM admin WHERE id = $1', [userId]);
   const user = response.rows[0];
 
@@ -119,34 +119,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 });
 
 
-export const refreshAcessToken = asyncHandler(async (req,res) => {
-  
-  const incomingToken = req.body.refreshToken || req.cookies.refreshToken;
-
-  if (!incomingToken) throw new ApiError(400 , "no token received!");
-  
-  const decodeToken = jwt.verify(incomingToken,REFRESH_TOKEN_SECRET) as AccessTokenJwtPayload;
-
-
-  const findUser = await pool.query('SELECT refreshtoken FROM agency WHERE id = $1)',[decodeToken.id]);
-
-  if(!findUser.rows[0].exists) throw new ApiError(400 , "No user found for the token being provided"); 
-
-  const refreshToken = findUser.rows[0].refreshtoken;
-
-  if(refreshToken != decodeToken) throw new ApiError(400, "Invalid RefreshToken");
-
-  const {AccessToken , RefreshToken, user} = await generateAccessAndRefreshToken(decodeToken.id);
-
-  const options = {
-      httpOnly: true,
-      secure: true
-  };
-
-  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(201, user, "token refreshed successfully"));
-})
-
-const createKey = (email: string, role: string) => {
+const createKey = (email: string, role: string = "Client") => {
 
   const key = crypto
     .createHash("sha256")
@@ -176,9 +149,36 @@ export const createAdminKey = asyncHandler(async (req:Request, res:Response) => 
   const keyExpiry = new Date(Date.now() + KEY_EXPIRY_MINUTES * 60 * 1000);
 
   const response = await pool.query('INSERT INTO key(key_hash , key_expiry , email , agency_id) VALUES ($1 , $2 ,$3 , $4) RETURNING *', [key, keyExpiry, email, user.agency_id]);
+
+  if(response.rows[0].exits) throw new ApiError(500 , "Failed to insert key in the database");
   const result = response.rows[0];
 
   return res.json(new ApiResponse(201, result, "key generated successfully!"));
 
 });
 
+export const createClientKey = asyncHandler(async (req,res) => {
+
+  const { email } = req.body;
+  const user = (req as any).user;
+  
+  console.log("my user is : ",user);
+
+  if (!user.admin_role) throw new ApiError(400, "don't have the authroity perform this operation");
+
+  if (!email) throw new ApiError(400, "email is required");
+
+  const key = createKey(email);
+
+  const KEY_EXPIRY_MINUTES = 10;
+  const keyExpiry = new Date(Date.now() + KEY_EXPIRY_MINUTES * 60 * 1000);
+
+  const response = await pool.query('INSERT INTO key(key_hash , key_expiry , email , agency_id) VALUES ($1 , $2 ,$3 , $4) RETURNING *', [key, keyExpiry, email, user.agency_id]);
+  if(response.rows[0].exits) throw new ApiError(500 , "Failed to insert key in the database");
+
+  const result = response.rows[0];
+
+  return res.json(new ApiResponse(201, result, "key generated successfully!"));
+
+
+})
