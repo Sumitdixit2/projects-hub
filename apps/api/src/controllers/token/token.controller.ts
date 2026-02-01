@@ -7,7 +7,7 @@ import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 import ApiError from '../../utils/apiError';
 
-export const refreshAcessToken = asyncHandler(async (req,res) => {
+export const refreshAccessToken = asyncHandler(async (req,res) => {
   
   const incomingToken = req.body.refreshToken || req.cookies.refreshToken;
 
@@ -15,7 +15,7 @@ export const refreshAcessToken = asyncHandler(async (req,res) => {
   
   const decodeToken = jwt.verify(incomingToken,REFRESH_TOKEN_SECRET) as AccessTokenJwtPayload;
 
-  const findUser = await pool.query('SELECT refreshtoken FROM agency WHERE id = $1)',[decodeToken.id]);
+  const findUser = await pool.query('SELECT refreshtoken FROM admin WHERE id = $1',[decodeToken.id]);
 
   if(!findUser.rows[0].exists) throw new ApiError(400 , "No user found for the token being provided"); 
 

@@ -18,6 +18,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       throw new ApiError(401, "Access Denied! No token provided");
     }
 
+    console.log("token is :",token);
     const decodedToken = jwt.verify(token, ACCESS_TOKEN_SECRET) as AccessTokenJwtPayload;
     console.log("decodedToken: ",decodedToken);
     const userId = decodedToken.id;
