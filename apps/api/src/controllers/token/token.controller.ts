@@ -1,33 +1,40 @@
-import {generateAccessAndRefreshToken} from '../admin/admin.controller';
+import { generateAccessAndRefreshToken } from '../admin/admin.controller';
 import jwt from "jsonwebtoken";
 import { AccessTokenJwtPayload } from "../../types/payload.type";
-import {REFRESH_TOKEN_SECRET} from "../../types/env.config";
+import { REFRESH_TOKEN_SECRET } from "../../types/env.config";
 import { pool } from '../../../postgress-config';
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 import ApiError from '../../utils/apiError';
+import bcrypt from "bcrypt";
 
-export const refreshAccessToken = asyncHandler(async (req,res) => {
-  
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+
   const incomingToken = req.body.refreshToken || req.cookies.refreshToken;
 
-  if (!incomingToken) throw new ApiError(400 , "no token received!");
-  
-  const decodeToken = jwt.verify(incomingToken,REFRESH_TOKEN_SECRET) as AccessTokenJwtPayload;
+  if (!incomingToken) throw new ApiError(400, "no token received!");
+  console.log('incomingToken : ', incomingToken);
 
-  const findUser = await pool.query('SELECT refreshtoken FROM admin WHERE id = $1',[decodeToken.id]);
+  const decodeToken = jwt.verify(incomingToken, REFRESH_TOKEN_SECRET) as AccessTokenJwtPayload;
+  console.log("id: ", decodeToken.id);
 
-  if(!findUser.rows[0].exists) throw new ApiError(400 , "No user found for the token being provided"); 
+  const findUser = await pool.query('SELECT refreshtoken FROM admin WHERE id = $1', [decodeToken.id]);
+  console.log("User is : ", findUser);
+
+  if (findUser.rowCount === 0) throw new ApiError(400, "No user found for the token being provided");
 
   const refreshToken = findUser.rows[0].refreshtoken;
+  console.log('refresh toke is : ', refreshToken);
 
-  if(refreshToken != decodeToken) throw new ApiError(400, "Invalid RefreshToken");
+  const result = await bcrypt.compare(incomingToken, refreshToken);
 
-  const {AccessToken , RefreshToken, user} = await generateAccessAndRefreshToken(decodeToken.id);
+  if (!result) throw new ApiError(400, "Invalid RefreshToken");
+
+  const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(decodeToken.id);
 
   const options = {
-      httpOnly: true,
-      secure: true
+    httpOnly: true,
+    secure: true
   };
 
   return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(201, user, "token refreshed successfully"));
