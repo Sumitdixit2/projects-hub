@@ -1,14 +1,25 @@
 import ApiError from "../../utils/apiError";
 import asyncHandler from "../../utils/asyncHandler"
 import { pool } from "../../../postgress-config";
+import { clientTypes } from "../../types/client.type";
+import { ApiResponse } from "../../utils/apiResponse";
 
-export const clientLogin = asyncHandler(async (req, res) => {
+export const clientSignUp = asyncHandler(async (req, res) => {
 
-  const { email, invitekey, fullname, password } = req.body;
+  const { agency_id, email, invitekey, name, password }: clientTypes = req.body;
+  if (!agency_id || !email || !invitekey || !name || !password) throw new ApiError(400, "Enter all the required fields");
 
-  if (!email || !invitekey || !fullname || !password) throw new ApiError(400, "Enter all the required fields");
+  const findUser = await pool.query('SELECT EXISTS (SELECT 1 FROM client WHERE email = $1 AND = $2)', [email, agency_id]);
 
-  const findUser = await pool.query('SELECT EXISTS (SELECT 1 FROM agency WHERE email = $1', [email]);
+  if (findUser.rows[0].exists) throw new ApiError(400, "client already exists with this email");
 
-  if (findUser.rows[0].exists) throw new ApiError(400,)
+  const checkKey = await pool.query('SELECT EXISTS (SELECT 1 FROM key WHERE key_hash = $1 AND key_expiry > NOW() AND email = $2 AND is_used = $3)');
+
+  if (!checkKey.rows[0].exists) throw new ApiError(400, "key not valid or key expired or key already used or not the correct email");
+
+  const result = await pool.query('INSERT INTO client (name , email ,  password , agency_id) VALUES ($1 , $2 , $3 , $4) RETURNING *', [name, email, password, agency_id]);
+
+  if (!result.rowCount) throw new ApiError(500, "problem while inserting client");
+
+  return res.json(new ApiResponse(201, result, "client successfully created!"));
 })
