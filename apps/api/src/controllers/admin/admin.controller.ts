@@ -6,11 +6,11 @@ import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 import crypto from "crypto";
 import { agency } from '../../types/agency.type';
-import {Request , Response} from "express";
-import {UserForReq} from "../../types/user.types";
+import { Request, Response } from "express";
+import { UserForReq } from "../../types/user.types";
 import jwt from "jsonwebtoken";
 import { AccessTokenJwtPayload } from "../../types/payload.type";
-import {REFRESH_TOKEN_SECRET} from "../../types/env.config";
+import { REFRESH_TOKEN_SECRET } from "../../types/env.config";
 
 enum userType {
   admin = "admin",
@@ -46,7 +46,7 @@ export const generateAccessAndRefreshToken = async (userId: string) => {
 
 }
 
-export const loginAdmin = asyncHandler(async (req, res) => {
+export const signUp = asyncHandler(async (req, res) => {
 
   const { agency_id, fullname, admin_role, agency_password, agency_email, email, inviteKey, password } = req.body;
 
@@ -93,7 +93,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
     if (!email || !inviteKey || !password) throw new ApiError(400, "email , password , inviteKey are required");
 
-    const find = await pool.query('SELECT agency_id FROM key WHERE key_hash = $1 AND email = $2 AND NOW() < key_expiry AND is_used = false AND agency_id = $3', [inviteKey, email , agency_id]);
+    const find = await pool.query('SELECT agency_id FROM key WHERE key_hash = $1 AND email = $2 AND NOW() < key_expiry AND is_used = false AND agency_id = $3', [inviteKey, email, agency_id]);
 
     if (!find.rowCount) throw new ApiError(400, "invalid email,inviteKey,used key or key expired");
 
@@ -103,7 +103,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
     if (!response.rowCount) throw new ApiError(500, "error while inserting admin");
 
-    await pool.query('UPDATE key SET is_used = true WHERE key_hash = $1 AND email = $2 AND NOW() < key_expiry RETURNING *', [inviteKey , email]);
+    await pool.query('UPDATE key SET is_used = true WHERE key_hash = $1 AND email = $2 AND NOW() < key_expiry RETURNING *', [inviteKey, email]);
 
     const id = response.rows[0].id;
 
@@ -131,12 +131,12 @@ const createKey = (email: string, role: string = "Client") => {
 }
 
 
-export const createAdminKey = asyncHandler(async (req:Request, res:Response) => {
+export const createAdminKey = asyncHandler(async (req: Request, res: Response) => {
 
   const { role, email } = req.body;
   const user = (req as any).user;
-  
-  console.log("my user is : ",user);
+
+  console.log("my user is : ", user);
 
   if (user.admin_role != 'owner') throw new ApiError(400, "don't have the authroity perform this operation");
 
@@ -150,19 +150,19 @@ export const createAdminKey = asyncHandler(async (req:Request, res:Response) => 
 
   const response = await pool.query('INSERT INTO key(key_hash , key_expiry , email , agency_id) VALUES ($1 , $2 ,$3 , $4) RETURNING *', [key, keyExpiry, email, user.agency_id]);
 
-  if(response.rows[0].exits) throw new ApiError(500 , "Failed to insert key in the database");
+  if (response.rows[0].exits) throw new ApiError(500, "Failed to insert key in the database");
   const result = response.rows[0];
 
   return res.json(new ApiResponse(201, result, "key generated successfully!"));
 
 });
 
-export const createClientKey = asyncHandler(async (req,res) => {
+export const createClientKey = asyncHandler(async (req, res) => {
 
   const { email } = req.body;
   const user = (req as any).user;
-  
-  console.log("my user is : ",user);
+
+  console.log("my user is : ", user);
 
   if (!user.admin_role) throw new ApiError(400, "don't have the authroity perform this operation");
 
@@ -174,7 +174,7 @@ export const createClientKey = asyncHandler(async (req,res) => {
   const keyExpiry = new Date(Date.now() + KEY_EXPIRY_MINUTES * 60 * 1000);
 
   const response = await pool.query('INSERT INTO key(key_hash , key_expiry , email , agency_id) VALUES ($1 , $2 ,$3 , $4) RETURNING *', [key, keyExpiry, email, user.agency_id]);
-  if(response.rows[0].exits) throw new ApiError(500 , "Failed to insert key in the database");
+  if (response.rows[0].exits) throw new ApiError(500, "Failed to insert key in the database");
 
   const result = response.rows[0];
 
