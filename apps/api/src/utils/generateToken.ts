@@ -1,39 +1,38 @@
 import JsonWebToken from 'jsonwebtoken'
-import { agency } from '../types/agency.type';
 import { ACCESS_TOKEN_EXPIRY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_EXPIRY, REFRESH_TOKEN_SECRET } from '../types/env.config';
-import userType from "../controllers/admin/admin.controller";
+import { JwtPayloadType } from '../types/payload.type';
+import { userType } from '../controllers/admin/admin.controller';
 
-export const generateAccessToken = (user: agency) => {
-  const { id, name, email, agency_id, admin_role } = user;
+export const generateAccessToken = (user: JwtPayloadType, user_type: userType) => {
+  const { id, agency_id, admin_role }: JwtPayloadType = user;
 
   return JsonWebToken.sign(
     {
-      id,
-      email,
-      name,
+      sub: id,
+      user_type,
       agency_id,
-      admin_role,
+      role: admin_role || null,
     },
     ACCESS_TOKEN_SECRET,
     { expiresIn: ACCESS_TOKEN_EXPIRY },
   );
 };
 
-export const generateRefreshToken = (user: agency) => {
+export const generateRefreshToken = (user: JwtPayloadType, user_type: userType) => {
 
-  const { id, name, email, agency_id, admin_role } = user;
+  const { id, agency_id, admin_role }: JwtPayloadType = user;
 
   return JsonWebToken.sign(
     {
-      id,
-      email,
-      name,
+      sub: id,
+      user_type,
       agency_id,
-      admin_role,
+      role: admin_role || null,
     },
     REFRESH_TOKEN_SECRET,
     { expiresIn: REFRESH_TOKEN_EXPIRY },
   );
+
 };
 
 
