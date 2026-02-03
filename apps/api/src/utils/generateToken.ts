@@ -1,6 +1,7 @@
 import JsonWebToken from 'jsonwebtoken'
 import { agency } from '../types/agency.type';
 import { ACCESS_TOKEN_EXPIRY, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_EXPIRY, REFRESH_TOKEN_SECRET } from '../types/env.config';
+import userType from "../controllers/admin/admin.controller";
 
 export const generateAccessToken = (user: agency) => {
   const { id, name, email, agency_id, admin_role } = user;

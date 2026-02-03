@@ -6,6 +6,6 @@ const adminRouter = Router();
 
 adminRouter.route('/signup').post(signUp);
 adminRouter.route('/generateAdminKey').post(verifyJWT, createAdminKey);
-adminRouter.route('/generateClientKey').post(verifyJWT, createAdminKey);
+adminRouter.route('/generateClientKey').post(verifyJWT, createClientKey);
 
 export default adminRouter;

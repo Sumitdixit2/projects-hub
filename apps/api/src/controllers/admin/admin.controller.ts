@@ -12,7 +12,7 @@ import jwt from "jsonwebtoken";
 import { AccessTokenJwtPayload } from "../../types/payload.type";
 import { REFRESH_TOKEN_SECRET } from "../../types/env.config";
 
-enum userType {
+export enum userType {
   admin = "admin",
   client = "client"
 }
@@ -23,9 +23,17 @@ enum role {
   developer = "developer"
 }
 
-export const generateAccessAndRefreshToken = async (userId: string) => {
+export const generateAccessAndRefreshToken = async (userId: string , userType:userType) => {
+
+  if(userType === "admin") {
   const response = await pool.query('SELECT id,fullname,email,agency_id,admin_role FROM admin WHERE id = $1', [userId]);
   const user = response.rows[0];
+  } else if(userType === "client") {
+  const response = await pool.query('SELECT id,fullname,email,agency_id FROM client WHERE id = $1', [userId]);
+  const user = response.rows[0];
+  } else {
+    throw new ApiError(400 , "Enter a valid role");
+  }
 
   if (!user) {
     throw new ApiError(400, "user not found");
@@ -79,14 +87,14 @@ export const signUp = asyncHandler(async (req, res) => {
 
     const id = response.rows[0].id;
 
-    const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(id);
+    // const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(id , "admin");
 
-    const options = {
-      httpOnly: true,
-      secure: true
-    };
+     // const options = {
+      // httpOnly: true,
+      // secure: true
+    // };
 
-    return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(201, user, "admin logged in successfully"));
+    return res.json(new ApiResponse(201, user, "admin created successfully"));
   }
 
   if (admin_role === 'staff' || admin_role === 'developer') {
@@ -107,17 +115,36 @@ export const signUp = asyncHandler(async (req, res) => {
 
     const id = response.rows[0].id;
 
-    const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(id);
-
-    const options = {
-      httpOnly: true,
-      secure: true
-    };
-
-    return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(201, user, "login successful"));
+    return res.json(new ApiResponse(201, user, "login successful"));
   }
 });
 
+export const adminLogin = asyncHandler(async(req,res) => {
+  
+  const {password , email , agencyId , admin_role} = req.body;
+
+  if(!password || !email || !agencyId || !admin_role) throw new ApiError(400 , "Enter all the required fields");
+
+  const check = await pool.query('SELECT password,fullname FROM admin WHERE admin_role = $1 AND email = $2 AND agency_id = $3',[admin_role , email , agency_id]);
+
+  if(!check.rowCount) throw new ApiError(404 ,"no such admin found registered");
+
+  const hashedPassword = check.rows[0].password;
+
+  cosnt verify = await bcrypt.compare(password , hashedPassword );
+
+  if(!verify) throw new ApiError(400 , "enter a valid password");
+
+ const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(id);
+
+     const options = {
+       httpOnly: true,
+       secure: true
+     };
+
+  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken",RefreshToken,options).json(new ApiResponse(200 ,user , "admin logged in successfully" ));
+
+});
 
 const createKey = (email: string, role: string = "Client") => {
 
@@ -125,7 +152,6 @@ const createKey = (email: string, role: string = "Client") => {
     .createHash("sha256")
     .update(email + ":" + role + ":" + Date.now())
     .digest("hex");
-
 
   return key;
 }
@@ -180,5 +206,4 @@ export const createClientKey = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(201, result, "key generated successfully!"));
 
-
-})
+});
