@@ -17,41 +17,45 @@ export enum userType {
   client = "client"
 }
 
-enum role {
+export enum role {
   owner = "owner",
   staff = "staff",
   developer = "developer"
 }
 
-export const generateAccessAndRefreshToken = async (userId: string , userType:userType) => {
-
-  if(userType === "admin") {
-  const response = await pool.query('SELECT id,fullname,email,agency_id,admin_role FROM admin WHERE id = $1', [userId]);
-  const user = response.rows[0];
-  } else if(userType === "client") {
-  const response = await pool.query('SELECT id,fullname,email,agency_id FROM client WHERE id = $1', [userId]);
-  const user = response.rows[0];
-  } else {
-    throw new ApiError(400 , "Enter a valid role");
+const getUser = async (userId: string, userType: userType) => {
+  if (userType === "admin") {
+    const response = await pool.query('SELECT id,agency_id,admin_role FROM admin WHERE id = $1', [userId]);
+    const user = response.rows[0];
+    return user;
   }
 
+  const response = await pool.query('SELECT id,agency_id FROM client WHERE id = $1', [userId]);
+  const user = response.rows[0];
+  return user;
+
+}
+
+export const generateAccessAndRefreshToken = async (userId: string, userType: userType) => {
+
+  if (userType !== "admin" && userType !== "client") throw new ApiError(400, "Enter a valid userType");
+
+  const user = await getUser(userId, userType);
   if (!user) {
     throw new ApiError(400, "user not found");
   }
 
-  const AccessToken = generateAccessToken(user);
-  const RefreshToken = generateRefreshToken(user);
+  const AccessToken = generateAccessToken(user, userType);
+  const RefreshToken = generateRefreshToken(user, userType);
   const hashToken = await bcrypt.hash(RefreshToken, 10);
   const refreshTokenExpiry = new Date(
     Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
   );
   const result = await pool.query('UPDATE admin SET refreshtoken = $1 , token_expiry = $2 WHERE id = $3 ', [hashToken, refreshTokenExpiry, userId]);
 
-  if (!result.rowCount) throw new ApiError(500, "error while inserting refreshtoken")
-
+  if (!result.rowCount) throw new ApiError(500, "error while inserting refreshtoken");
 
   return { AccessToken, RefreshToken, user };
-
 }
 
 export const signUp = asyncHandler(async (req, res) => {
@@ -85,14 +89,7 @@ export const signUp = asyncHandler(async (req, res) => {
 
     if (!response.rowCount) throw new ApiError(500, "Error , failed to insert admin");
 
-    const id = response.rows[0].id;
-
-    // const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(id , "admin");
-
-     // const options = {
-      // httpOnly: true,
-      // secure: true
-    // };
+    const user = response.rows[0];
 
     return res.json(new ApiResponse(201, user, "admin created successfully"));
   }
@@ -113,36 +110,38 @@ export const signUp = asyncHandler(async (req, res) => {
 
     await pool.query('UPDATE key SET is_used = true WHERE key_hash = $1 AND email = $2 AND NOW() < key_expiry RETURNING *', [inviteKey, email]);
 
-    const id = response.rows[0].id;
+    const user = response.rows[0].id;
 
     return res.json(new ApiResponse(201, user, "login successful"));
   }
 });
 
-export const adminLogin = asyncHandler(async(req,res) => {
-  
-  const {password , email , agencyId , admin_role} = req.body;
+export const adminLogin = asyncHandler(async (req, res) => {
 
-  if(!password || !email || !agencyId || !admin_role) throw new ApiError(400 , "Enter all the required fields");
+  const { password, email, agencyId, admin_role } = req.body;
 
-  const check = await pool.query('SELECT password,fullname FROM admin WHERE admin_role = $1 AND email = $2 AND agency_id = $3',[admin_role , email , agency_id]);
+  if (!password || !email || !agencyId || !admin_role) throw new ApiError(400, "Enter all the required fields");
 
-  if(!check.rowCount) throw new ApiError(404 ,"no such admin found registered");
+  const check = await pool.query('SELECT id,password,fullname FROM admin WHERE admin_role = $1 AND email = $2 AND agency_id = $3', [admin_role, email, agencyId]);
+
+  if (!check.rowCount) throw new ApiError(404, "no such admin found registered");
 
   const hashedPassword = check.rows[0].password;
 
-  cosnt verify = await bcrypt.compare(password , hashedPassword );
+  const verify = await bcrypt.compare(password, hashedPassword);
 
-  if(!verify) throw new ApiError(400 , "enter a valid password");
+  if (!verify) throw new ApiError(400, "enter a valid password");
 
- const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(id);
+  const id = check.rows[0].id;
 
-     const options = {
-       httpOnly: true,
-       secure: true
-     };
+  const { AccessToken, RefreshToken } = await generateAccessAndRefreshToken(id, userType.admin);
 
-  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken",RefreshToken,options).json(new ApiResponse(200 ,user , "admin logged in successfully" ));
+  const options = {
+    httpOnly: true,
+    secure: true
+  };
+
+  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(200, "admin logged in successfully"));
 
 });
 

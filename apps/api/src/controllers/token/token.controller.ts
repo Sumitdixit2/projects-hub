@@ -1,4 +1,4 @@
-import { generateAccessAndRefreshToken } from '../admin/admin.controller';
+import { generateAccessAndRefreshToken, userType } from '../admin/admin.controller';
 import jwt from "jsonwebtoken";
 import { AccessTokenJwtPayload } from "../../types/payload.type";
 import { REFRESH_TOKEN_SECRET } from "../../types/env.config";
@@ -11,6 +11,7 @@ import bcrypt from "bcrypt";
 export const refreshAccessToken = asyncHandler(async (req, res) => {
 
   const incomingToken = req.body.refreshToken || req.cookies.refreshToken;
+  const userType: userType = req.body.userType;
 
   if (!incomingToken) throw new ApiError(400, "no token received!");
   console.log('incomingToken : ', incomingToken);
@@ -30,7 +31,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
   if (!result) throw new ApiError(400, "Invalid RefreshToken");
 
-  const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(decodeToken.id);
+  const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(decodeToken.id, userType);
 
   const options = {
     httpOnly: true,
