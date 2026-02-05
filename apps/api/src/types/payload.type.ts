@@ -10,7 +10,5 @@ export interface AccessTokenJwtPayload extends JwtPayload {
 
 export type JwtPayloadType = {
   id: string,
-  agency_id: string,
-  admin_role: role,
   user_type: userType
 }

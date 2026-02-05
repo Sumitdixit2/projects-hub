@@ -85,7 +85,9 @@ export const signUp = asyncHandler(async (req, res) => {
 
     if (!check) throw new ApiError(400, "wrong password");
 
-    const response = await pool.query('INSERT INTO admin(agency_id , fullname , admin_role , password , email) VALUES ($1 , $2 , $3 , $4 ,$5) RETURNING *', [agency_id, fullname, admin_role, password, email]);
+    const myhashedPassword =  await bcrypt.hash(password,10);
+
+    const response = await pool.query('INSERT INTO admin(agency_id , fullname , admin_role , password , email) VALUES ($1 , $2 , $3 , $4 ,$5) RETURNING *', [agency_id, fullname, admin_role, myhashedPassword, email]);
 
     if (!response.rowCount) throw new ApiError(500, "Error , failed to insert admin");
 
@@ -104,7 +106,9 @@ export const signUp = asyncHandler(async (req, res) => {
 
     const agencyId = find.rows[0].agency_id;
 
-    const response = await pool.query('INSERT INTO admin(agency_id , fullname , admin_role , password , email) VALUES ($1 , $2 , $3 , $4 ,$5) RETURNING *', [agencyId, fullname, admin_role, password, email]);
+    const myhashedPassword = await bcrypt.hash(password,10);
+
+    const response = await pool.query('INSERT INTO admin(agency_id , fullname , admin_role , password , email) VALUES ($1 , $2 , $3 , $4 ,$5) RETURNING *', [agencyId, fullname, admin_role, myhashedPassword, email]);
 
     if (!response.rowCount) throw new ApiError(500, "error while inserting admin");
 

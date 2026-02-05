@@ -3,10 +3,20 @@ import asyncHandler from "../utils/asyncHandler";
 import jwt from "jsonwebtoken"
 import { ACCESS_TOKEN_SECRET } from "../types/env.config";
 import { pool } from "../../postgress-config";
-import { agency } from "../types/agency.type";
 import { AccessTokenJwtPayload } from "../types/payload.type";
-import {SendUser} from "../types/user.type";
+import { userType } from "../controllers/admin/admin.controller";
  
+
+const fetchUser = async(userId: string,userType:userType) => {
+
+  if(userType === "admin") {
+    const response = await pool.query('SELECT id , agency_id , fullname , admin_role , email FROM admin WHERE id = $1 AND NOW() < token_expiry', [userId]);
+    return response;
+  }    
+
+  const response = await pool.query('SELECT id , agency_id , fullname , email FROM client WHERE id = $1 AND NOW() < token_expiry', [userId]);
+  return response;
+}
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
@@ -20,11 +30,18 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     console.log("token is :",token);
     const decodedToken = jwt.verify(token, ACCESS_TOKEN_SECRET) as AccessTokenJwtPayload;
+
     console.log("decodedToken: ",decodedToken);
-    const userId = decodedToken.id;
+    const userId = decodedToken.sub;
+
+    if(!userId) throw new ApiError(400 , "invalid token");
+
+    const userType = decodedToken.user_type;
     console.log("user id: ",userId);
 
-    const response = await pool.query('SELECT id , agency_id , fullname , admin_role , email FROM admin WHERE id = $1 AND NOW() < token_expiry', [userId]);
+    const response = await fetchUser(userId,userType);
+
+    if(!response) throw new ApiError(500,"Error while fetching user data");
 
     if (!response.rowCount) {
       throw new ApiError(401, "Invalid Access Token or token expired");
@@ -36,6 +53,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     console.log("user for jwt is :", user);
     (req as any).user = user;
+    (req as any).userType = userType;
     next();
   } catch (error: any) {
     throw new ApiError(401, error?.message || "Invalid Access Token");
