@@ -11,27 +11,30 @@ import bcrypt from "bcrypt";
 export const refreshAccessToken = asyncHandler(async (req, res) => {
 
   const incomingToken = req.body.refreshToken || req.cookies.refreshToken;
-  const userType: userType = req.body.userType;
 
   if (!incomingToken) throw new ApiError(400, "no token received!");
   console.log('incomingToken : ', incomingToken);
 
   const decodeToken = jwt.verify(incomingToken, REFRESH_TOKEN_SECRET) as AccessTokenJwtPayload;
-  console.log("id: ", decodeToken.id);
 
-  const findUser = await pool.query('SELECT refreshtoken FROM admin WHERE id = $1', [decodeToken.id]);
-  console.log("User is : ", findUser);
+  if (!decodeToken) throw new ApiError(400, "token failed to get verified");
+  if (!decodeToken.sub) throw new ApiError(500, "id is undefined");
+
+  console.log("id: ", decodeToken.sub);
+
+  const findUser = await pool.query('SELECT refreshtoken FROM admin WHERE id = $1', [decodeToken.sub]);
+  console.log("User is : ", findUser.rowCount);
 
   if (findUser.rowCount === 0) throw new ApiError(400, "No user found for the token being provided");
 
   const refreshToken = findUser.rows[0].refreshtoken;
-  console.log('refresh toke is : ', refreshToken);
+  console.log('refresh token is : ', refreshToken);
 
   const result = await bcrypt.compare(incomingToken, refreshToken);
 
   if (!result) throw new ApiError(400, "Invalid RefreshToken");
 
-  const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(decodeToken.id, userType);
+  const { AccessToken, RefreshToken, user } = await generateAccessAndRefreshToken(decodeToken.sub, decodeToken.user_type);
 
   const options = {
     httpOnly: true,

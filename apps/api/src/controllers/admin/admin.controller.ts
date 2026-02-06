@@ -85,7 +85,7 @@ export const signUp = asyncHandler(async (req, res) => {
 
     if (!check) throw new ApiError(400, "wrong password");
 
-    const myhashedPassword =  await bcrypt.hash(password,10);
+    const myhashedPassword = await bcrypt.hash(password, 10);
 
     const response = await pool.query('INSERT INTO admin(agency_id , fullname , admin_role , password , email) VALUES ($1 , $2 , $3 , $4 ,$5) RETURNING *', [agency_id, fullname, admin_role, myhashedPassword, email]);
 
@@ -106,7 +106,7 @@ export const signUp = asyncHandler(async (req, res) => {
 
     const agencyId = find.rows[0].agency_id;
 
-    const myhashedPassword = await bcrypt.hash(password,10);
+    const myhashedPassword = await bcrypt.hash(password, 10);
 
     const response = await pool.query('INSERT INTO admin(agency_id , fullname , admin_role , password , email) VALUES ($1 , $2 , $3 , $4 ,$5) RETURNING *', [agencyId, fullname, admin_role, myhashedPassword, email]);
 
@@ -132,6 +132,8 @@ export const adminLogin = asyncHandler(async (req, res) => {
 
   const hashedPassword = check.rows[0].password;
 
+  console.log("hashedPassword: ", hashedPassword);
+
   const verify = await bcrypt.compare(password, hashedPassword);
 
   if (!verify) throw new ApiError(400, "enter a valid password");
@@ -139,6 +141,7 @@ export const adminLogin = asyncHandler(async (req, res) => {
   const id = check.rows[0].id;
 
   const { AccessToken, RefreshToken } = await generateAccessAndRefreshToken(id, userType.admin);
+  console.log("tokens are : ", AccessToken);
 
   const options = {
     httpOnly: true,
@@ -171,7 +174,9 @@ export const createAdminKey = asyncHandler(async (req: Request, res: Response) =
 
   if (!role || !email) throw new ApiError(400, "email and role are required");
 
-  if (role != 'staff' && role != 'developer') throw new ApiError(400, "enter a  valid admin role");
+  const check = await pool.query("SELECT EXISTS(SELECT 1 FROM key WHERE email = $1)", [email]);
+
+  if (check.rows[0].exits) throw new ApiError(400, " invite key already exists for this email");
 
   const key = createKey(email, role);
   const KEY_EXPIRY_MINUTES = 10;
@@ -192,8 +197,6 @@ export const createClientKey = asyncHandler(async (req, res) => {
   const user = (req as any).user;
 
   console.log("my user is : ", user);
-
-  if (!user.admin_role) throw new ApiError(400, "don't have the authroity perform this operation");
 
   if (!email) throw new ApiError(400, "email is required");
 
