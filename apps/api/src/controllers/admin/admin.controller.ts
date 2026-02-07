@@ -5,12 +5,7 @@ import bcrypt from "bcrypt"
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 import crypto from "crypto";
-import { agency } from '../../types/agency.type';
 import { Request, Response } from "express";
-import { UserForReq } from "../../types/user.types";
-import jwt from "jsonwebtoken";
-import { AccessTokenJwtPayload } from "../../types/payload.type";
-import { REFRESH_TOKEN_SECRET } from "../../types/env.config";
 
 export enum userType {
   admin = "admin",
@@ -213,3 +208,14 @@ export const createClientKey = asyncHandler(async (req, res) => {
   return res.json(new ApiResponse(201, result, "key generated successfully!"));
 
 });
+
+export const getClients = asyncHandler(async (req, res) => {
+
+  const user = (req as any).user;
+  const agency_id = user.agency_id;
+
+  const result = pool.query('SELECT name , email FROM client WHERE agency_id = $1', [agency_id]);
+
+  return res.json(new ApiResponse(200, result, "clients fetched successfully"));
+
+})

@@ -2,42 +2,58 @@ import { pool } from '../../../postgress-config';
 import ApiError from '../../utils/apiError';
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
-import { projectType } from '../../types/project.type';
-import { ppid } from 'process';
+import { projectStatus, projectType } from '../../types/project.type';
 
-  export const createProject = asyncHandler(async(req,res) => {
-  
-    const {name , clientId, description , deadline } : projectType = req.body;
-    const user = (req as any).user;
+export const createProject = asyncHandler(async (req, res) => {
 
-    if(!name || !clientId || !description || deadline) throw new ApiError(400 , "Enter all the required fields");
+  const { name, clientId, description, deadline }: projectType = req.body;
+  const user = (req as any).user;
 
-    const check = await pool.query('SELECT EXISTS (SELECT 1 FROM client WHERE id = $1)' , [clientId]); 
+  if (!name || !clientId || !description || deadline) throw new ApiError(400, "Enter all the required fields");
 
-    if(!check) throw new ApiError(400 , "no such client found");
+  const check = await pool.query('SELECT EXISTS (SELECT 1 FROM client WHERE id = $1)', [clientId]);
 
-    const agency_id = user.agency_id;
-    const id = user.id;
+  if (!check) throw new ApiError(400, "no such client found");
 
-    const nameCheck = await pool.query('SELECT EXISTS (SELECT 1 FROM project WHERE name = $1 AND agency_id = $2)',[name,agency_id]); 
+  const agency_id = user.agency_id;
+  const id = user.id;
 
-    if(!nameCheck.rows[0].exists) throw new ApiError(400 , "another project exists with this email");
+  const nameCheck = await pool.query('SELECT EXISTS (SELECT 1 FROM project WHERE name = $1 AND agency_id = $2)', [name, agency_id]);
 
-    const create = await pool.query('INSERT INTO project (name , description , client_id , admin_id , deadline,agency_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *' , [name , description , clientId ,id,deadline,agency_id]);
+  if (!nameCheck.rows[0].exists) throw new ApiError(400, "another project exists with this email");
 
-    if(!create.rowCount) throw new ApiError(500 , "Error while creating project");
+  const create = await pool.query('INSERT INTO project (name , description , client_id , admin_id , deadline,agency_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *', [name, description, clientId, id, deadline, agency_id]);
 
-    return res.json(new ApiResponse(201 , create.rows[0] , "new project created successfully"));
+  if (!create.rowCount) throw new ApiError(500, "Error while creating project");
 
-  });
-  
-  export const getAllProject = asyncHandler(async(req,res) => {
-    
-    const user = (req as any).user;
-    const agency_id = user.id;
+  return res.json(new ApiResponse(201, create.rows[0], "new project created successfully"));
 
-    const result = await pool.query('SELECT name , description , client_id , deadline , project_status FROM project WHERE agency_id = $1' , [agency_id]);
+});
 
-    if(!result) throw new ApiError(500 , "Error while finding projects");
+export const getAllProject = asyncHandler(async (req, res) => {
 
-  })
+  const user = (req as any).user;
+  const agency_id = user.id;
+
+  const result = await pool.query('SELECT name , description , client_id , deadline , project_status FROM project WHERE agency_id = $1', [agency_id]);
+
+  if (!result) throw new ApiError(500, "Error while finding projects");
+
+})
+
+const isProjectStatus = (value: any): value is projectStatus => {
+  return Object.values(projectStatus).includes(value as projectStatus);
+};
+
+export const changeStatus = asyncHandler(async (req, res) => {
+
+  const { id } = req.params;
+  const { newStatus } = req.query;
+
+  if (!isProjectStatus(newStatus)) throw new ApiError(400, "Enter a valid status");
+
+  await pool.query('UPDATE project SET project_status = $1 WHERE id = $2', [newStatus, id]);
+
+  return res.json(new ApiResponse(200, "project status updated successfully"));
+
+})

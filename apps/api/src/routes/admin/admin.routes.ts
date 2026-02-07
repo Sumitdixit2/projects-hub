@@ -1,9 +1,8 @@
 import { Router } from "express";
-import { createAdminKey, signUp, createClientKey, adminLogin } from "../../controllers/admin/admin.controller";
+import { createAdminKey, signUp, createClientKey, adminLogin, getClients } from "../../controllers/admin/admin.controller";
 import { verifyJWT } from "../../middlewares/verifyJwt";
 import { requireAdmin } from "../../middlewares/validateUser.middleware";
 import { validateAdmin } from "../../middlewares/validate.middleware";
-import { getClients } from "../../controllers/agency/agency.controller";
 
 const adminRouter = Router();
 
