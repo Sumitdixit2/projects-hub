@@ -6,14 +6,15 @@ import { ApiResponse } from "../../utils/apiResponse";
 
 export const clientSignUp = asyncHandler(async (req, res) => {
 
-  const { agency_id, email, invitekey, name, password }: clientTypes = req.body;
-  if (!agency_id || !email || !invitekey || !name || !password) throw new ApiError(400, "Enter all the required fields");
+  const { agency_id, email, inviteKey, name, password } : clientTypes = req.body;
 
-  const findUser = await pool.query('SELECT EXISTS (SELECT 1 FROM client WHERE email = $1 AND = $2)', [email, agency_id]);
+    if (!agency_id || !email || !inviteKey || !name || !password) throw new ApiError(400, "Enter all the required fields");
+
+  const findUser = await pool.query('SELECT EXISTS (SELECT 1 FROM client WHERE email = $1 AND agency_id = $2)', [email, agency_id]);
 
   if (findUser.rows[0].exists) throw new ApiError(400, "client already exists with this email");
 
-  const checkKey = await pool.query('SELECT EXISTS (SELECT 1 FROM key WHERE key_hash = $1 AND key_expiry > NOW() AND email = $2 AND is_used = $3)');
+  const checkKey = await pool.query('SELECT EXISTS (SELECT 1 FROM key WHERE key_hash = $1 AND key_expiry > NOW() AND email = $2 AND is_used = $3)' , [inviteKey , email, false]);
 
   if (!checkKey.rows[0].exists) throw new ApiError(400, "key not valid or key expired or key already used or not the correct email");
 
@@ -22,4 +23,4 @@ export const clientSignUp = asyncHandler(async (req, res) => {
   if (!result.rowCount) throw new ApiError(500, "problem while inserting client");
 
   return res.json(new ApiResponse(201, result, "client successfully created!"));
-})
+});

@@ -19,7 +19,6 @@ const fetchUser = async(userId: string,userType:userType) => {
 }
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
-  try {
     const token =
       req.cookies?.AccessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
@@ -30,6 +29,8 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     console.log("token is :",token);
     const decodedToken = jwt.verify(token, ACCESS_TOKEN_SECRET) as AccessTokenJwtPayload;
+
+    if(!decodedToken) throw new ApiError(500 , "error while verifying the decodedToken");
 
     console.log("decodedToken: ",decodedToken);
     const userId = decodedToken.sub;
@@ -55,8 +56,5 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     (req as any).user = user;
     (req as any).userType = userType;
     next();
-  } catch (error: any) {
-    throw new ApiError(401, error?.message || "Invalid Access Token");
-  }
 })
 
