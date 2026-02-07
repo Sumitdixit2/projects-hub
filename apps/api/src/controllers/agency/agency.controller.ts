@@ -4,7 +4,6 @@ import ApiError from '../../utils/apiError';
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 import { Resend } from "resend";
-import { response } from 'express';
 import { generateOtp } from '../../utils/otpGenerator';
 import { hashOtp } from '../../utils/hashOtp';
 

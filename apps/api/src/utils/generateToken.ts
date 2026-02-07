@@ -4,7 +4,7 @@ import { JwtPayloadType } from '../types/payload.type';
 import { userType } from '../controllers/admin/admin.controller';
 
 export const generateAccessToken = (user: JwtPayloadType, user_type: userType) => {
-  const { id }: JwtPayloadType = user;
+  const { id}: JwtPayloadType = user;
 
   return JsonWebToken.sign(
     {

@@ -10,5 +10,4 @@ export interface AccessTokenJwtPayload extends JwtPayload {
 
 export type JwtPayloadType = {
   id: string,
-  user_type: userType
 }
