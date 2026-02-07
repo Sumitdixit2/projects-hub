@@ -126,7 +126,7 @@ export const adminLogin = asyncHandler(async (req, res) => {
 
   if (!password || !email || !agencyId || !admin_role) throw new ApiError(400, "Enter all the required fields");
 
-  const check = await pool.query('SELECT id,password,fullname FROM admin WHERE admin_role = $1 AND email = $2 AND agency_id = $3', [admin_role, email, agencyId]);
+  const check = await pool.query('SELECT id,password FROM admin WHERE admin_role = $1 AND email = $2 AND agency_id = $3', [admin_role, email, agencyId]);
 
   if (!check.rowCount) throw new ApiError(404, "no such admin found registered");
 
