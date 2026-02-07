@@ -1,8 +1,12 @@
 import { Router } from "express";
-import { createProject } from "../../controllers/project/project.controller";
+import { createProject, getAllProject } from "../../controllers/project/project.controller";
+import { verifyJWT } from "../../middlewares/verifyJwt";
+import { requireAdmin } from "../../middlewares/validateUser.middleware";
+import { validateAdmin } from "../../middlewares/validate.middleware";
 
 const projectRouter = Router();
 
-projectRouter.route('/createProject').post(createProject);
+projectRouter.route('/createProject').post(verifyJWT,requireAdmin,createProject);
+projectRouter.route('/getAllProjects').post(verifyJWT,requireAdmin,validateAdmin,getAllProject);
 
 export default projectRouter;
