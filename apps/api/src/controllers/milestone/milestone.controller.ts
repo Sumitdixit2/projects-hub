@@ -32,5 +32,17 @@ export const changeStatus = asyncHandler(async(req,res) => {
 
   return res.json(new ApiResponse(200 , "milestone status changed successfully"));
 
-})
+});
 
+export const getMyMilestone = asyncHandler(async(req,res) => {
+
+  const {id} = req.params;
+
+  if(!id) throw new ApiError(400, "id is required");
+
+  const result = await pool.query('SELECT name , due_date , created_at , milestone_status , description FROM milestone WHERE project_id = $1' , [id]);
+
+  if(!result.rowCount) throw new ApiError(404 , "no milestones found");
+  
+  return res.json(new ApiResponse(200 , result.rows[0] , "milestones fetched for the project"));
+})
