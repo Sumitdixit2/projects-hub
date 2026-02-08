@@ -37,7 +37,9 @@ export const getAllProject = asyncHandler(async (req, res) => {
 
   const result = await pool.query('SELECT name , description , client_id , deadline , project_status FROM project WHERE agency_id = $1', [agency_id]);
 
-  if (!result) throw new ApiError(500, "Error while finding projects");
+  if (!result.rowCount) throw new ApiError(404, "no project's found");
+
+  return res.json(new ApiResponse(200 , result.rows[0] , "fetched all the agencies projects"));
 
 })
 
@@ -50,10 +52,28 @@ export const changeStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { newStatus } = req.body;
 
+  if(!id || !newStatus) throw new ApiError(400 , "id and new Status are required to be provided");
+
   if (!isProjectStatus(newStatus)) throw new ApiError(400, "Enter a valid status");
 
-  await pool.query('UPDATE project SET project_status = $1 WHERE id = $2', [newStatus, id]);
+   await pool.query('UPDATE project SET project_status = $1 WHERE id = $2', [newStatus, id]);
 
   return res.json(new ApiResponse(200, "project status updated successfully"));
 
 });
+
+ export const getMyProject = asyncHandler(async(req,res) => {
+
+  const {id} = req.params;
+
+  if(!id) throw new ApiError(400 , "id must be provided");
+
+  const find = await pool.query('SELECT * FROM project WHERE id = $1',[id]);
+
+  if(!find.rowCount) throw new ApiError(404 , "project not found");
+
+  return res.json(new ApiResponse(200 , find.rows[0] , "project successfully fetched from db"));
+
+});
+
+
