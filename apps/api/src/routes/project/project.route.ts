@@ -3,12 +3,13 @@ import { changeStatus, createProject, getAllProject, getMyProject } from "../../
 import { verifyJWT } from "../../middlewares/verifyJwt";
 import { requireAdmin } from "../../middlewares/validateUser.middleware";
 import { validateAdmin } from "../../middlewares/validate.middleware";
+import { isMyProject } from "../../middlewares/isMyProject.middleware";
 
 const projectRouter = Router();
 
-projectRouter.route('/createProject').post(verifyJWT, requireAdmin, createProject);
+projectRouter.route('/createProject').post(verifyJWT, requireAdmin,validateAdmin, createProject);
 projectRouter.route('/getAllProjects').get(verifyJWT, requireAdmin, validateAdmin, getAllProject);
-projectRouter.route('/changeStatus/:id').patch(verifyJWT, requireAdmin, validateAdmin, changeStatus);
+projectRouter.route('/changeStatus/:id').patch(verifyJWT, requireAdmin, isMyProject, changeStatus);
 projectRouter.route('/getMyProject/:id').get(verifyJWT,getMyProject);
 
 export default projectRouter;

@@ -45,4 +45,4 @@ export const getMyMilestone = asyncHandler(async(req,res) => {
   if(!result.rowCount) throw new ApiError(404 , "no milestones found");
   
   return res.json(new ApiResponse(200 , result.rows[0] , "milestones fetched for the project"));
-})
+});

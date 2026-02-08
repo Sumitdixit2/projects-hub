@@ -10,6 +10,6 @@ adminRouter.route('/signup').post(signUp);
 adminRouter.route('/login').post(adminLogin);
 adminRouter.route('/generateAdminKey').post(verifyJWT, requireAdmin, validateAdmin, createAdminKey);
 adminRouter.route('/generateClientKey').post(verifyJWT, requireAdmin, createClientKey);
-adminRouter.route('/getAllClients').post(verifyJWT, requireAdmin, validateAdmin, getClients);
+adminRouter.route('/getAllClients').get(verifyJWT, requireAdmin, validateAdmin, getClients);
 
 export default adminRouter;

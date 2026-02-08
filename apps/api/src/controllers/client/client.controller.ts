@@ -57,4 +57,4 @@ export const clientLogin = asyncHandler(async(req ,res) => {
 
   return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(200, "client logged in successfully"));
 
-})
+});
