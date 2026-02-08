@@ -2,6 +2,7 @@ import { pool } from '../../../postgress-config';
 import ApiError from '../../utils/apiError';
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
+import { isProjectStatus } from '../project/project.controller';
 
 
 export const  createMilestones = asyncHandler(async(req,res) => {
@@ -16,4 +17,20 @@ export const  createMilestones = asyncHandler(async(req,res) => {
 
   return res.json(new ApiResponse(201 , create.rows[0] , "milestone created"));
 
+});
+
+export const changeStatus = asyncHandler(async(req,res) => {
+
+  const {id} = req.params;
+  const {newStatus} = req.body;
+
+  if(!id || !newStatus) throw new ApiError(400 , "Enter all the required fields");
+
+  if(!isProjectStatus(newStatus)) throw new ApiError(400 , "enter a valid status");
+
+  await pool.query('UPDATE milestone SET milestone_status = $1 WHERE id = $2');
+
+  return res.json(new ApiResponse(200 , "milestone status changed successfully"));
+
 })
+

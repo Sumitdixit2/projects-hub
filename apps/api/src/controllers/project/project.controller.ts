@@ -43,7 +43,7 @@ export const getAllProject = asyncHandler(async (req, res) => {
 
 })
 
-const isProjectStatus = (value: any): value is projectStatus => {
+export const isProjectStatus = (value: any): value is projectStatus => {
   return Object.values(projectStatus).includes(value as projectStatus);
 };
 
