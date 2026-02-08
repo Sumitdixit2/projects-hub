@@ -8,6 +8,6 @@ const projectRouter = Router();
 
 projectRouter.route('/createProject').post(verifyJWT, requireAdmin, createProject);
 projectRouter.route('/getAllProjects').post(verifyJWT, requireAdmin, validateAdmin, getAllProject);
-projectRouter.route('/changeStatus/:id').get(verifyJWT, requireAdmin, validateAdmin, changeStatus);
+projectRouter.route('/changeStatus/:id').patch(verifyJWT, requireAdmin, validateAdmin, changeStatus);
 
 export default projectRouter;

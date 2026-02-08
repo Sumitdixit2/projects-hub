@@ -48,7 +48,7 @@ const isProjectStatus = (value: any): value is projectStatus => {
 export const changeStatus = asyncHandler(async (req, res) => {
 
   const { id } = req.params;
-  const { newStatus } = req.query;
+  const { newStatus } = req.body;
 
   if (!isProjectStatus(newStatus)) throw new ApiError(400, "Enter a valid status");
 
@@ -56,4 +56,4 @@ export const changeStatus = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(200, "project status updated successfully"));
 
-})
+});
