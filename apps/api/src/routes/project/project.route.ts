@@ -7,7 +7,7 @@ import { isMyProject } from "../../middlewares/isMyProject.middleware";
 
 const projectRouter = Router();
 
-projectRouter.route('/createProject').post(verifyJWT, requireAdmin,validateAdmin, createProject);
+projectRouter.route('/createproject').post(verifyJWT, requireAdmin,validateAdmin, createProject);
 projectRouter.route('/getAllProjects').get(verifyJWT, requireAdmin, validateAdmin, getAllProject);
 projectRouter.route('/changeStatus/:id').patch(verifyJWT, requireAdmin, isMyProject, changeStatus);
 projectRouter.route('/getMyProject/:id').get(verifyJWT, requireAdmin , isMyProject , getMyProject);

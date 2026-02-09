@@ -2,7 +2,8 @@ export type projectType = {
   name: string,
   description: string,
   deadline: Date,
-  clientId: string
+  clientId: string,
+  assignedTo : string
 }
 
 export enum projectStatus {

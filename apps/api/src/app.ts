@@ -27,7 +27,7 @@ app.use('/api/v1/agency', agencyRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/token', tokenRouter);
 app.use('/api/v1/client', clientRouter);
-app.use('api/v1/project',projectRouter);
-app.use('api/v1/milestone',milestoneRouter);
+app.use('/api/v1/project',projectRouter);
+app.use('/api/v1/milestone',milestoneRouter);
 
 export default app;
