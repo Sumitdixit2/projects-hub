@@ -32,7 +32,7 @@ export const createProject = asyncHandler(async (req, res) => {
 export const getAllProject = asyncHandler(async (req, res) => {
 
   const user = (req as any).user;
-  const agency_id = user.id;
+  const agency_id = user.agency_id;
 
   const result = await pool.query('SELECT name , description , client_id , deadline , project_status FROM project WHERE agency_id = $1', [agency_id]);
 

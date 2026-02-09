@@ -1,4 +1,3 @@
-import { userType } from "../controllers/admin/admin.controller";
 import ApiError from "../utils/apiError";
 import asyncHandler from "../utils/asyncHandler";
 
