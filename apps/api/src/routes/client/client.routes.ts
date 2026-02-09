@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { clientSignUp } from "../../controllers/client/client.controller";
+import { clientLogin, clientSignUp } from "../../controllers/client/client.controller";
 
 const clientRouter = Router();
 
 clientRouter.route('/signup').post(clientSignUp);
+clientRouter.route('/login').post(clientLogin);
 
 export default clientRouter;

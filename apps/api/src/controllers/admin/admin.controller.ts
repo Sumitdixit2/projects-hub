@@ -46,9 +46,18 @@ export const generateAccessAndRefreshToken = async (userId: string, userType: us
   const refreshTokenExpiry = new Date(
     Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
   );
+
+  if(userType === "admin") {
   const result = await pool.query('UPDATE admin SET refreshtoken = $1 , token_expiry = $2 WHERE id = $3 ', [hashToken, refreshTokenExpiry, userId]);
 
   if (!result.rowCount) throw new ApiError(500, "error while inserting refreshtoken");
+}
+
+if(userType === "client") {
+  const result = await pool.query('UPDATE client SET refreshtoken = $1 , token_expiry = $2 WHERE id = $3',[hashToken,refreshTokenExpiry,userId]);
+
+  if(!result.rowCount) throw new ApiError(500 , "refreshtoken was not inserted");
+}
 
   return { AccessToken, RefreshToken, user };
 }

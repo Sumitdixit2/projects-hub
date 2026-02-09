@@ -33,7 +33,7 @@ export const clientLogin = asyncHandler(async(req ,res) => {
   
   const {agency_id , email , password} = req.body;
 
-  if (!agency_id || !email || password) throw new ApiError(400 , "Enter all the required fields");
+  if (!agency_id || !email || !password) throw new ApiError(400 , "Enter all the required fields");
 
   const check = await pool.query('SELECT id,password FROM client WHERE agency_id = $1 AND email = $2', [agency_id,email]);
 
