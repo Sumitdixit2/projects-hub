@@ -1,6 +1,8 @@
 'use client';
+import { useRouter } from "next/navigation";
 
 export default async function Home() {
+  const router = useRouter();
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col bg-white group/design-root overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
       <div className="layout-container flex h-full grow flex-col">
@@ -35,10 +37,10 @@ export default async function Home() {
               Streamline project management and communication between our agency and your team. Access your dashboards, project updates, and collaboration tools in one central place.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full justify-center px-4">
-              <button className="flex min-w-[160px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#2080df] text-white text-base font-bold leading-normal tracking-[0.015em]">
+              <button type="button" onClick={() => router.push('/loginAs')} className="flex min-w-[160px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#2080df] text-white text-base font-bold leading-normal tracking-[0.015em]">
                 <span className="truncate">Log In</span>
               </button>
-              <button className="flex min-w-[160px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 border border-[#dce0e5] bg-white text-[#111417] text-base font-bold leading-normal tracking-[0.015em]">
+              <button type="button" onClick={() => router.push('/registerAs')} className="flex min-w-[160px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 border border-[#dce0e5] bg-white text-[#111417] text-base font-bold leading-normal tracking-[0.015em]">
                 <span className="truncate">Sign Up</span>
               </button>
             </div>

@@ -1,7 +1,9 @@
 'use client';
+import { useRouter } from "next/navigation";
 
 
 export default function RegisterFor() {
+  const router = useRouter();
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
 
@@ -36,6 +38,7 @@ export default function RegisterFor() {
                 </span>
               </div>
 
+
               <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-3">
                 Register as Agency
               </h2>
@@ -44,7 +47,7 @@ export default function RegisterFor() {
                 Main account for agency owners and founders. Manage workspace, branding, billing, and operations.
               </p>
 
-              <button className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded transition-colors flex items-center justify-center space-x-2">
+              <button type="button" onClick={() => router.push('/agency/signup')} className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded transition-colors flex items-center justify-center space-x-2">
                 <span>Get Started</span>
                 <span className="material-icons text-sm">arrow_forward</span>
               </button>
