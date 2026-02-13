@@ -58,7 +58,6 @@ export const registerAgency = asyncHandler(async (req, res) => {
   }
 
   const find = await pool.query('SELECT EXISTS (SELECT 1 FROM agency WHERE email = $1)', [email]);
-
   if (find.rows[0].exists) {
     throw new ApiError(409, "agency already exists");
   }

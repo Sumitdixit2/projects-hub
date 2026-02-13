@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from "next/navigation";
 
-export default async function Home() {
+export default function Home() {
   const router = useRouter();
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col bg-white group/design-root overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
