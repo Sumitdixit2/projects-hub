@@ -7,7 +7,17 @@ export const authService = {
       const response = await api.post('/agency/registerAgency', data);
       return response.data;
     } catch (error: any) {
-      console.error("ma request fucked up man", error);
+      console.error("ma agency registeration request donked up man", error);
+    }
+  },
+
+  async verifyAgency(data: { email: string; Code: string }) {
+    try {
+      const response = await api.post('/agency/verify-code', data);
+      return response.data;
+    } catch (error: any) {
+      console.error("code verification failed", error);
     }
   }
 }
+
