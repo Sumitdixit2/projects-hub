@@ -1,5 +1,5 @@
 import api from "@/lib/api";
-import { agencyRegisterDataType } from "@/types/auth.types";
+import { agencyRegisterDataType, clientRegisterDataType } from "@/types/auth.types";
 
 export const authService = {
   async registerAgency(data: agencyRegisterDataType) {
@@ -17,6 +17,23 @@ export const authService = {
       return response.data;
     } catch (error: any) {
       console.error("code verification failed", error);
+    }
+  },
+
+  async getAgency() {
+    try {
+      const response = await api.get('/agency/get-agency');
+      return response.data;
+    } catch (error: any) {
+      console.error("failed to fetch agencies", error);
+    }
+  },
+
+  async registerClient(data: clientRegisterDataType) {
+    try {
+      const response = await api.post('/client/signup', data);
+    } catch (error: any) {
+      console.error("failed to register client", error);
     }
   }
 }
