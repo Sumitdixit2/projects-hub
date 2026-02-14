@@ -33,7 +33,6 @@ export default function VerifyPage() {
     }
   }, [email, router]);
 
-  // Handle typing
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
@@ -48,7 +47,6 @@ export default function VerifyPage() {
     updateCode();
   };
 
-  // Handle backspace & arrows
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
     index: number
@@ -66,7 +64,6 @@ export default function VerifyPage() {
     }
   };
 
-  // Combine OTP values
   const updateCode = () => {
     const code = inputs.current.map((input) => input?.value || "").join("");
     form.setValue("Code", code);
@@ -82,9 +79,7 @@ export default function VerifyPage() {
         email,
         Code: data.Code,
       });
-
       toast.success("Successfully verified agency!");
-      router.push("/agency/dashboard");
     } catch (error: any) {
       console.error(error);
       toast.error("Verification failed");
