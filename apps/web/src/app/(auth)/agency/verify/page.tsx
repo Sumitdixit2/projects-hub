@@ -80,6 +80,7 @@ export default function VerifyPage() {
         Code: data.Code,
       });
       toast.success("Successfully verified agency!");
+      router.push('/registerAs');
     } catch (error: any) {
       console.error(error);
       toast.error("Verification failed");

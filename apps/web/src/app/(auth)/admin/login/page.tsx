@@ -16,28 +16,12 @@ import {
 import { authService } from "@/services/auth.service";
 import { toast } from "sonner";
 
-const baseSchema = z.object({
-  fullname: z.string().min(2, "Name must be at least 2 characters"),
+const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  agency_id: z.string().uuid("Valid agency selection is required"),
+  agencyId: z.string().uuid("Valid agency selection is required"),
+  admin_role: z.enum(["staff", "dev", "owner"]),
 });
-
-const ownerSchema = baseSchema.extend({
-  admin_role: z.literal("owner"),
-  agency_email: z.string().email("Agency email is required"),
-  agency_password: z.string().min(6, "Agency password must be at least 6 characters"),
-});
-
-const memberSchema = baseSchema.extend({
-  admin_role: z.enum(["staff", "dev"]),
-  inviteKey: z.string().min(1, "Invite key is required"),
-});
-
-const registerSchema = z.discriminatedUnion("admin_role", [
-  ownerSchema,
-  memberSchema,
-]);
 
 type RegisterFormType = z.infer<typeof registerSchema>;
 
@@ -56,23 +40,13 @@ export default function SignupPage() {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       admin_role: "staff",
-      fullname: "",
       email: "",
       password: "",
-      agency_id: "",
+      agencyId: "",
     },
   });
 
   const role = form.watch("admin_role");
-
-  useEffect(() => {
-    if (role === "owner") {
-      form.unregister("inviteKey");
-    } else {
-      form.unregister("agency_email");
-      form.unregister("agency_password");
-    }
-  }, [role, form]);
 
   useEffect(() => {
     const fetchAgencies = async () => {
@@ -90,9 +64,9 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const response = await authService.registerAdmin(data);
-      toast.success(response?.message || "Admin successfully registered!");
-      router.push("/admin/login");
+      const response = await authService.adminLogin(data);
+      toast.success(response?.message || "Admin successfully logged In!");
+
     } catch (error: any) {
       toast.error(
         error?.message || "Registration failed"
@@ -106,7 +80,7 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950">
       <div className="w-full max-w-[480px] bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 p-8">
         <h1 className="text-2xl font-bold mb-6 text-center">
-          Create your account
+          login to your account
         </h1>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
@@ -121,17 +95,6 @@ export default function SignupPage() {
               <option value="dev">Developer</option>
               <option value="owner">Owner</option>
             </select>
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label>Full Name</label>
-            <input
-              {...form.register("fullname")}
-              className="w-full px-4 py-2 rounded border bg-white dark:bg-slate-800"
-            />
-            <p className="text-xs text-red-500">
-              {form.formState.errors.fullname?.message}
-            </p>
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -158,7 +121,7 @@ export default function SignupPage() {
                   (agency) => agency.name === selectedName
                 );
                 if (selectedAgency) {
-                  form.setValue("agency_id", selectedAgency.id, {
+                  form.setValue("agencyId", selectedAgency.id, {
                     shouldValidate: true,
                   });
                 }
@@ -177,53 +140,12 @@ export default function SignupPage() {
               </ComboboxContent>
             </Combobox>
 
-            <input type="hidden" {...form.register("agency_id")} />
+            <input type="hidden" {...form.register("agencyId")} />
 
             <p className="text-xs text-red-500">
-              {form.formState.errors.agency_id?.message}
+              {form.formState.errors.agencyId?.message}
             </p>
           </div>
-
-          {role === "owner" && (
-            <>
-              <div className="flex flex-col gap-1.5">
-                <label>Agency Email</label>
-                <input
-                  type="email"
-                  {...form.register("agency_email")}
-                  className="w-full px-4 py-2 rounded border bg-white dark:bg-slate-800"
-                />
-                <p className="text-xs text-red-500">
-                  {form.formState.errors.agency_email?.message}
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label>Agency Password</label>
-                <input
-                  type="password"
-                  {...form.register("agency_password")}
-                  className="w-full px-4 py-2 rounded border bg-white dark:bg-slate-800"
-                />
-                <p className="text-xs text-red-500">
-                  {form.formState.errors.agency_password?.message}
-                </p>
-              </div>
-            </>
-          )}
-
-          {(role === "staff" || role === "dev") && (
-            <div className="flex flex-col gap-1.5">
-              <label>Invite Key</label>
-              <input
-                {...form.register("inviteKey")}
-                className="w-full px-4 py-2 rounded border bg-white dark:bg-slate-800"
-              />
-              <p className="text-xs text-red-500">
-                {form.formState.errors.inviteKey?.message}
-              </p>
-            </div>
-          )}
 
           <div className="flex flex-col gap-1.5">
             <label>Password</label>

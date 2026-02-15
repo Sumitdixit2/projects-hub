@@ -35,3 +35,10 @@ export type memberRegisterDataType = {
   password: string;
   inviteKey: string;
 }
+
+export type adminLoginDataType = {
+  agencyId: string;
+  email: string;
+  password: string;
+  admin_role: UserRole;
+}

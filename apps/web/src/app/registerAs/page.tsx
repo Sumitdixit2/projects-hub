@@ -69,7 +69,7 @@ export default function RegisterFor() {
                 Internal staff members. Manage projects, assign tasks, and handle communications.
               </p>
 
-              <button className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded transition-colors flex items-center justify-center space-x-2">
+              <button type="button" onClick={() => router.push('/admin/signup')} className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded transition-colors flex items-center justify-center space-x-2">
                 <span>Join Team</span>
                 <span className="material-icons text-sm">arrow_forward</span>
               </button>
@@ -91,7 +91,7 @@ export default function RegisterFor() {
                 View progress, approve deliverables, communicate with the team.
               </p>
 
-              <button className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded transition-colors flex items-center justify-center space-x-2">
+              <button type="button" onClick={() => router.push('/client/signup')} className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded transition-colors flex items-center justify-center space-x-2">
                 <span>Access Portal</span>
                 <span className="material-icons text-sm">arrow_forward</span>
               </button>

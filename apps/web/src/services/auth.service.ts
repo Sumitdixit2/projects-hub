@@ -1,5 +1,5 @@
 import api from "@/lib/api";
-import { agencyRegisterDataType, clientRegisterDataType, memberRegisterDataType, ownerRegisterDataType } from "@/types/auth.types";
+import { adminLoginDataType, agencyRegisterDataType, clientRegisterDataType, memberRegisterDataType, ownerRegisterDataType } from "@/types/auth.types";
 import { toast } from "sonner";
 
 export const authService = {
@@ -8,7 +8,7 @@ export const authService = {
       const response = await api.post('/agency/registerAgency', data);
       return response.data;
     } catch (error: any) {
-      console.error("ma agency registeration request donked up man", error);
+      throw error.response?.data || error;
     }
   },
 
@@ -17,7 +17,7 @@ export const authService = {
       const response = await api.post('/agency/verify-code', data);
       return response.data;
     } catch (error: any) {
-      console.error("code verification failed", error);
+      throw error.response?.data || error;
     }
   },
 
@@ -26,8 +26,21 @@ export const authService = {
       const response = await api.get('/agency/get-agency');
       return response.data;
     } catch (error: any) {
-      console.error("failed to fetch agencies", error);
+      throw error.response?.data || error;
     }
+  },
+
+  async adminLogin(credentials: adminLoginDataType) {
+    const { email, password, agencyId, admin_role } = credentials;
+
+    const response = await api.post('admin/login', {
+      email,
+      password,
+      agencyId,
+      admin_role
+    });
+
+    return response.data;
   },
 
   async registerClient(data: clientRegisterDataType) {
@@ -35,7 +48,7 @@ export const authService = {
       const response = await api.post('/client/signup', data);
       return response.data;
     } catch (error: any) {
-      console.error("failed to register client", error);
+      throw error.response?.data || error;
     }
   },
 
