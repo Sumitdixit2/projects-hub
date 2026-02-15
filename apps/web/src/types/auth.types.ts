@@ -16,3 +16,22 @@ export type clientRegisterDataType = {
   agency_id: string;
   inviteKey: string;
 }
+
+export type ownerRegisterDataType = {
+  admin_id: string;
+  fullname: string;
+  admin_role: "owner";
+  agency_password: string;
+  agency_email: string;
+  email: string;
+  password: string;
+}
+
+export type memberRegisterDataType = {
+  admin_id: string;
+  fullname: string;
+  admin_role: "staff" | "dev";
+  email: string;
+  password: string;
+  inviteKey: string;
+}

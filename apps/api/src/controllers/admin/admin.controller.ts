@@ -47,17 +47,17 @@ export const generateAccessAndRefreshToken = async (userId: string, userType: us
     Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
   );
 
-  if(userType === "admin") {
-  const result = await pool.query('UPDATE admin SET refreshtoken = $1 , token_expiry = $2 WHERE id = $3 ', [hashToken, refreshTokenExpiry, userId]);
+  if (userType === "admin") {
+    const result = await pool.query('UPDATE admin SET refreshtoken = $1 , token_expiry = $2 WHERE id = $3 ', [hashToken, refreshTokenExpiry, userId]);
 
-  if (!result.rowCount) throw new ApiError(500, "error while inserting refreshtoken");
-}
+    if (!result.rowCount) throw new ApiError(500, "error while inserting refreshtoken");
+  }
 
-if(userType === "client") {
-  const result = await pool.query('UPDATE client SET refreshtoken = $1 , token_expiry = $2 WHERE id = $3',[hashToken,refreshTokenExpiry,userId]);
+  if (userType === "client") {
+    const result = await pool.query('UPDATE client SET refreshtoken = $1 , token_expiry = $2 WHERE id = $3', [hashToken, refreshTokenExpiry, userId]);
 
-  if(!result.rowCount) throw new ApiError(500 , "refreshtoken was not inserted");
-}
+    if (!result.rowCount) throw new ApiError(500, "refreshtoken was not inserted");
+  }
 
   return { AccessToken, RefreshToken, user };
 }
@@ -229,14 +229,14 @@ export const getClients = asyncHandler(async (req, res) => {
 
 })
 
-export const getAdmins = asyncHandler(async(req,res) => {
+export const getAdmins = asyncHandler(async (req, res) => {
 
   const user = (req as any).user;
   const agency_id = user.agency_id;
 
-  const result = await pool.query('SELECT fullname , admin_role , created_at , email FROM admin WHERE agency_id = $1',[agency_id]);
+  const result = await pool.query('SELECT fullname , admin_role , created_at , email FROM admin WHERE agency_id = $1', [agency_id]);
 
-  if(!result.rowCount) throw new ApiError(404 , "no admin found");
+  if (!result.rowCount) throw new ApiError(404, "no admin found");
 
-  return res.json(new ApiResponse(200 , result.rows[0] , "admins fetched"));
+  return res.json(new ApiResponse(200, result.rows[0], "admins fetched"));
 })

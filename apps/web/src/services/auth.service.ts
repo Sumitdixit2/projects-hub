@@ -1,5 +1,6 @@
 import api from "@/lib/api";
-import { agencyRegisterDataType, clientRegisterDataType } from "@/types/auth.types";
+import { agencyRegisterDataType, clientRegisterDataType, memberRegisterDataType, ownerRegisterDataType } from "@/types/auth.types";
+import { toast } from "sonner";
 
 export const authService = {
   async registerAgency(data: agencyRegisterDataType) {
@@ -32,8 +33,18 @@ export const authService = {
   async registerClient(data: clientRegisterDataType) {
     try {
       const response = await api.post('/client/signup', data);
+      return response.data;
     } catch (error: any) {
       console.error("failed to register client", error);
+    }
+  },
+
+  async registerAdmin(data: ownerRegisterDataType | memberRegisterDataType) {
+    try {
+      const response = await api.post('/admin/signup', data);
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || error;
     }
   }
 }
