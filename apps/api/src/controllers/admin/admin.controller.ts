@@ -152,7 +152,7 @@ export const adminLogin = asyncHandler(async (req, res) => {
     secure: true
   };
 
-  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(200, "admin logged in successfully"));
+  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(200, id, "admin logged in successfully"));
 
 });
 

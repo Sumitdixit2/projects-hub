@@ -42,3 +42,21 @@ export type adminLoginDataType = {
   password: string;
   admin_role: UserRole;
 }
+
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  fullname?: string;
+  role?: UserRole;
+  agency_id: string;
+}
+
+export interface Authstate {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (user: User) => void;
+  logout: () => void;
+  setLoading: (loading: boolean) => void;
+}

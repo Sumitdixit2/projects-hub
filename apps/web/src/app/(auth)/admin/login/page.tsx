@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/combobox";
 import { authService } from "@/services/auth.service";
 import { toast } from "sonner";
+import { useAuthStore } from "@/store/auth.store";
+import { UserRole } from "@/types/auth.types";
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -35,6 +37,7 @@ export default function SignupPage() {
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [selectedAgencyName, setSelectedAgencyName] = useState("");
   const router = useRouter();
+  const login = useAuthStore((state) => state.login);
 
   const form = useForm<RegisterFormType>({
     resolver: zodResolver(registerSchema),
@@ -65,8 +68,14 @@ export default function SignupPage() {
 
     try {
       const response = await authService.adminLogin(data);
+      console.log("response is: ", response);
       toast.success(response?.message || "Admin successfully logged In!");
-
+      login({
+        id: response.id,
+        email: data.email,
+        role: data.admin_role as UserRole,
+        agency_id: data.agencyId
+      });
     } catch (error: any) {
       toast.error(
         error?.message || "Registration failed"
