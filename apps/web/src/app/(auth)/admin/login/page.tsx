@@ -49,7 +49,6 @@ export default function SignupPage() {
     },
   });
 
-  const role = form.watch("admin_role");
 
   useEffect(() => {
     const fetchAgencies = async () => {
