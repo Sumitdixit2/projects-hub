@@ -1,13 +1,9 @@
 "use client";
-
 import Overview from "@/components/overview/overview";
-import { projectService } from "@/services/project.service";
-import { useState, useEffect } from "react";
 
-
-export default function DashboardPage(){
-  return(
-<div className="relative flex h-auto min-h-screen w-full flex-col bg-slate-50 group/design-root overflow-x-hidden" style={{fontFamily: 'Inter, "Noto Sans", sans-serif'}}>
+export default function DashboardPage() {
+  return (
+    <div className="relative flex h-auto min-h-screen w-full flex-col bg-slate-50 group/design-root overflow-x-hidden" style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}>
       <div className="layout-container flex h-full grow flex-col">
         <div className="gap-1 px-6 flex flex-1 justify-center py-5">
           <div className="layout-content-container flex flex-col w-80">
@@ -73,20 +69,20 @@ export default function DashboardPage(){
             </div>
           </div>
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-          <Overview/>
-                        <h2 className="text-[#0e141b] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Projects by Status</h2>
+            <Overview />
+            <h2 className="text-[#0e141b] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Projects by Status</h2>
             <div className="flex flex-wrap gap-4 px-4 py-6">
               <div className="flex min-w-72 flex-1 flex-col gap-2">
                 <p className="text-[#0e141b] text-base font-medium leading-normal">Project Status</p>
                 <div className="grid min-h-[180px] gap-x-4 gap-y-6 grid-cols-[auto_1fr] items-center py-3">
                   <p className="text-[#4e7397] text-[13px] font-bold leading-normal tracking-[0.015em]">In Progress</p>
-                  <div className="h-full flex-1"><div className="border-[#4e7397] bg-[#e7edf3] border-r-2 h-full" style={{width: "60%"}}></div></div>
+                  <div className="h-full flex-1"><div className="border-[#4e7397] bg-[#e7edf3] border-r-2 h-full" style={{ width: "60%" }}></div></div>
                   <p className="text-[#4e7397] text-[13px] font-bold leading-normal tracking-[0.015em]">Completed</p>
-                  <div className="h-full flex-1"><div className="border-[#4e7397] bg-[#e7edf3] border-r-2 h-full" style={{width: "20%"}}></div></div>
+                  <div className="h-full flex-1"><div className="border-[#4e7397] bg-[#e7edf3] border-r-2 h-full" style={{ width: "20%" }}></div></div>
                   <p className="text-[#4e7397] text-[13px] font-bold leading-normal tracking-[0.015em]">On Hold</p>
-                  <div className="h-full flex-1"><div className="border-[#4e7397] bg-[#e7edf3] border-r-2 h-full" style={{width: "60%"}}></div></div>
+                  <div className="h-full flex-1"><div className="border-[#4e7397] bg-[#e7edf3] border-r-2 h-full" style={{ width: "60%" }}></div></div>
                   <p className="text-[#4e7397] text-[13px] font-bold leading-normal tracking-[0.015em]">Planning</p>
-                  <div className="h-full flex-1"><div className="border-[#4e7397] bg-[#e7edf3] border-r-2 h-full" style={{width: "80%"}}></div></div>
+                  <div className="h-full flex-1"><div className="border-[#4e7397] bg-[#e7edf3] border-r-2 h-full" style={{ width: "80%" }}></div></div>
                 </div>
               </div>
             </div>
@@ -170,5 +166,5 @@ export default function DashboardPage(){
         </div>
       </div>
     </div>
-);
+  );
 }
