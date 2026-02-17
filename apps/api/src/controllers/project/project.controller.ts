@@ -34,9 +34,7 @@ export const getAllProject = asyncHandler(async (req, res) => {
   const user = (req as any).user;
   const agency_id = user.agency_id;
 
-  const result = await pool.query('SELECT name , description , client_id , deadline , project_status FROM project WHERE agency_id = $1', [agency_id]);
-
-  if (!result.rowCount) throw new ApiError(404, "no project's found");
+  const result = await pool.query('SELECT admin_id , id, name , description , client_id , deadline , project_status FROM project WHERE agency_id = $1', [agency_id]);
 
   return res.json(new ApiResponse(200 , result.rows[0] , "fetched all the agencies projects"));
 

@@ -1,5 +1,6 @@
 import { projectService } from "@/services/project.service";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function Overview () {
 const [project , setProject] = useState([]);
@@ -10,12 +11,15 @@ const [project , setProject] = useState([]);
         const response = await projectService.getAllProjects();
         console.log("project data is :" , response.data);
         setProject(Array.isArray(response.data) ? response.data : []);
+        toast.success(response?.message || "all Projects fetched");
       } catch {
         setProject([]);
       }
     }
     fetchProjects();
   },[]);
+
+  const activeProject = project.filter
 
   return(
     <>

@@ -20,35 +20,30 @@ const fetchUser = async(userId: string,userType:userType) => {
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
     const token =
-      req.cookies?.access_token ||
+      req.cookies?.accessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
       throw new ApiError(401, "Access Denied! No token provided");
     }
 
-    console.log("token is :",token);
     const decodedToken = jwt.verify(token, ACCESS_TOKEN_SECRET) as AccessTokenJwtPayload;
 
     if(!decodedToken) throw new ApiError(500 , "error while verifying the decodedToken");
 
-    console.log("decodedToken: ",decodedToken);
     const userId = decodedToken.sub;
 
     if(!userId) throw new ApiError(400 , "invalid token");
 
     const userType = decodedToken.user_type;
-    console.log("user id: ",userId);
 
     const response = await fetchUser(userId,userType);
 
     if(!response) throw new ApiError(500,"Error while fetching user data");
 
-    if (!response.rowCount) {
+    if (!response.rowCount) { 
       throw new ApiError(401, "Invalid Access Token or token expired");
     }
-
-    console.log("incoming response is :",response);
 
     const user = response.rows[0];
 
