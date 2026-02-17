@@ -20,7 +20,7 @@ const fetchUser = async(userId: string,userType:userType) => {
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
     const token =
-      req.cookies?.AccessToken ||
+      req.cookies?.access_token ||
       req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {

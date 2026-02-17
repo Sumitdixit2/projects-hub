@@ -1,5 +1,12 @@
+"use client";
+
+import Overview from "@/components/overview/overview";
+import { projectService } from "@/services/project.service";
+import { useState, useEffect } from "react";
+
+
 export default function DashboardPage(){
-return(
+  return(
 <div className="relative flex h-auto min-h-screen w-full flex-col bg-slate-50 group/design-root overflow-x-hidden" style={{fontFamily: 'Inter, "Noto Sans", sans-serif'}}>
       <div className="layout-container flex h-full grow flex-col">
         <div className="gap-1 px-6 flex flex-1 justify-center py-5">
@@ -66,22 +73,8 @@ return(
             </div>
           </div>
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
-            <div className="flex flex-wrap justify-between gap-3 p-4"><p className="text-[#0e141b] tracking-light text-[32px] font-bold leading-tight min-w-72">Overview</p></div>
-            <div className="flex flex-wrap gap-4 p-4">
-              <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-[#d0dbe7]">
-                <p className="text-[#0e141b] text-base font-medium leading-normal">Active Projects</p>
-                <p className="text-[#0e141b] tracking-light text-2xl font-bold leading-tight">12</p>
-              </div>
-              <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-[#d0dbe7]">
-                <p className="text-[#0e141b] text-base font-medium leading-normal">Completed Projects</p>
-                <p className="text-[#0e141b] tracking-light text-2xl font-bold leading-tight">35</p>
-              </div>
-              <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-[#d0dbe7]">
-                <p className="text-[#0e141b] text-base font-medium leading-normal">Total Clients</p>
-                <p className="text-[#0e141b] tracking-light text-2xl font-bold leading-tight">8</p>
-              </div>
-            </div>
-            <h2 className="text-[#0e141b] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Projects by Status</h2>
+          <Overview/>
+                        <h2 className="text-[#0e141b] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Projects by Status</h2>
             <div className="flex flex-wrap gap-4 px-4 py-6">
               <div className="flex min-w-72 flex-1 flex-col gap-2">
                 <p className="text-[#0e141b] text-base font-medium leading-normal">Project Status</p>
