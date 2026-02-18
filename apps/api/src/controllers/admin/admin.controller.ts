@@ -204,6 +204,8 @@ export const createClientKey = asyncHandler(async (req, res) => {
 
   if (!email) throw new ApiError(400, "email is required");
 
+  const check = await pool.query('SELECT EXISTS (SELECT 1 FROM key  WHERE email = $1 AND is_used = $2)', [email, false]);
+
   const key = createKey(email);
 
   const KEY_EXPIRY_MINUTES = 10;

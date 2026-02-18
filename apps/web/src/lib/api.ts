@@ -15,7 +15,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        await api.post('/token/refresh-token');
+        await api.post('/token/refreshAccessToken');
+        console.log("post request has been sent!");
         return api(originalRequest);
       } catch (refreshError) {
         return Promise.reject(refreshError);

@@ -10,7 +10,9 @@ import bcrypt from "bcrypt";
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {
 
-  const incomingToken = req.body.refreshToken || req.cookies.refreshToken;
+  const incomingToken = req.cookies?.refreshToken;
+
+  console.log("incomingToken is : ", incomingToken);
 
   if (!incomingToken) throw new ApiError(400, "no token received!");
   console.log('incomingToken : ', incomingToken);

@@ -1,6 +1,46 @@
 "use client";
+import { adminService } from "@/services/admin.service";
+import { projectService } from "@/services/project.service";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { register } from "module";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
+
+const ClientEmail = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+type RegisterFormType = z.infer<typeof ClientEmail>;
 
 export default function GenerateClientKeyPage() {
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const form = useForm<RegisterFormType>({
+    resolver: zodResolver(ClientEmail),
+    defaultValues: {
+      email: ""
+    }
+  });
+
+  const onSubmit = async (data: RegisterFormType) => {
+    setLoading(true);
+
+    try {
+      console.log("email i am sending is: ", data.email);
+      const response = await adminService.generateClientKey(data);
+      console.log("response is: ", response);
+      toast.success(response?.message || "Admin successfully logged In!");
+    } catch (error: any) {
+      toast.error(
+        error?.message || "Registration failed"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -57,12 +97,13 @@ export default function GenerateClientKeyPage() {
 
             {/* Form Card */}
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-primary/10 p-8 shadow-sm">
-              <form className="space-y-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold">
                     Client Email Address *
                   </label>
                   <input
+                    {...form.register("email")}
                     type="email"
                     placeholder="name@company.com"
                     className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-primary outline-none"
@@ -73,10 +114,11 @@ export default function GenerateClientKeyPage() {
                 </div>
 
                 <button
-                  type="button"
+                  type="submit"
+                  disabled={loading}
                   className="px-8 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-all"
                 >
-                  Generate Key
+                  {loading ? "Generating Key" : "Generate Key"}
                 </button>
               </form>
             </div>
