@@ -1,8 +1,6 @@
 "use client";
 import { adminService } from "@/services/admin.service";
-import { projectService } from "@/services/project.service";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { register } from "module";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -16,6 +14,7 @@ type RegisterFormType = z.infer<typeof ClientEmail>;
 
 export default function GenerateClientKeyPage() {
   const [loading, setLoading] = useState<boolean>(false);
+  const [ClientKey , setClientKey]  = useState<string>("");
 
   const form = useForm<RegisterFormType>({
     resolver: zodResolver(ClientEmail),
@@ -31,6 +30,7 @@ export default function GenerateClientKeyPage() {
       console.log("email i am sending is: ", data.email);
       const response = await adminService.generateClientKey(data);
       console.log("response is: ", response);
+      setClientKey(response.data.key_hash);
       toast.success(response?.message || "Admin successfully logged In!");
     } catch (error: any) {
       toast.error(
@@ -132,7 +132,7 @@ export default function GenerateClientKeyPage() {
               <div className="flex flex-col md:flex-row gap-3">
                 <input
                   readOnly
-                  value="CLT-4921-X92-JPR-2024"
+                  value={ClientKey}
                   className="flex-1 px-4 py-3 rounded-lg border border-primary/20 bg-white dark:bg-slate-900 font-mono text-sm tracking-widest"
                 />
 

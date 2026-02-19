@@ -59,6 +59,15 @@ export const authService = {
     } catch (error: any) {
       throw error.response?.data || error;
     }
+  },
+
+  async clientLogin(data: { email: string; password: string; agency_id: string }) {
+    try {
+      const response = await api.post('/client/login', data);
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || error;
+    }
   }
 }
 

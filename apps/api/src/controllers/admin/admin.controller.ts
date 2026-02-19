@@ -156,14 +156,20 @@ export const adminLogin = asyncHandler(async (req, res) => {
 
 });
 
+const SECRET = process.env.INVITE_SECRET!;
+
 const createKey = (email: string, role: string = "Client") => {
+const raw = `${email}:${role}:${Date.now()}`;
 
-  const key = crypto
-    .createHash("sha256")
-    .update(email + ":" + role + ":" + Date.now())
-    .digest("hex");
+  const hash = crypto
+    .createHmac("sha256", SECRET)
+    .update(raw)
+    .digest("base64")
+    .replace(/[^A-Z0-9]/gi, "")
+    .toUpperCase()
+    .slice(0, 8);
 
-  return key;
+  return `INV-${hash}`;
 }
 
 
@@ -178,9 +184,9 @@ export const createAdminKey = asyncHandler(async (req: Request, res: Response) =
 
   if (!role || !email) throw new ApiError(400, "email and role are required");
 
-  const check = await pool.query("SELECT EXISTS(SELECT 1 FROM key WHERE email = $1)", [email]);
+  const check = await pool.query('SELECT EXISTS (SELECT 1 FROM key  WHERE email = $1 AND is_used = $2)', [email, false]);
 
-  if (check.rows[0].exits) throw new ApiError(400, " invite key already exists for this email");
+  if(check.rows[0].exists) throw new ApiError(400 , "unused invite key already exists for this email");
 
   const key = createKey(email, role);
   const KEY_EXPIRY_MINUTES = 10;
@@ -205,6 +211,8 @@ export const createClientKey = asyncHandler(async (req, res) => {
   if (!email) throw new ApiError(400, "email is required");
 
   const check = await pool.query('SELECT EXISTS (SELECT 1 FROM key  WHERE email = $1 AND is_used = $2)', [email, false]);
+
+  if(check.rows[0].exists) throw new ApiError(400 , "unused invite key already exists for this email");
 
   const key = createKey(email);
 
