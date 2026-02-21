@@ -4,27 +4,26 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { projectService } from "@/services/project.service";
 import { toast } from "sonner";
-import { projectType } from "@/types/project.types";
 
 export default function AdminProjectsPage() {
   const router = useRouter();
-  const [projects, setProjects] = useState<projectType>([]);
+  const [projects, setProjects] = useState([]);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await projectService.getAllProjects();
         console.log("project data is :", response.data);
-        setProjects(Array.isArray(response.data) ? response.data : []);
+        setProject(Array.isArray(response.data) ? response.data : []);
         toast.success(response?.message || "all Projects fetched");
       } catch {
-        setProjects([]);
+        setProject([]);
       }
     }
     fetchProjects();
   }, []);
 
-  console.log("projects are : ", projects);
+  console.log("projects are : ", project);
 
   return (
     <div className="flex" >
@@ -44,12 +43,11 @@ export default function AdminProjectsPage() {
             <thead>
               <tr className="bg-[#e7edf3] text-[#4e7397] text-sm font-medium uppercase tracking-wider">
                 <th className="p-4 rounded-tl-xl">Project Name</th>
-                <th className="p-4" > Description </th>
                 <th className="p-4">Client</th>
                 <th className="p-4">Assigned To</th>
                 <th className="p-4">Status</th>
                 <th className="p-4">Due Date</th>
-                <th className="p-4 rounded-tr-xl">Status</th>
+                <th className="p-4 rounded-tr-xl">Actions</th>
               </tr>
             </thead>
             <tbody className="text-[#0e141b] text-sm">
@@ -59,8 +57,7 @@ export default function AdminProjectsPage() {
                   className="border-t border-[#d0dbe7] hover:bg-slate-50 transition-colors"
                 >
                   <td className="p-4 font-medium">{project.name}</td>
-                  <td className="p-4">{project.description}</td>
-                  <td className="p-4">{project.clientId}</td>
+                  <td className="p-4">{project.client}</td>
                   <td className="p-4">{project.agency}</td>
                   <td className="p-4">
                     <span

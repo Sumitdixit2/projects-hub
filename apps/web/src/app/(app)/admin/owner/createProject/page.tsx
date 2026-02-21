@@ -1,22 +1,20 @@
 import Sidebar from "@/components/layout/sidebar";
 
 export default function AddProjectPage() {
+
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-slate-50 overflow-x-hidden font-sans">
       <div className="flex flex-1 justify-center px-6 py-5 gap-1">
-        
-        {/* Sidebar */}
-        <Sidebar role="admin"/>
-                {/* Main Content */}
+
+        <Sidebar role="admin" />
         <div className="flex flex-1 max-w-[960px] flex-col">
-          
+
           <div className="p-4">
             <h1 className="text-[32px] font-bold text-[#0e141b]">
               Add New Project
             </h1>
           </div>
 
-          {/* Form */}
           <div className="space-y-4 px-4">
 
             <InputField label="Project Name" placeholder="Enter project name" />
@@ -55,14 +53,11 @@ export default function AddProjectPage() {
   );
 }
 
-/* ----------------- Components ----------------- */
-
 function NavItem({ label, active = false }: { label: string; active?: boolean }) {
   return (
     <div
-      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer ${
-        active ? "bg-[#e7edf3]" : ""
-      }`}
+      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer ${active ? "bg-[#e7edf3]" : ""
+        }`}
     >
       <span className="text-[#0e141b]">{label}</span>
     </div>
