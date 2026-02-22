@@ -4,7 +4,7 @@ import ApiError from '../../utils/apiError';
 import bcrypt from "bcrypt"
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
-import crypto from "crypto";
+import { createHmac } from 'node:crypto';
 import { Request, Response } from "express";
 
 export enum userType {
@@ -159,16 +159,18 @@ export const adminLogin = asyncHandler(async (req, res) => {
 const SECRET = process.env.INVITE_SECRET!;
 
 const createKey = (email: string, role: string = "Client") => {
-const raw = `${email}:${role}:${Date.now()}`;
+  const raw = `${email}:${role}:${Date.now()}`;
 
-  const hash = crypto
-    .createHmac("sha256", SECRET)
+  console.log("so is the hash not working?");
+  console.log("SECRET IS OF TYPE", typeof SECRET);
+  const hash = createHmac("sha256", SECRET)
     .update(raw)
     .digest("base64")
     .replace(/[^A-Z0-9]/gi, "")
     .toUpperCase()
     .slice(0, 8);
 
+  console.log("type is : ", typeof hash);
   return `INV-${hash}`;
 }
 
@@ -186,7 +188,7 @@ export const createAdminKey = asyncHandler(async (req: Request, res: Response) =
 
   const check = await pool.query('SELECT EXISTS (SELECT 1 FROM key  WHERE email = $1 AND is_used = $2)', [email, false]);
 
-  if(check.rows[0].exists) throw new ApiError(400 , "unused invite key already exists for this email");
+  if (check.rows[0].exists) throw new ApiError(400, "unused invite key already exists for this email");
 
   const key = createKey(email, role);
   const KEY_EXPIRY_MINUTES = 10;
@@ -212,15 +214,16 @@ export const createClientKey = asyncHandler(async (req, res) => {
 
   const check = await pool.query('SELECT EXISTS (SELECT 1 FROM key  WHERE email = $1 AND is_used = $2)', [email, false]);
 
-  if(check.rows[0].exists) throw new ApiError(400 , "unused invite key already exists for this email");
+  if (check.rows[0].exists) throw new ApiError(400, "unused invite key already exists for this email");
 
+  console.log("is code working till this point?");
   const key = createKey(email);
+  console.log("key is : ", typeof key);
 
   const KEY_EXPIRY_MINUTES = 10;
   const keyExpiry = new Date(Date.now() + KEY_EXPIRY_MINUTES * 60 * 1000);
 
   const response = await pool.query('INSERT INTO key(key_hash , key_expiry , email , agency_id) VALUES ($1 , $2 ,$3 , $4) RETURNING *', [key, keyExpiry, email, user.agency_id]);
-  if (response.rows[0].exits) throw new ApiError(500, "Failed to insert key in the database");
 
   const result = response.rows[0];
 

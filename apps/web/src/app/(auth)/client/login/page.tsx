@@ -58,11 +58,11 @@ export default function SignupPage() {
   const onSubmit = async (data: z.infer<typeof registerSchema>) => {
     setIsLoading(true);
     try {
-      await authService.registerClient(data);
-      toast.success("client successfully registered!");
+      await authService.clientLogin(data);
+      toast.success("client successfully logged In!");
     } catch (error: any) {
       console.error(
-        "agency not created",
+        "failed to login client",
         error.response?.data?.message
       );
       toast.error(
@@ -94,21 +94,6 @@ export default function SignupPage() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="px-8 pb-8 space-y-5"
         >
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">Full Name</label>
-            <input
-              type="text"
-              placeholder="John Doe"
-              className="w-full px-4 py-2 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-              {...form.register("name")}
-            />
-            {form.formState.errors.name && (
-              <p className="text-xs text-red-500">
-                {form.formState.errors.name.message}
-              </p>
-            )}
-          </div>
 
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium">Email Address</label>
@@ -159,7 +144,6 @@ export default function SignupPage() {
               </ComboboxContent>
             </Combobox>
 
-            {/* 👇 IMPORTANT */}
             <input type="hidden" {...form.register("agency_id")} />
 
             {form.formState.errors.agency_id && (
@@ -168,22 +152,6 @@ export default function SignupPage() {
               </p>
             )}
           </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">invite key</label>
-            <input
-              type="text"
-              placeholder="Enter your one time invite key"
-              className="w-full px-4 py-2 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
-              {...form.register("inviteKey")}
-            />
-            {form.formState.errors.inviteKey && (
-              <p className="text-xs text-red-500">
-                {form.formState.errors.inviteKey.message}
-              </p>
-            )}
-          </div>
-
 
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium">Password</label>

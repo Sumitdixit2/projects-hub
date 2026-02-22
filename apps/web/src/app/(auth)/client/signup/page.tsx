@@ -63,13 +63,14 @@ export default function SignupPage() {
     try {
       await authService.registerClient(data);
       toast.success("client successfully registered!");
+      router.push("/client/login");
     } catch (error: any) {
       console.error(
         "agency not created",
-        error.response?.data?.message
+        error.message
       );
       toast.error(
-        error.response?.data?.message || "Registration failed"
+        error.message || "Registration failed"
       );
     } finally {
       setIsLoading(false);
