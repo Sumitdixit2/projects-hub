@@ -1,6 +1,45 @@
+"use client";
 import Sidebar from "@/components/layout/sidebar";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { useEffect, useState } from "react";
+import { adminService } from "@/services/admin.service";
+
+const projectSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  description: z.string().min(10, "description must be atleast 10 characters"),
+  client_id: z.string().min(1, "Selecting a client is required"),
+  admin_id: z.string().min(1, "Selecting an agency is required"),
+  deadline: z.coerce.date();
+});
+
+type Client = {
+  id: string;
+  name: string;
+}
 
 export default function AddProjectPage() {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [clients, setClients] = useState([]);
+
+  const form = useForm<z.infer<typeof projectSchema>>({
+    resolver: zodResolver(projectSchema)
+  });
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await adminService.getAllClients();
+        setClients(response.data);
+      } catch (error: any) {
+        console.error("agencies failed to fetch", error);
+        setClients([]);
+      }
+    };
+
+    fetchClients();
+  }, []);
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-slate-50 overflow-x-hidden font-sans">
@@ -39,6 +78,20 @@ export default function AddProjectPage() {
             <InputField label="Milestone 1" placeholder="Enter milestone name" />
             <InputField label="Milestone 2" placeholder="Enter milestone name" />
             <InputField label="Milestone 3" placeholder="Enter milestone name" />
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">Password</label>
+              <input
+                type="password"
+                className="w-full px-4 py-2 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                {...form.register("password")}
+              />
+              {form.formState.errors.password && (
+                <p className="text-xs text-red-500">
+                  {form.formState.errors.password.message}
+                </p>
+              )}
+            </div>
 
             <div className="flex justify-end pt-4">
               <button className="h-10 rounded-lg bg-[#1980e6] px-4 text-sm font-bold text-white">

@@ -27,7 +27,7 @@ type Agency = {
   name: string;
 };
 
-export default function SignupPage() {
+export default function LoginPage() {
   const [loading, setIsLoading] = useState<boolean>(false);
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const router = useRouter();
