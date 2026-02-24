@@ -30,8 +30,8 @@ const projectSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   client_id: z.string().min(1, "Selecting a client is required"),
-  status: z.nativeEnum(statusValues),
-  deadline: z.coerce.date()
+  status: z.enum(statusValues),
+  deadline: z.string().min(1, "Deadline is required"),
 });
 
 type FormData = z.infer<typeof projectSchema>;
@@ -54,6 +54,8 @@ export default function AddProjectPage() {
     const fetchClients = async () => {
       try {
         const response = await adminService.getAllClients();
+        console.log("response is : ",response);
+        console.log("response DATA is: ",response.data);
         setClients(response.data);
       } catch (error) {
         console.error("Clients failed to fetch", error);
@@ -130,7 +132,7 @@ export default function AddProjectPage() {
             <label>Select client</label>
 
             <Combobox
-              items={clients.map((client) => client.name)}
+              //items={clients.map((client) => client.name)}
               value={clientName}
               onValueChange={(selectedName: string) => {
                 setClientName(selectedName);
