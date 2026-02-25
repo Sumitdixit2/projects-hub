@@ -20,7 +20,6 @@ export default function AppLayout({
     <div
       className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
     >
-      <Toaster />
       {children}
     </div>
   );

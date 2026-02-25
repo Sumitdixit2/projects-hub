@@ -21,6 +21,15 @@ export const authService = {
     }
   },
 
+  async renewCode (data: {email: string}) {
+    try {
+      const response = await api.post('/agency/renew-code',data);
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || error;
+    }
+  }
+
   async getAgency() {
     try {
       const response = await api.get('/agency/get-agency');
