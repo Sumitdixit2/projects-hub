@@ -56,7 +56,7 @@ export default function AddProjectPage() {
         const response = await adminService.getAllClients();
         console.log("response is : ",response);
         console.log("response DATA is: ",response.data);
-        setClients(response.data);
+        setClients([response.data]);
       } catch (error) {
         console.error("Clients failed to fetch", error);
         setClients([]);
@@ -65,6 +65,8 @@ export default function AddProjectPage() {
 
     fetchClients();
   }, []);
+
+  console.log("clients are: ",clients);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -132,7 +134,7 @@ export default function AddProjectPage() {
             <label>Select client</label>
 
             <Combobox
-              //items={clients.map((client) => client.name)}
+              items={clients.map((client) => client.name)}
               value={clientName}
               onValueChange={(selectedName: string) => {
                 setClientName(selectedName);
