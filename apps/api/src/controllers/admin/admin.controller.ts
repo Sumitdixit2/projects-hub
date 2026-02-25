@@ -236,7 +236,8 @@ export const getClients = asyncHandler(async (req, res) => {
   const user = (req as any).user;
   const agency_id = user.agency_id;
 
-  const result = pool.query('SELECT name , email FROM client WHERE agency_id = $1', [agency_id]);
+  const result = await pool.query('SELECT name , email FROM client WHERE agency_id = $1', [agency_id]);
+  console.log("result is: ",result);
 
   return res.json(new ApiResponse(200, result, "clients fetched successfully"));
 
