@@ -16,7 +16,6 @@ import {
   ComboboxList,
 } from "@/components/ui/combobox";
 
-
 const statusValues = [
   "draft",
   "pending",
@@ -44,138 +43,139 @@ type Client = {
 export default function AddProjectPage() {
   const [loading, setLoading] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
-  const [clientName , setClientName] = useState("");
+  const [clientName, setClientName] = useState("");
 
   const form = useForm<FormData>({
-    resolver: zodResolver(projectSchema)
+    resolver: zodResolver(projectSchema),
   });
 
   useEffect(() => {
     const fetchClients = async () => {
       try {
         const response = await adminService.getAllClients();
-        console.log("response is : ",response);
-        console.log("response DATA is: ",response.data);
         setClients([response.data]);
       } catch (error) {
-        console.error("Clients failed to fetch", error);
         setClients([]);
       }
     };
-
     fetchClients();
   }, []);
-
-  console.log("clients are: ",clients);
 
   const onSubmit = async (data: FormData) => {
     try {
       setLoading(true);
-
-      await projectService.createProject(
-        data
-      );
-
+      await projectService.createProject(data);
       form.reset();
+      setClientName("");
       alert("Project created successfully 🚀");
     } catch (error: any) {
-      console.error("Project creation failed", error);
       alert(error?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="relative flex min-h-screen w-full flex-col bg-slate-50 font-sans">
-      <div className="flex flex-1 justify-center px-6 py-5 gap-1">
-        <Sidebar role="admin" />
+  const inputStyles =
+    "h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-[#1980e6] focus:ring-2 focus:ring-[#1980e6]/20";
 
-        <div className="flex flex-1 max-w-[960px] flex-col">
-          <div className="p-4">
-            <h1 className="text-[32px] font-bold text-[#0e141b]">
-              Add New Project
-            </h1>
-          </div>
+  return (
+    <div className="flex min-h-screen w-full bg-slate-100 font-sans">
+      <Sidebar role="admin" />
+
+      <div className="flex flex-1 justify-center px-6 py-10">
+        <div className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-sm">
+          <h1 className="mb-8 text-3xl font-bold text-slate-900">
+            Add New Project
+          </h1>
 
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 px-4"
+            className="space-y-6"
           >
-            {/* Project Name */}
-            <div className="flex flex-col max-w-[480px]">
-              <label className="pb-2 font-medium">Project Name</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-slate-700">
+                Project Name
+              </label>
               <input
                 {...form.register("name")}
-                className="h-12 rounded-lg border px-4"
+                className={inputStyles}
               />
               {form.formState.errors.name && (
-                <p className="text-sm text-red-500">
+                <p className="text-xs text-red-500">
                   {form.formState.errors.name.message}
                 </p>
               )}
             </div>
 
-            {/* Description */}
-            <div className="flex flex-col max-w-[480px]">
-              <label className="pb-2 font-medium">Description</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-slate-700">
+                Description
+              </label>
               <textarea
                 {...form.register("description")}
-                className="rounded-lg border px-4 py-2"
+                className="min-h-[120px] w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none focus:border-[#1980e6] focus:ring-2 focus:ring-[#1980e6]/20"
               />
               {form.formState.errors.description && (
-                <p className="text-sm text-red-500">
+                <p className="text-xs text-red-500">
                   {form.formState.errors.description.message}
                 </p>
               )}
             </div>
 
-            <div className="flex flex-col gap-1.5">
-            <label>Select client</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-slate-700">
+                Select Client
+              </label>
 
-            <Combobox
-              items={clients.map((client) => client.name)}
-              value={clientName}
-              onValueChange={(selectedName: string) => {
-                setClientName(selectedName);
-                const selectedClient = clients.find(
-                  (client) => client.name === selectedName
-                );
-                if (selectedClient) {
-                  form.setValue("client_id", selectedClient.id, {
-                    shouldValidate: true,
-                  });
-                }
-              }}
-            >
-              <ComboboxInput placeholder="Search clients..." />
-              <ComboboxContent>
-                <ComboboxEmpty>No clients found.</ComboboxEmpty>
-                <ComboboxList>
-                  {(item: string) => (
-                    <ComboboxItem key={item} value={item}>
-                      {item}
-                    </ComboboxItem>
-                  )}
-                </ComboboxList>
-              </ComboboxContent>
-            </Combobox>
+              <Combobox
+                items={clients.map((client) => client.name)}
+                value={clientName}
+                onValueChange={(selectedName: string) => {
+                  setClientName(selectedName);
+                  const selectedClient = clients.find(
+                    (client) => client.name === selectedName
+                  );
+                  if (selectedClient) {
+                    form.setValue("client_id", selectedClient.id, {
+                      shouldValidate: true,
+                    });
+                  }
+                }}
+              >
+                <ComboboxInput
+                  placeholder="Search clients..."
+                  className={inputStyles}
+                />
+                <ComboboxContent>
+                  <ComboboxEmpty>No clients found.</ComboboxEmpty>
+                  <ComboboxList>
+                    {(item: string) => (
+                      <ComboboxItem key={item} value={item}>
+                        {item}
+                      </ComboboxItem>
+                    )}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
 
-            <input type="hidden" {...form.register("client_id")} />
+              <input type="hidden" {...form.register("client_id")} />
 
-            <p className="text-xs text-red-500">
-              {form.formState.errors.client_id?.message}
-            </p>
-          </div>
+              {form.formState.errors.client_id && (
+                <p className="text-xs text-red-500">
+                  {form.formState.errors.client_id.message}
+                </p>
+              )}
+            </div>
 
-            {/* Status */}
-            <div className="flex flex-col max-w-[480px]">
-              <label className="pb-2 font-medium">Initial Status</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-slate-700">
+                Initial Status
+              </label>
               <select
                 {...form.register("status")}
-                className="h-12 rounded-lg border px-4"
+                className={inputStyles}
               >
-                {Object.values(statusValues).map((status) => (
+                {statusValues.map((status) => (
                   <option key={status} value={status}>
                     {status}
                   </option>
@@ -183,22 +183,22 @@ export default function AddProjectPage() {
               </select>
             </div>
 
-            {/* Deadline */}
-            <div className="flex flex-col max-w-[480px]">
-              <label className="pb-2 font-medium">Deadline</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-slate-700">
+                Deadline
+              </label>
               <input
                 type="date"
                 {...form.register("deadline")}
-                className="h-12 rounded-lg border px-4"
+                className={inputStyles}
               />
             </div>
 
-            {/* Submit */}
             <div className="flex justify-end pt-4">
               <button
                 type="submit"
                 disabled={loading}
-                className="h-10 rounded-lg bg-[#1980e6] px-6 text-sm font-bold text-white disabled:opacity-50"
+                className="h-11 rounded-xl bg-[#1980e6] px-6 text-sm font-semibold text-white transition hover:bg-[#166fd1] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? "Creating..." : "Add Project"}
               </button>
