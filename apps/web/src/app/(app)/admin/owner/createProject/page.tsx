@@ -28,7 +28,7 @@ const statusValues = [
 const projectSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  client_id: z.string().min(1, "Selecting a client is required"),
+  client_id: z.string(),
   status: z.enum(statusValues),
   deadline: z.string().min(1, "Deadline is required"),
 });
@@ -47,6 +47,13 @@ export default function AddProjectPage() {
 
   const form = useForm<FormData>({
     resolver: zodResolver(projectSchema),
+     defaultValues: {
+    name: "",
+    description: "",
+    client_id: "",
+    status: "draft",
+    deadline: "",
+  },
   });
 
   useEffect(() => {
@@ -121,7 +128,6 @@ export default function AddProjectPage() {
                 </p>
               )}
             </div>
-
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-slate-700">
                 Select Client
@@ -131,17 +137,20 @@ export default function AddProjectPage() {
                 items={clients.map((client) => client.name)}
                 value={clientName}
                 onValueChange={(selectedName: string) => {
-                  setClientName(selectedName);
-                  const selectedClient = clients.find(
-                    (client) => client.name === selectedName
-                  );
-                  if (selectedClient) {
-                    form.setValue("client_id", selectedClient.id, {
-                      shouldValidate: true,
-                    });
-                  }
-                }}
-              >
+  setClientName(selectedName);
+  const selectedClient = clients.find(
+    (client) => client.name === selectedName
+  );
+
+  if (selectedClient) {
+    form.setValue("client_id", selectedClient.id, {
+      shouldValidate: true,
+    });
+
+    form.clearErrors("client_id");
+  }
+}}
+                             >
                 <ComboboxInput
                   placeholder="Search clients..."
                   className={inputStyles}
