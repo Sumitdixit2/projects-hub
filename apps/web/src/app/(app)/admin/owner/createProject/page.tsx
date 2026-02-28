@@ -60,7 +60,8 @@ export default function AddProjectPage() {
     const fetchClients = async () => {
       try {
         const response = await adminService.getAllClients();
-        setClients([response.data]);
+        console.log("response is: ",response.data);
+        setClients(response.data);
       } catch (error) {
         setClients([]);
       }
