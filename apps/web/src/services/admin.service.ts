@@ -26,5 +26,13 @@ export const adminService = {
     } catch (error: any) {
       throw error.response?.data || error;
     }
+  },
+  
+  async getAllAdmins() {
+    try {
+      const response = await api.get('');
+    } catch (error: any) {
+      throw error.response?.data || error;
+    }
   }
 }

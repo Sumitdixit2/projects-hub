@@ -247,9 +247,9 @@ export const getAdmins = asyncHandler(async (req, res) => {
   const user = (req as any).user;
   const agency_id = user.agency_id;
 
-  const result = await pool.query('SELECT fullname , admin_role , created_at , email FROM admin WHERE agency_id = $1', [agency_id]);
+  const result = await pool.query('SELECT id, fullname , admin_role , created_at , email FROM admin WHERE agency_id = $1', [agency_id]);
 
   if (!result.rowCount) throw new ApiError(404, "no admin found");
 
-  return res.json(new ApiResponse(200, result.rows[0], "admins fetched"));
+  return res.json(new ApiResponse(200, result.rows, "admins fetched"));
 })

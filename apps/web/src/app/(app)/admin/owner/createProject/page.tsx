@@ -15,6 +15,7 @@ import {
   ComboboxItem,
   ComboboxList,
 } from "@/components/ui/combobox";
+import { toast } from "sonner";
 
 const statusValues = [
   "draft",
@@ -28,7 +29,7 @@ const statusValues = [
 const projectSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  client_id: z.string(),
+  clientId: z.string(),
   status: z.enum(statusValues),
   deadline: z.string().min(1, "Deadline is required"),
 });
@@ -66,6 +67,14 @@ export default function AddProjectPage() {
         setClients([]);
       }
     };
+
+    const fetchAdmins = async () => {
+      try {
+        
+      } catch (error: any) {
+        
+      }
+    }
     fetchClients();
   }, []);
 
@@ -75,9 +84,9 @@ export default function AddProjectPage() {
       await projectService.createProject(data);
       form.reset();
       setClientName("");
-      alert("Project created successfully 🚀");
+      toast.success("Project created successfully 🚀");
     } catch (error: any) {
-      alert(error?.message || "Something went wrong");
+      toast.error(error?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
