@@ -30,6 +30,7 @@ const projectSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   clientId: z.string(),
+  assignedTo: z.string(),
   status: z.enum(statusValues),
   deadline: z.string().min(1, "Deadline is required"),
 });
@@ -44,6 +45,7 @@ type Client = {
 export default function AddProjectPage() {
   const [loading, setLoading] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
+  const [admins,setAdmins] = useState([]);
   const [clientName, setClientName] = useState("");
 
   const form = useForm<FormData>({
@@ -51,7 +53,8 @@ export default function AddProjectPage() {
      defaultValues: {
     name: "",
     description: "",
-    client_id: "",
+    clientId: "",
+    assignedTo: "",
     status: "draft",
     deadline: "",
   },
@@ -70,16 +73,20 @@ export default function AddProjectPage() {
 
     const fetchAdmins = async () => {
       try {
-        
+        const response = await adminService.getAllAdmins();
+        console.log("response is: ",response.data);
+        setAdmins(response.data);
       } catch (error: any) {
-        
+        setAdmins([]);
       }
     }
     fetchClients();
+    fetchAdmins();
   }, []);
 
   const onSubmit = async (data: FormData) => {
     try {
+      console.log("error is: ",form.formState.errors);
       setLoading(true);
       await projectService.createProject(data);
       form.reset();
@@ -153,11 +160,11 @@ export default function AddProjectPage() {
   );
 
   if (selectedClient) {
-    form.setValue("client_id", selectedClient.id, {
+    form.setValue("clientId", selectedClient.id, {
       shouldValidate: true,
     });
 
-    form.clearErrors("client_id");
+    form.clearErrors("clientId");
   }
 }}
                              >
@@ -177,11 +184,59 @@ export default function AddProjectPage() {
                 </ComboboxContent>
               </Combobox>
 
-              <input type="hidden" {...form.register("client_id")} />
+              <input type="hidden" {...form.register("clientId")} />
 
-              {form.formState.errors.client_id && (
+              {form.formState.errors.clientId && (
                 <p className="text-xs text-red-500">
-                  {form.formState.errors.client_id.message}
+                  {form.formState.errors.clientId.message}
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-slate-700">
+                Select Admins
+              </label>
+
+              <Combobox
+                items={admins.map((admin) => admin.name)}
+                value={clientName}
+                onValueChange={(selectedName: string) => {
+  setClientName(selectedName);
+  const selectedAdmin = admins.find(
+    (admin) => admin.name === selectedName
+  );
+
+  if (selectedAdmin) {
+    form.setValue("assignedTo", selectedAdmin.id, {
+      shouldValidate: true,
+    });
+
+    form.clearErrors("assignedTo");
+  }
+}}
+                             >
+                <ComboboxInput
+                  placeholder="Search admins..."
+                  className={inputStyles}
+                />
+                <ComboboxContent>
+                  <ComboboxEmpty>No admins found.</ComboboxEmpty>
+                  <ComboboxList>
+                    {(item: string) => (
+                      <ComboboxItem key={item} value={item}>
+                        {item}
+                      </ComboboxItem>
+                    )}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
+
+              <input type="hidden" {...form.register("assignedTo")} />
+
+              {form.formState.errors.assignedTo && (
+                <p className="text-xs text-red-500">
+                  {form.formState.errors.assignedTo.message}
                 </p>
               )}
             </div>

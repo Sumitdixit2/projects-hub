@@ -30,7 +30,8 @@ export const adminService = {
   
   async getAllAdmins() {
     try {
-      const response = await api.get('');
+      const response = await api.get('/admin/getAllAdmins');
+      return response.data;
     } catch (error: any) {
       throw error.response?.data || error;
     }
