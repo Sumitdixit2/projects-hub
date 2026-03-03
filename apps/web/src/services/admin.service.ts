@@ -27,7 +27,7 @@ export const adminService = {
       throw error.response?.data || error;
     }
   },
-  
+
   async getAllAdmins() {
     try {
       const response = await api.get('/admin/getAllAdmins');

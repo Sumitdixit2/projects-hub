@@ -45,26 +45,27 @@ type Client = {
 export default function AddProjectPage() {
   const [loading, setLoading] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
-  const [admins,setAdmins] = useState([]);
+  const [admins, setAdmins] = useState([]);
   const [clientName, setClientName] = useState("");
+  const [adminsName, setAdminsName] = useState("");
 
   const form = useForm<FormData>({
     resolver: zodResolver(projectSchema),
-     defaultValues: {
-    name: "",
-    description: "",
-    clientId: "",
-    assignedTo: "",
-    status: "draft",
-    deadline: "",
-  },
+    defaultValues: {
+      name: "",
+      description: "",
+      clientId: "",
+      assignedTo: "",
+      status: "draft",
+      deadline: "",
+    },
   });
 
   useEffect(() => {
     const fetchClients = async () => {
       try {
         const response = await adminService.getAllClients();
-        console.log("response is: ",response.data);
+        console.log("clients are: ", response.data);
         setClients(response.data);
       } catch (error) {
         setClients([]);
@@ -74,7 +75,7 @@ export default function AddProjectPage() {
     const fetchAdmins = async () => {
       try {
         const response = await adminService.getAllAdmins();
-        console.log("response is: ",response.data);
+        console.log("admins are: ", response.data);
         setAdmins(response.data);
       } catch (error: any) {
         setAdmins([]);
@@ -86,7 +87,7 @@ export default function AddProjectPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      console.log("error is: ",form.formState.errors);
+      console.log("error is: ", form.formState.errors);
       setLoading(true);
       await projectService.createProject(data);
       form.reset();
@@ -154,20 +155,20 @@ export default function AddProjectPage() {
                 items={clients.map((client) => client.name)}
                 value={clientName}
                 onValueChange={(selectedName: string) => {
-  setClientName(selectedName);
-  const selectedClient = clients.find(
-    (client) => client.name === selectedName
-  );
+                  setClientName(selectedName);
+                  const selectedClient = clients.find(
+                    (client) => client.name === selectedName
+                  );
 
-  if (selectedClient) {
-    form.setValue("clientId", selectedClient.id, {
-      shouldValidate: true,
-    });
+                  if (selectedClient) {
+                    form.setValue("clientId", selectedClient.id, {
+                      shouldValidate: true,
+                    });
 
-    form.clearErrors("clientId");
-  }
-}}
-                             >
+                    form.clearErrors("clientId");
+                  }
+                }}
+              >
                 <ComboboxInput
                   placeholder="Search clients..."
                   className={inputStyles}
@@ -199,23 +200,23 @@ export default function AddProjectPage() {
               </label>
 
               <Combobox
-                items={admins.map((admin) => admin.name)}
-                value={clientName}
+                items={admins.map((admin) => admin.fullname)}
+                value={adminsName}
                 onValueChange={(selectedName: string) => {
-  setClientName(selectedName);
-  const selectedAdmin = admins.find(
-    (admin) => admin.name === selectedName
-  );
+                  setAdminsName(selectedName);
+                  const selectedAdmin = admins.find(
+                    (admin) => admin.fullname === selectedName
+                  );
 
-  if (selectedAdmin) {
-    form.setValue("assignedTo", selectedAdmin.id, {
-      shouldValidate: true,
-    });
+                  if (selectedAdmin) {
+                    form.setValue("assignedTo", selectedAdmin.id, {
+                      shouldValidate: true,
+                    });
 
-    form.clearErrors("assignedTo");
-  }
-}}
-                             >
+                    form.clearErrors("assignedTo");
+                  }
+                }}
+              >
                 <ComboboxInput
                   placeholder="Search admins..."
                   className={inputStyles}
