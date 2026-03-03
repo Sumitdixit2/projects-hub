@@ -8,7 +8,7 @@ import { projectType } from "@/types/project.types";
 
 export default function AdminProjectsPage() {
   const router = useRouter();
-  const [projects, setProjects] = useState<projectType>([]);
+  const [projects, setProjects] = useState<projectType[]>([]);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -48,7 +48,7 @@ export default function AdminProjectsPage() {
                 <th className="p-4">Client</th>
                 <th className="p-4">Assigned To</th>
                 <th className="p-4">Status</th>
-                <th className="p-4">Due Date</th>
+                <th className="p-4">Deadline</th>
                 <th className="p-4 rounded-tr-xl">Status</th>
               </tr>
             </thead>
@@ -60,21 +60,21 @@ export default function AdminProjectsPage() {
                 >
                   <td className="p-4 font-medium">{project.name}</td>
                   <td className="p-4">{project.description}</td>
-                  <td className="p-4">{project.clientId}</td>
-                  <td className="p-4">{project.agency}</td>
+                  <td className="p-4">{project.client}</td>
+                  <td className="p-4">{project.assignedto}</td>
                   <td className="p-4">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-bold ${project.status === "In Progress"
+                      className={`px-2 py-1 rounded-full text-xs font-bold ${project.project_status === "on_hold"
                         ? "bg-blue-100 text-blue-700"
-                        : project.status === "Completed"
+                        : project.project_status === "completed"
                           ? "bg-green-100 text-green-700"
                           : "bg-gray-100 text-gray-700"
                         }`}
                     >
-                      {project.status}
+                      {project.project_status}
                     </span>
                   </td>
-                  <td className="p-4">{project.dueDate}</td>
+                  <td className="p-4">{project.deadline}</td>
                   <td className="p-4">
                     <button className="text-[#4e7397] hover:text-[#0e141b] font-medium transition-colors">
                       Edit
