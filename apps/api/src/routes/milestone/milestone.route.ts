@@ -6,8 +6,8 @@ import { changeStatus } from "../../controllers/project/project.controller";
 
 const milestoneRouter = Router();
 
-milestoneRouter.route('/createMilestone/:id').post(verifyJWT,requireAdmin , createMilestones);
-milestoneRouter.route('/changeMilestoneStatus/:id').patch(verifyJWT,requireAdmin,changeStatus);
-milestoneRouter.route('/getMilestones/:id').get(verifyJWT,requireAdmin,getMyMilestone);
+milestoneRouter.route('/createMilestone/:id').post(verifyJWT, requireAdmin, createMilestones);
+milestoneRouter.route('/changeMilestoneStatus/:id').patch(verifyJWT, requireAdmin, changeStatus);
+milestoneRouter.route('/getMilestones/:id').get(verifyJWT, requireAdmin, getMyMilestone);
 
 export default milestoneRouter;
