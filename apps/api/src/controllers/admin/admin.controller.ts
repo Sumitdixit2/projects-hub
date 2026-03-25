@@ -253,3 +253,15 @@ export const getAdmins = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(200, result.rows, "admins fetched"));
 })
+
+export const deleteClient = asyncHandler(async (req, res) => {
+
+  const { id } = req.params;
+
+  if (!id) throw new ApiError(400, "Client id is required");
+
+  await pool.query('DELETE FROM client WHERE id = $1', [id]);
+
+
+  return res.json(new ApiResponse(204, "Client deleted successfully"));
+})
