@@ -56,3 +56,14 @@ export const getMyMilestone = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(200, result.rows[0], "milestones fetched for the project"));
 });
+
+export const deleteMilestone = asyncHandler(async (req, res) => {
+
+  const { id } = req.params;
+
+  if (!id) throw new ApiError(400, "id is required");
+
+  await pool.query('DELETE FROM milestone WHERE id = $1', [id]);
+
+  return res.status(204).json(new ApiResponse(204, "milestone deleted successfully"))
+})

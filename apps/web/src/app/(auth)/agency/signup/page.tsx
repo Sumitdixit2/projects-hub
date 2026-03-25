@@ -38,7 +38,7 @@ function SignUpAgency() {
       toast.success("Agency successfully registered!");
       router.push(`/agency/verify?email=${encodeURIComponent(data.email)}`);
     } catch (error: any) {
-      console.error("agency not created", error.response?.date?.message);
+      console.error("agency not created", error.response.message);
       toast.error(error.response?.data?.message || 'Registeration failed');
     } finally {
       setIsLoading(false);
@@ -81,13 +81,15 @@ function SignUpAgency() {
                   <label htmlFor="name" className="flex flex-col min-w-40 flex-1">
                     <p className="text-[#111417] text-base font-medium leading-normal pb-2">Agency Name</p>
                   </label>
-                  <input
-                    id="name"
-                    placeholder="Enter your agency name"
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111417] focus:outline-0 focus:ring-0 border border-[#dce0e5] bg-white focus:border-[#dce0e5] h-14 placeholder:text-[#647587] p-[15px] text-base font-normal leading-normal"
-                    {...form.register('name')}
-                  />
-                  {form.formState.errors.name && <p className="text-xs text-red-500" > {form.formState.errors.name.message} </p>}
+                  <div className="flex flex-col">
+                    <input
+                      id="name"
+                      placeholder="Enter your agency name"
+                      className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111417] focus:outline-0 focus:ring-0 border border-[#dce0e5] bg-white focus:border-[#dce0e5] h-14 placeholder:text-[#647587] p-[15px] text-base font-normal leading-normal"
+                      {...form.register('name')}
+                    />
+                    {form.formState.errors.name && <p className="text-xs text-red-500" > {form.formState.errors.name.message} </p>}
+                  </div>
                 </div>
                 <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
                   <label htmlFor="email" className="flex flex-col min-w-40 flex-1">

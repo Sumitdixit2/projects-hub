@@ -9,8 +9,8 @@ export default function DashboardPage() {
         <div className="gap-1 px-6 flex flex-1 justify-center py-5">
           <div className="layout-content-container flex flex-col w-80">
             <div className="flex h-full min-h-[700px] flex-col justify-between bg-slate-50 p-4">
-            <Sidebar role="admin" />
-                          </div>
+              <Sidebar role="admin" />
+            </div>
           </div>
           <div className="layout-content-container flex flex-col max-w-[960px] flex-1">
             <Overview />

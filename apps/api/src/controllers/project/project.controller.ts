@@ -73,4 +73,18 @@ export const getMyProject = asyncHandler(async (req, res) => {
 
 });
 
+export const deleteProject = asyncHandler(async (req, res) => {
 
+  const { id } = req.params;
+
+  if (!id) throw new ApiError(400, "id must be provided");
+
+  const project = await pool.query('SELECT EXISTS (SELECT 1 FROM project WHERE id = $1)', [id]);
+
+  if (!project.rows[0].exists) throw new ApiError(404, "project not found");
+
+  await pool.query('DELETE FROM milestone WHERE project_id = $1', [id]);
+  await pool.query('DELETE FROM project WHERE id = $1', [id]);
+
+  return res.status(204).json(new ApiResponse(204, "project has been deleted successfully"));
+});

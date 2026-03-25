@@ -262,6 +262,5 @@ export const deleteClient = asyncHandler(async (req, res) => {
 
   await pool.query('DELETE FROM client WHERE id = $1', [id]);
 
-
-  return res.json(new ApiResponse(204, "Client deleted successfully"));
+  return res.status(204).json(new ApiResponse(204, "Client deleted successfully"));
 })
