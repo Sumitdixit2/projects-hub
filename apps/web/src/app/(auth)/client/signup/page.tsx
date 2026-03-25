@@ -20,8 +20,8 @@ const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  agency_id: z.string().min(1, "Selecting an agency is required"),
-  inviteKey: z.string().min(1, "inviteKey is required")
+  agency_id: z.string().uuid("Valid agency selection is required"),
+  inviteKey: z.string().min(1, "Invite key is required"),
 });
 
 type Agency = {
@@ -32,6 +32,7 @@ type Agency = {
 export default function SignupPage() {
   const [loading, setIsLoading] = useState<boolean>(false);
   const [agencies, setAgencies] = useState<Agency[]>([]);
+  const [selectedAgencyName, setSelectedAgencyName] = useState("");
   const router = useRouter();
 
   const form = useForm<z.infer<typeof registerSchema>>({
@@ -41,17 +42,19 @@ export default function SignupPage() {
       email: "",
       password: "",
       agency_id: "",
+      inviteKey: "",
     },
   });
 
+  // Fetch agencies
   useEffect(() => {
     const fetchAgencies = async () => {
       try {
         const response = await authService.getAgency();
-        setAgencies(response.data);
-      } catch (error: any) {
+        setAgencies(Array.isArray(response?.data) ? response.data : []);
+      } catch (error) {
         console.error("agencies failed to fetch", error);
-        setAgencies([]); // safety
+        setAgencies([]);
       }
     };
 
@@ -60,18 +63,30 @@ export default function SignupPage() {
 
   const onSubmit = async (data: z.infer<typeof registerSchema>) => {
     setIsLoading(true);
+
     try {
-      await authService.registerClient(data);
-      toast.success("client successfully registered!");
+      const cleanedData = {
+        ...data,
+        name: data.name.trim(),
+        email: data.email.trim(),
+      };
+
+      const response = await authService.registerClient(cleanedData);
+
+      toast.success(response?.message || "Client successfully registered!");
       router.push("/client/login");
     } catch (error: any) {
       console.error(
-        "agency not created",
-        error.message
+        "Client registration failed",
+        error?.response?.data?.message || error.message
       );
-      toast.error(
-        error.message || "Registration failed"
-      );
+
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Registration failed";
+
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -79,9 +94,10 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950">
-      <div className="w-full max-w-[480px] bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800">
+      <div className="w-full max-w-[480px] bg-white dark:bg-slate-900 rounded-lg shadow-sm border">
 
-        <div className="flex justify-center mt-5 items-center gap-4 text-[#111417]">
+        {/* Header */}
+        <div className="flex justify-center mt-5 items-center">
           <h2 className="text-lg font-bold">Project Hub</h2>
         </div>
 
@@ -99,50 +115,45 @@ export default function SignupPage() {
           className="px-8 pb-8 space-y-5"
         >
 
+          {/* Name */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium">Full Name</label>
             <input
-              type="text"
               placeholder="John Doe"
-              className="w-full px-4 py-2 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="input"
               {...form.register("name")}
             />
             {form.formState.errors.name && (
-              <p className="text-xs text-red-500">
-                {form.formState.errors.name.message}
-              </p>
+              <p className="error">{form.formState.errors.name.message}</p>
             )}
           </div>
 
+          {/* Email */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium">Email Address</label>
             <input
               type="email"
               placeholder="name@company.com"
-              className="w-full px-4 py-2 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="input"
               {...form.register("email")}
             />
             {form.formState.errors.email && (
-              <p className="text-xs text-red-500">
-                {form.formState.errors.email.message}
-              </p>
+              <p className="error">{form.formState.errors.email.message}</p>
             )}
           </div>
 
+          {/* Agency */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">
-              Select Agency
-            </label>
+            <label className="text-sm font-medium">Select Agency</label>
 
             <Combobox
-              items={agencies.map((agency) => agency.name)}
-              onValueChange={(selectedName: string) => {
-                const selectedAgency = agencies.find(
-                  (agency) => agency.name === selectedName
-                );
-
-                if (selectedAgency) {
-                  form.setValue("agency_id", selectedAgency.id, {
+              items={agencies.map((a) => a.name)}
+              value={selectedAgencyName}
+              onValueChange={(name: string) => {
+                setSelectedAgencyName(name);
+                const agency = agencies.find((a) => a.name === name);
+                if (agency) {
+                  form.setValue("agency_id", agency.id, {
                     shouldValidate: true,
                   });
                 }
@@ -154,64 +165,84 @@ export default function SignupPage() {
                 <ComboboxEmpty>No agencies found.</ComboboxEmpty>
 
                 <ComboboxList>
-                  {(item: string) => (
-                    <ComboboxItem key={item} value={item}>
-                      {item}
+                  {agencies.map((agency) => (
+                    <ComboboxItem key={agency.id} value={agency.name}>
+                      {agency.name}
                     </ComboboxItem>
-                  )}
+                  ))}
                 </ComboboxList>
               </ComboboxContent>
             </Combobox>
 
-            {/* 👇 IMPORTANT */}
             <input type="hidden" {...form.register("agency_id")} />
 
             {form.formState.errors.agency_id && (
-              <p className="text-xs text-red-500">
+              <p className="error">
                 {form.formState.errors.agency_id.message}
               </p>
             )}
           </div>
 
+          {/* Invite Key */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">invite key</label>
+            <label className="text-sm font-medium">Invite Key</label>
             <input
-              type="text"
-              placeholder="Enter your one time invite key"
-              className="w-full px-4 py-2 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              placeholder="Enter your invite key"
+              className="input"
               {...form.register("inviteKey")}
             />
             {form.formState.errors.inviteKey && (
-              <p className="text-xs text-red-500">
+              <p className="error">
                 {form.formState.errors.inviteKey.message}
               </p>
             )}
           </div>
 
-
+          {/* Password */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium">Password</label>
             <input
               type="password"
-              className="w-full px-4 py-2 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+              className="input"
               {...form.register("password")}
             />
             {form.formState.errors.password && (
-              <p className="text-xs text-red-500">
+              <p className="error">
                 {form.formState.errors.password.message}
               </p>
             )}
           </div>
 
+          {/* Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded transition-colors disabled:opacity-50"
+            className="w-full bg-blue-600 text-white font-medium py-2.5 rounded disabled:opacity-50"
           >
             {loading ? "Creating..." : "Sign Up"}
           </button>
         </form>
+
+        {loading && (
+          <p className="text-center text-sm mt-3 text-gray-500">
+            Processing...
+          </p>
+        )}
       </div>
+
+      {/* Reusable styles */}
+      <style jsx>{`
+        .input {
+          width: 100%;
+          padding: 10px;
+          border-radius: 6px;
+          border: 1px solid #ccc;
+        }
+        .error {
+          font-size: 12px;
+          color: red;
+        }
+      `}</style>
     </div>
   );
 }

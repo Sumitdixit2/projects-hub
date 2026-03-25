@@ -1,43 +1,83 @@
+"use client";
+
 import { projectService } from "@/services/project.service";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
+type Project = {
+  id: string;
+  status: "active" | "completed" | "pending";
+  clientId?: string;
+};
+
 export default function Overview() {
-  const [project, setProject] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await projectService.getAllProjects();
-        console.log("project data is :", response.data);
-        setProject(Array.isArray(response.data) ? response.data : []);
-        toast.success(response?.message || "all Projects fetched");
-      } catch {
-        setProject([]);
+
+        const data = Array.isArray(response?.data)
+          ? response.data
+          : [];
+
+        setProjects(data);
+      } catch (error: any) {
+        console.error(
+          "Failed to fetch projects",
+          error?.response?.data?.message || error.message
+        );
+
+        toast.error(
+          error?.response?.data?.message || "Failed to fetch projects"
+        );
+
+        setProjects([]);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+
     fetchProjects();
   }, []);
 
-  console.log("projects are : ", project);
+  const activeProjects = projects.filter(p => p.status === "active").length;
+  const completedProjects = projects.filter(p => p.status === "completed").length;
+
+  const totalClients = new Set(projects.map(p => p.clientId)).size;
+
+  if (loading) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        Loading overview...
+      </div>
+    );
+  }
 
   return (
     <>
-      <div className="flex flex-wrap justify-between gap-3 p-4"><p className="text-[#0e141b] tracking-light text-[32px] font-bold leading-tight min-w-72">Overview</p></div>
+      <div className="flex justify-between p-4">
+        <p className="text-[32px] font-bold">Overview</p>
+      </div>
+
       <div className="flex flex-wrap gap-4 p-4">
-        <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-[#d0dbe7]">
-          <p className="text-[#0e141b] text-base font-medium leading-normal">Active Projects</p>
-          <p className="text-[#0e141b] tracking-light text-2xl font-bold leading-tight">12</p>
-        </div>
-        <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-[#d0dbe7]">
-          <p className="text-[#0e141b] text-base font-medium leading-normal">Completed Projects</p>
-          <p className="text-[#0e141b] tracking-light text-2xl font-bold leading-tight">35</p>
-        </div>
-        <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-[#d0dbe7]">
-          <p className="text-[#0e141b] text-base font-medium leading-normal">Total Clients</p>
-          <p className="text-[#0e141b] tracking-light text-2xl font-bold leading-tight">8</p>
-        </div>
+
+        <StatCard title="Active Projects" value={activeProjects} />
+        <StatCard title="Completed Projects" value={completedProjects} />
+        <StatCard title="Total Clients" value={totalClients} />
+
       </div>
     </>
+  );
+}
+
+function StatCard({ title, value }: { title: string; value: number }) {
+  return (
+    <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-[#d0dbe7]">
+      <p className="text-base font-medium">{title}</p>
+      <p className="text-2xl font-bold">{value}</p>
+    </div>
   );
 }

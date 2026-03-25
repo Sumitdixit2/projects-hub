@@ -5,6 +5,8 @@ import { Authstate, User } from "@/types/auth.types";
 interface AuthStore extends Authstate {
   setUser: (user: User | null) => void;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
+  setHasHydrated: (state: boolean) => void;
+  hasHydrated: boolean;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -12,16 +14,30 @@ export const useAuthStore = create<AuthStore>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
-      isLoading: true,
+      isLoading: false,
+
+      hasHydrated: false, // 🔥 important
+
       setUser: (user) => set({ user }),
       setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
+      setHasHydrated: (state) => set({ hasHydrated: state }),
+
       login: (user) => set({ user, isAuthenticated: true }),
       logout: () => set({ user: null, isAuthenticated: false }),
+
       setLoading: (isLoading) => set({ isLoading }),
     }),
     {
-      name: 'auth-storage',
-      partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
+      name: "auth-storage",
+
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
+
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true); // 🔥 THIS FIXES YOUR ISSUE
+      },
     }
   )
-)
+);
