@@ -31,7 +31,7 @@ const projectSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   clientId: z.string(),
   assignedTo: z.string(),
-  status: z.enum(statusValues),
+  project_status: z.enum(statusValues),
   deadline: z.string().min(1, "Deadline is required"),
 });
 
@@ -56,7 +56,7 @@ export default function AddProjectPage() {
       description: "",
       clientId: "",
       assignedTo: "",
-      status: "draft",
+      project_status: "draft",
       deadline: "",
     },
   });
@@ -88,6 +88,7 @@ export default function AddProjectPage() {
   const onSubmit = async (data: FormData) => {
     try {
       console.log("error is: ", form.formState.errors);
+      console.log("form data is :", data);
       setLoading(true);
       await projectService.createProject(data);
       form.reset();
@@ -247,7 +248,7 @@ export default function AddProjectPage() {
                 Initial Status
               </label>
               <select
-                {...form.register("status")}
+                {...form.register("project_status")}
                 className={inputStyles}
               >
                 {statusValues.map((status) => (

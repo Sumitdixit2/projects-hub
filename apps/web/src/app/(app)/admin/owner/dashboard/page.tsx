@@ -33,29 +33,6 @@ export default function DashboardPage() {
 
         <Overview />
 
-        <section className="mt-6">
-          <h2 className="text-xl font-bold mb-4">
-            Projects by Status
-          </h2>
-
-          <div className="space-y-4">
-            {projectStats.map((item) => (
-              <div key={item.label}>
-                <p className="text-sm font-medium mb-1">
-                  {item.label}
-                </p>
-                <div className="w-full bg-gray-200 rounded h-3">
-                  <div
-                    className="bg-blue-500 h-3 rounded"
-                    style={{ width: `${item.value}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Activity Section */}
         <section className="mt-8">
           <h2 className="text-xl font-bold mb-4">
             Recent Activity

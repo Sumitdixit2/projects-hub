@@ -4,10 +4,36 @@ import { projectService } from "@/services/project.service";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
+export type projectStatus =
+  | "draft"
+  | "pending"
+  | "active"
+  | "on_hold"
+  | "completed"
+  | "cancelled";
+
 type Project = {
   id: string;
-  status: "active" | "completed" | "pending";
+  project_status: projectStatus;
   clientId?: string;
+};
+
+const ALL_STATUSES: projectStatus[] = [
+  "draft",
+  "pending",
+  "active",
+  "on_hold",
+  "completed",
+  "cancelled",
+];
+
+const STATUS_COLORS: Record<projectStatus, string> = {
+  draft: "bg-gray-400",
+  pending: "bg-yellow-400",
+  active: "bg-blue-500",
+  on_hold: "bg-orange-400",
+  completed: "bg-green-500",
+  cancelled: "bg-red-500",
 };
 
 export default function Overview() {
@@ -22,6 +48,8 @@ export default function Overview() {
         const data = Array.isArray(response?.data)
           ? response.data
           : [];
+
+        console.log("project data is: ", data);
 
         setProjects(data);
       } catch (error: any) {
@@ -43,10 +71,25 @@ export default function Overview() {
     fetchProjects();
   }, []);
 
-  const activeProjects = projects.filter(p => p.status === "active").length;
-  const completedProjects = projects.filter(p => p.status === "completed").length;
-
+  const activeProjects = projects.filter(p => p.project_status === "active").length;
+  const completedProjects = projects.filter(p => p.project_status === "completed").length;
   const totalClients = new Set(projects.map(p => p.clientId)).size;
+
+  const totalProjects = projects.length;
+
+  const statusCounts = ALL_STATUSES.reduce((acc, status) => {
+    acc[status] = projects.filter(p => p.status === status).length;
+    return acc;
+  }, {} as Record<projectStatus, number>);
+
+  const projectStats = ALL_STATUSES.map(status => ({
+    status,
+    label: status.replace("_", " ").toUpperCase(),
+    value: totalProjects
+      ? Math.round((statusCounts[status] / totalProjects) * 100)
+      : 0,
+    count: statusCounts[status],
+  }));
 
   if (loading) {
     return (
@@ -63,12 +106,32 @@ export default function Overview() {
       </div>
 
       <div className="flex flex-wrap gap-4 p-4">
-
         <StatCard title="Active Projects" value={activeProjects} />
         <StatCard title="Completed Projects" value={completedProjects} />
         <StatCard title="Total Clients" value={totalClients} />
-
       </div>
+
+      <section className="mt-6 p-4">
+        <h2 className="text-xl font-bold mb-4">
+          Projects by Status
+        </h2>
+
+        <div className="space-y-4">
+          {projectStats.map((item) => (
+            <div key={item.status}>
+              <p className="text-sm font-medium mb-1">
+                {item.label} ({item.count})
+              </p>
+              <div className="w-full bg-gray-200 rounded h-3">
+                <div
+                  className={`${STATUS_COLORS[item.status]} h-3 rounded transition-all duration-500`}
+                  style={{ width: `${item.value}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </>
   );
 }
