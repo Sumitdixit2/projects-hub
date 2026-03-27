@@ -55,7 +55,6 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
   const user = response.rows[0];
 
-  console.log("user for jwt is :", user);
   (req as any).user = user;
   (req as any).userType = userType;
   next();
