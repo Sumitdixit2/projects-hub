@@ -119,7 +119,7 @@ export default function AdminProjectsPage() {
                         </td>
                         <td className="p-4 text-right">
                           <button
-                            onClick={() => router.push(`/admin/owner/projects/${project.id}`)}
+                            onClick={() => router.push(`/admin/owner/project/${project.id}`)}
                             className="text-[#4e7397] hover:text-[#0e141b] font-bold text-xs uppercase tracking-wide transition-colors"
                           >
                             View
