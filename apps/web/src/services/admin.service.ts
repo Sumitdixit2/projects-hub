@@ -28,6 +28,15 @@ export const adminService = {
     }
   },
 
+  async getClientById(clientId: string) {
+    try {
+      const response = await api.get(`/admin/getClient/${clientId}`);
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || error;
+    }
+  },
+
   async getAllAdmins() {
     try {
       const response = await api.get('/admin/getAllAdmins');

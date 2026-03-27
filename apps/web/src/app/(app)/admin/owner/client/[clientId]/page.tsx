@@ -6,6 +6,8 @@ import { adminService } from "@/services/admin.service";
 import Sidebar from "@/components/layout/sidebar";
 import { toast } from "sonner";
 import Link from "next/link";
+import { projectType } from "@/types/project.types";
+import { projectService } from "@/services/project.service";
 
 type Project = {
   id: string;
@@ -20,7 +22,7 @@ type ClientDetails = {
   email: string;
   phone?: string;
   address?: string;
-  projects: Project[];
+  project: Project[];
 };
 
 export default function ClientDetailPage() {
@@ -28,6 +30,22 @@ export default function ClientDetailPage() {
   const router = useRouter();
   const [client, setClient] = useState<ClientDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  const [projects, setProjects] = useState<projectType[]>([]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await projectService.getAllProjects();
+        setProjects(Array.isArray(response.data) ? response.data : []);
+      } catch (error: any) {
+        setProjects([]);
+        toast.error("Failed to fetch projects");
+      }
+    };
+    fetchProjects();
+  }, []);
+
+
 
   useEffect(() => {
     const fetchClientData = async () => {
@@ -50,13 +68,11 @@ export default function ClientDetailPage() {
 
   return (
     <div className="relative flex h-screen w-full bg-slate-50 group/design-root overflow-hidden">
-      {/* Reusing your existing Sidebar component */}
       <Sidebar role="admin" />
 
       <div className="flex flex-1 flex-col overflow-y-auto">
         <div className="layout-content-container flex flex-col max-w-[960px] flex-1 mx-auto w-full">
 
-          {/* Breadcrumbs */}
           <div className="flex flex-wrap gap-2 p-4">
             <Link className="text-[#4e7397] text-base font-medium leading-normal hover:underline" href="/admin/owner/projects">
               Projects
@@ -65,7 +81,6 @@ export default function ClientDetailPage() {
             <span className="text-[#0e141b] text-base font-medium leading-normal">Client Details</span>
           </div>
 
-          {/* Header */}
           <div className="flex flex-wrap justify-between gap-3 p-4">
             <p className="text-[#0e141b] tracking-light text-[32px] font-bold leading-tight min-w-72">
               Client: {client.name}
@@ -77,7 +92,6 @@ export default function ClientDetailPage() {
             </button>
           </div>
 
-          {/* Contact Information */}
           <h3 className="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
             Contact Information
           </h3>
@@ -96,7 +110,6 @@ export default function ClientDetailPage() {
             </div>
           </div>
 
-          {/* Associated Projects Table */}
           <h3 className="text-[#0e141b] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
             Associated Projects
           </h3>
@@ -115,8 +128,8 @@ export default function ClientDetailPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {client.projects && client.projects.length > 0 ? (
-                    client.projects.map((project) => (
+                  {client.project && client.project.length > 0 ? (
+                    client.project.map((project) => (
                       <tr key={project.id} className="border-t border-[#d0dbe7] hover:bg-slate-50 transition-colors">
                         <td className="h-[72px] px-4 py-2 text-[#0e141b] text-sm font-normal">
                           {project.name}

@@ -21,7 +21,7 @@ export default function ClientsPage() {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await adminService.getAllClients(); //
+        const response = await adminService.getAllClients();
         setClients(Array.isArray(response?.data) ? response.data : []);
       } catch (error: any) {
         console.error("Failed to fetch clients", error);

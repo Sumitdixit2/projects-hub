@@ -244,9 +244,33 @@ export const getClients = asyncHandler(async (req, res) => {
 
 export const getClient = asyncHandler(async (req, res) => {
 
-  const clientId = req.params;
+  const { clientId } = req.params;
 
-  const result = await pool.query('SELECT id,name,email FROM client WHERE id = $1 ', [clientId]);
+  const result = await pool.query(
+    `
+  SELECT 
+    c.id,
+    c.name,
+    c.email,
+    COALESCE(
+      JSON_AGG(
+        JSON_BUILD_OBJECT(
+          'id', p.id,
+          'name', p.name,
+          'project_status', p.project_status,
+          'deadline', p.deadline
+        )
+      ) FILTER (WHERE p.id IS NOT NULL),
+      '[]'
+    ) AS project
+  FROM client c
+  LEFT JOIN project p ON c.id = p.client_id
+  WHERE c.id = $1
+  GROUP BY c.id;
+  `,
+    [clientId]
+  );
+  console.log("result is: ", result.rows[0]);
 
   return res.json(new ApiResponse(200, result.rows[0], "client fetched successfully"));
 })
