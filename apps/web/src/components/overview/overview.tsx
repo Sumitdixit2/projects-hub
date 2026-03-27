@@ -49,7 +49,6 @@ export default function Overview() {
           ? response.data
           : [];
 
-        console.log("project data is: ", data);
 
         setProjects(data);
       } catch (error: any) {
@@ -78,7 +77,7 @@ export default function Overview() {
   const totalProjects = projects.length;
 
   const statusCounts = ALL_STATUSES.reduce((acc, status) => {
-    acc[status] = projects.filter(p => p.status === status).length;
+    acc[status] = projects.filter(p => p.project_status === status).length; // Correct property 'project_status'
     return acc;
   }, {} as Record<projectStatus, number>);
 

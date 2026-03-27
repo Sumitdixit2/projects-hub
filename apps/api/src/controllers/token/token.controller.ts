@@ -12,25 +12,20 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
   const incomingToken = req.cookies?.refreshToken;
 
-  console.log("incomingToken is : ", incomingToken);
 
   if (!incomingToken) throw new ApiError(400, "no token received!");
-  console.log('incomingToken : ', incomingToken);
 
   const decodeToken = jwt.verify(incomingToken, REFRESH_TOKEN_SECRET) as AccessTokenJwtPayload;
 
   if (!decodeToken) throw new ApiError(400, "token failed to get verified");
   if (!decodeToken.sub) throw new ApiError(500, "id is undefined");
 
-  console.log("id: ", decodeToken.sub);
 
   const findUser = await pool.query('SELECT refreshtoken FROM admin WHERE id = $1', [decodeToken.sub]);
-  console.log("User is : ", findUser.rowCount);
 
   if (findUser.rowCount === 0) throw new ApiError(400, "No user found for the token being provided");
 
   const refreshToken = findUser.rows[0].refreshtoken;
-  console.log('refresh token is : ', refreshToken);
 
   const result = await bcrypt.compare(incomingToken, refreshToken);
 
