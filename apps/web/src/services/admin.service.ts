@@ -10,7 +10,7 @@ export const adminService = {
     }
   },
 
-  async generateAdminKey(data: { email: string; role: string }) {
+  async generateAdminKey(data: { email: string; role: "staff" | "developer" }) {
     try {
       const response = await api.post('/admin/generateAdminKey', data);
       return response.data;

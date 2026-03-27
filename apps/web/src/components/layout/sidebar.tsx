@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Key } from "lucide-react";
+import { icons, Key, Projector } from "lucide-react";
 
 interface SidebarProps {
-  role: "admin" | "agency" | "client";
+  role: "admin" | "client";
 }
 
 export default function Sidebar({ role }: SidebarProps) {
@@ -17,17 +17,13 @@ export default function Sidebar({ role }: SidebarProps) {
       { href: "/admin/owner/dashboard", label: "Dashboard", icon: <HouseIcon /> },
       { href: "/admin/owner/projects", label: "Projects", icon: <FolderIcon /> },
       { href: "/admin/owner/generateClientKey", label: "Client Key", icon: <Key /> },
-      { href: "/admin/owner/myclients", label: "Clients", icon: <UsersIcon /> }, // Added Clients for Admin
+      { href: "/admin/owner/myclients", label: "Clients", icon: <UsersIcon /> },
+      { href: "/admin/owner/createProject", label: "Create Project", icon: <Projector /> },
       { href: "/admin/owner/messages", label: "Messages", icon: <EnvelopeIcon /> },
       { href: "/admin/owner/activity", label: "Activity Log", icon: <ListBulletsIcon /> },
       { href: "/admin/owner/settings", label: "Settings", icon: <GearIcon /> },
     ],
-    agency: [
-      { href: "/agency/dashboard", label: "Dashboard", icon: <HouseIcon /> },
-      { href: "/agency/projects", label: "Projects", icon: <FolderIcon /> },
-      { href: "/agency/clients", label: "Clients", icon: <UsersIcon /> },
-      { href: "/agency/settings", label: "Settings", icon: <GearIcon /> },
-    ],
+
     client: [
       { href: "/client/dashboard", label: "Dashboard", icon: <HouseIcon /> },
       { href: "/client/projects", label: "Projects", icon: <FolderIcon /> },
