@@ -65,7 +65,7 @@ export const getMyProject = asyncHandler(async (req, res) => {
 
   if (!id) throw new ApiError(400, "id must be provided");
 
-  const find = await pool.query('SELECT * FROM project WHERE id = $1', [id]);
+  const find = await pool.query('SELECT project.name , project.description , project.started_at , project.deadline , project.project_status , client.name as client , admin.fullname as assignedto FROM project INNER JOIN client ON project.client_id = client.id INNER JOIN admin ON project.admin_id = admin.id WHERE project.id = $1', [id]);
 
   if (!find.rowCount) throw new ApiError(404, "project not found");
 

@@ -52,8 +52,6 @@ export const getMyMilestone = asyncHandler(async (req, res) => {
 
   const result = await pool.query('SELECT name , due_date , created_at , milestone_status , description FROM milestone WHERE project_id = $1', [id]);
 
-  if (!result.rowCount) throw new ApiError(404, "no milestones found");
-
   return res.json(new ApiResponse(200, result.rows[0], "milestones fetched for the project"));
 });
 

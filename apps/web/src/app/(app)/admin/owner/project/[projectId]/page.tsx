@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation"; // Added useRouter for navigation
 import Sidebar from "@/components/layout/sidebar";
 import { projectService } from "@/services/project.service";
 import { milestoneService } from "@/services/milestone.service";
@@ -12,19 +12,27 @@ import { cn } from "@/lib/utils";
 
 export default function ProjectDetailsPage() {
   const { projectId } = useParams() as { projectId: string };
-  const [project, setProject] = useState<projectType | null>(null);
+  const router = useRouter();
+  const [project, setProject] = useState<any | null>(null); // Use any temporarily if types don't match API exactly
   const [milestones, setMilestones] = useState<MilestoneType[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [projectData, milestonesData] = await Promise.all([
+        const [projectResponse, milestonesResponse] = await Promise.all([
           projectService.getMyProject(projectId),
           milestoneService.getMilestones(projectId),
         ]);
-        setProject(projectData);
-        setMilestones(milestonesData);
+
+        console.log("project data is: ", projectResponse);
+        console.log("milestone data is : ", milestonesResponse);
+
+        // Fix 1: Correctly extract 'data' from the response wrapper
+        setProject(projectResponse.data);
+
+        // Fix 2: Set milestones to the array directly, fallback to empty array if undefined
+        setMilestones(milestonesResponse.data || []);
       } catch (error: any) {
         toast.error(error.message || "Failed to fetch project details");
       } finally {
@@ -38,7 +46,7 @@ export default function ProjectDetailsPage() {
   const handleProjectStatusChange = async (newStatus: projectStatus) => {
     try {
       await projectService.changeStatus(projectId, newStatus);
-      setProject((prev) => (prev ? { ...prev, project_status: newStatus } : null));
+      setProject((prev: any) => (prev ? { ...prev, project_status: newStatus } : null));
       toast.success("Project status updated");
     } catch (error: any) {
       toast.error(error.message || "Failed to update status");
@@ -73,8 +81,7 @@ export default function ProjectDetailsPage() {
       <div className="layout-container flex h-full grow">
         <Sidebar role="admin" />
 
-        <main className="flex-1 flex flex-col max-w-[960px] mx-auto py-5 px-6">
-          {/* Breadcrumbs */}
+        <main className="flex-1 flex flex-col max-w-[960px] mx-auto py-5 px-6 ml-80">
           <div className="flex flex-wrap gap-2 p-4">
             <a className="text-[#4e7397] text-base font-medium hover:underline" href="/admin/owner/projects">
               Projects
@@ -83,7 +90,6 @@ export default function ProjectDetailsPage() {
             <span className="text-[#0e141b] text-base font-medium">{project.name}</span>
           </div>
 
-          {/* Header */}
           <div className="flex flex-wrap justify-between gap-3 p-4">
             <div className="flex min-w-72 flex-col gap-3">
               <h1 className="text-[#0e141b] tracking-light text-[32px] font-bold leading-tight">
@@ -95,12 +101,11 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          {/* Project Information */}
           <h3 className="text-[#0e141b] text-lg font-bold px-4 pb-2 pt-4">Project Information</h3>
           <div className="p-4 grid grid-cols-[20%_1fr] gap-x-6">
             <div className="col-span-2 grid grid-cols-subgrid border-t border-[#d0dbe7] py-5">
-              <p className="text-[#4e7397] text-sm">Client</p>
-              <p className="text-[#0e141b] text-sm font-medium">{project.client}</p>
+              <p className="text-[#4e7397] text-sm">Client ID</p>
+              <p className="text-[#0e141b] text-sm font-medium">{project.client_id}</p>
             </div>
             <div className="col-span-2 grid grid-cols-subgrid border-t border-[#d0dbe7] py-5">
               <p className="text-[#4e7397] text-sm">Deadline</p>
@@ -109,12 +114,11 @@ export default function ProjectDetailsPage() {
               </p>
             </div>
             <div className="col-span-2 grid grid-cols-subgrid border-t border-[#d0dbe7] py-5">
-              <p className="text-[#4e7397] text-sm">Assigned To</p>
-              <p className="text-[#0e141b] text-sm font-medium">{project.assignedto}</p>
+              <p className="text-[#4e7397] text-sm">Admin ID</p>
+              <p className="text-[#0e141b] text-sm font-medium">{project.admin_id}</p>
             </div>
           </div>
 
-          {/* Project Status Selection */}
           <h3 className="text-[#0e141b] text-lg font-bold px-4 pb-2 pt-4">Project Status</h3>
           <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
             <label className="flex flex-col min-w-40 flex-1">
@@ -133,7 +137,6 @@ export default function ProjectDetailsPage() {
             </label>
           </div>
 
-          {/* Milestones Table */}
           <h3 className="text-[#0e141b] text-lg font-bold px-4 pb-2 pt-4">Milestones</h3>
           <div className="px-4 py-3">
             <div className="overflow-hidden rounded-lg border border-[#d0dbe7] bg-slate-50">
@@ -150,9 +153,10 @@ export default function ProjectDetailsPage() {
                   {milestones.length > 0 ? (
                     milestones.map((milestone) => (
                       <tr key={milestone.id} className="border-t border-[#d0dbe7] hover:bg-slate-100">
-                        <td className="px-4 py-4 text-[#0e141b] text-sm">{milestone.title}</td>
+                        {/* Fix: Added optional chaining and better structure */}
+                        <td className="px-4 py-4 text-[#0e141b] text-sm">{milestone?.title || "Untitled"}</td>
                         <td className="px-4 py-4 text-[#4e7397] text-sm">
-                          {new Date(milestone.dueDate).toLocaleDateString()}
+                          {milestone?.dueDate ? new Date(milestone.dueDate).toLocaleDateString() : "No Date"}
                         </td>
                         <td className="px-4 py-4 text-center">
                           <button
@@ -187,7 +191,10 @@ export default function ProjectDetailsPage() {
           </div>
 
           <div className="flex px-4 py-3">
-            <button className="flex items-center justify-center rounded-lg h-10 px-4 bg-[#e7edf3] text-[#0e141b] text-sm font-bold hover:bg-[#d0dbe7]">
+            <button
+              onClick={() => router.push(`/admin/owner/createmilestone/${projectId}`)}
+              className="flex items-center justify-center rounded-lg h-10 px-4 bg-[#e7edf3] text-[#0e141b] text-sm font-bold hover:bg-[#d0dbe7]"
+            >
               Add Milestone
             </button>
           </div>
