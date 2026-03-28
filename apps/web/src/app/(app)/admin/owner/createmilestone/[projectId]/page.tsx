@@ -9,8 +9,8 @@ import { toast } from "sonner";
 import Sidebar from "@/components/layout/sidebar";
 import { projectService } from "@/services/project.service";
 import { milestoneService } from "@/services/milestone.service";
-import { MilestoneStatus } from "@/types/milestone.types";
-import { ChevronRight, Task, AlarmClock, NetworkTree, Info, Search, Bell, HelpCircle } from "lucide-react";
+// Changed Task to CheckSquare
+import { ChevronRight, CheckSquare, AlarmClock, Network, Info, Search, Bell, HelpCircle } from "lucide-react";
 
 const milestoneSchema = z.object({
   title: z.string().min(2, "Milestone name must be at least 2 characters"),
@@ -42,8 +42,7 @@ export default function CreateMilestonePage() {
     const fetchProject = async () => {
       try {
         const project = await projectService.getMyProject(projectId);
-        console.log("project is:", project);
-        setProjectName(project.name);
+        setProjectName(project.data?.name || "Project");
       } catch (error) {
         setProjectName("Project");
       }
@@ -189,7 +188,8 @@ export default function CreateMilestonePage() {
                 <h3 className="text-xs font-black text-[#197fe6] uppercase tracking-widest mb-4">Quick Guidelines</h3>
                 <ul className="space-y-4">
                   <li className="flex gap-3">
-                    <Task className="text-[#197fe6] w-5 h-5 flex-shrink-0" />
+                    {/* Changed Task to CheckSquare */}
+                    <CheckSquare className="text-[#197fe6] w-5 h-5 flex-shrink-0" />
                     <p className="text-xs text-slate-600 leading-relaxed">
                       <strong className="text-[#0f172a] block">Specific Goals</strong>
                       Milestones should be atomic and verifiable upon completion.
@@ -203,7 +203,7 @@ export default function CreateMilestonePage() {
                     </p>
                   </li>
                   <li className="flex gap-3">
-                    <NetworkTree className="text-[#197fe6] w-5 h-5 flex-shrink-0" />
+                    <Network className="text-[#197fe6] w-5 h-5 flex-shrink-0" />
                     <p className="text-xs text-slate-600 leading-relaxed">
                       <strong className="text-[#0f172a] block">Dependency Check</strong>
                       Identify any blocked tasks that rely on this milestone.

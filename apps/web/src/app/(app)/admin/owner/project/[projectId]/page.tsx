@@ -9,7 +9,19 @@ import { projectType, projectStatus } from "@/types/project.types";
 import { MilestoneType, MilestoneStatus } from "@/types/milestone.types";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { ChevronDown, CheckCircle2, Clock, PlayCircle, StopCircle, XCircle, FileText } from "lucide-react";
+import {
+  ChevronDown,
+  CheckCircle2,
+  Clock,
+  PlayCircle,
+  StopCircle,
+  XCircle,
+  FileText,
+  Calendar,
+  User,
+  Briefcase,
+  AlignLeft
+} from "lucide-react";
 
 export default function ProjectDetailsPage() {
   const { projectId } = useParams() as { projectId: string };
@@ -26,6 +38,7 @@ export default function ProjectDetailsPage() {
           projectService.getMyProject(projectId),
           milestoneService.getMilestones(projectId),
         ]);
+        // Extracting data from API response structure
         setProject(projectResponse.data);
         setMilestones(milestonesResponse.data || []);
       } catch (error: any) {
@@ -79,10 +92,12 @@ export default function ProjectDetailsPage() {
           <div className="flex flex-wrap justify-between items-center gap-3 p-4">
             <div className="flex flex-col gap-1">
               <h1 className="text-[#0e141b] text-[32px] font-bold leading-tight">{project.name}</h1>
-              <p className="text-[#4e7397] text-sm">{project.description}</p>
+              <div className="flex items-center gap-2 text-[#4e7397] text-sm">
+                <Briefcase className="w-4 h-4" />
+                <span>Project ID: {projectId.slice(0, 8)}...</span>
+              </div>
             </div>
 
-            {/* NEW: Button-based Status Control */}
             <div className="relative">
               <button
                 onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)}
@@ -98,15 +113,14 @@ export default function ProjectDetailsPage() {
               </button>
 
               {isStatusMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden py-1 animate-in fade-in zoom-in duration-200">
-                  <p className="px-4 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">Change Status</p>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden py-1">
                   {statusOptions.map((option) => (
                     <button
                       key={option.value}
                       onClick={() => handleProjectStatusChange(option.value)}
                       className={cn(
                         "flex items-center gap-3 w-full px-4 py-2.5 text-sm transition-colors hover:bg-slate-50",
-                        project.project_status === option.value ? "text-blue-600 bg-blue-50/50 font-medium" : "text-slate-600"
+                        project.project_status === option.value ? "text-blue-600 bg-blue-50 font-medium" : "text-slate-600"
                       )}
                     >
                       <option.icon className="w-4 h-4" />
@@ -118,26 +132,63 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          {/* Project Details Grid */}
-          <h3 className="text-[#0e141b] text-lg font-bold px-4 pb-2 pt-8">Information</h3>
-          <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* NEW SECTION: Project Description */}
+          <div className="px-4 mt-6">
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+              <div className="flex items-center gap-2 mb-3 text-[#0e141b]">
+                <AlignLeft className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-bold">Project Description</h3>
+              </div>
+              <p className="text-slate-600 leading-relaxed text-sm whitespace-pre-wrap">
+                {project.description || "No description provided for this project."}
+              </p>
+            </div>
+          </div>
+
+          {/* Project Details Grid (Added "Started At") */}
+          <h3 className="text-[#0e141b] text-lg font-bold px-4 pb-2 pt-8">Quick Stats</h3>
+          <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-xl border border-slate-200">
-              <p className="text-[#4e7397] text-xs font-bold uppercase tracking-wider mb-1">Client</p>
+              <div className="flex items-center gap-2 text-[#4e7397] mb-1">
+                <User className="w-4 h-4" />
+                <p className="text-xs font-bold uppercase tracking-wider">Client</p>
+              </div>
               <p className="text-[#0e141b] font-medium">{project.client}</p>
             </div>
+
+            {/* NEW: Started At Field */}
             <div className="bg-white p-4 rounded-xl border border-slate-200">
-              <p className="text-[#4e7397] text-xs font-bold uppercase tracking-wider mb-1">Deadline</p>
-              <p className="text-[#0e141b] font-medium">{new Date(project.deadline).toLocaleDateString()}</p>
+              <div className="flex items-center gap-2 text-[#4e7397] mb-1">
+                <Calendar className="w-4 h-4" />
+                <p className="text-xs font-bold uppercase tracking-wider">Started At</p>
+              </div>
+              <p className="text-[#0e141b] font-medium">
+                {project.started_at ? new Date(project.started_at).toLocaleDateString() : "Not set"}
+              </p>
             </div>
+
             <div className="bg-white p-4 rounded-xl border border-slate-200">
-              <p className="text-[#4e7397] text-xs font-bold uppercase tracking-wider mb-1">Lead Admin</p>
+              <div className="flex items-center gap-2 text-[#4e7397] mb-1">
+                <Clock className="w-4 h-4" />
+                <p className="text-xs font-bold uppercase tracking-wider">Deadline</p>
+              </div>
+              <p className="text-[#0e141b] font-medium">
+                {new Date(project.deadline).toLocaleDateString()}
+              </p>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-slate-200">
+              <div className="flex items-center gap-2 text-[#4e7397] mb-1">
+                <CheckCircle2 className="w-4 h-4" />
+                <p className="text-xs font-bold uppercase tracking-wider">Admin</p>
+              </div>
               <p className="text-[#0e141b] font-medium">{project.assignedto}</p>
             </div>
           </div>
 
           {/* Milestones Section */}
           <div className="flex items-center justify-between px-4 mt-8">
-            <h3 className="text-[#0e141b] text-lg font-bold">Project Milestones</h3>
+            <h3 className="text-[#0e141b] text-lg font-bold">Milestones</h3>
             <button
               onClick={() => router.push(`/admin/owner/createmilestone/${projectId}`)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-md shadow-blue-200"
@@ -164,7 +215,6 @@ export default function ProjectDetailsPage() {
                         <td className="px-6 py-4 text-sm text-[#4e7397]">{new Date(m.dueDate).toLocaleDateString()}</td>
                         <td className="px-6 py-4 text-center">
                           <button
-                            onClick={() => { }}
                             className={cn(
                               "px-3 py-1 rounded-full text-xs font-bold border",
                               m.status === "completed" ? "bg-green-50 text-green-700 border-green-200" : "bg-slate-50 text-slate-600 border-slate-200"
