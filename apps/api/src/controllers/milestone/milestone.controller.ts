@@ -10,6 +10,11 @@ export const createMilestones = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name, description, due_date, initialStatus } = req.body;
 
+  console.log("name is: ", name);
+  console.log("description is : ", description);
+  console.log("due_date is : ", due_date);
+  console.log("initialStatus is : ", initialStatus);
+
   if (!id) throw new ApiError(400, "id must be provided");
   if (!name?.trim() || !description?.trim() || !due_date?.trim()) throw new ApiError(400, "Enter all the required fields");
 
@@ -50,7 +55,7 @@ export const getMyMilestone = asyncHandler(async (req, res) => {
 
   if (!id) throw new ApiError(400, "id is required");
 
-  const result = await pool.query('SELECT name , due_date , created_at , milestone_status , description FROM milestone WHERE project_id = $1', [id]);
+  const result = await pool.query('SELECT id, name , due_date , created_at , milestone_status , description FROM milestone WHERE project_id = $1', [id]);
 
   return res.json(new ApiResponse(200, result.rows[0], "milestones fetched for the project"));
 });

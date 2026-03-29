@@ -9,14 +9,13 @@ import { toast } from "sonner";
 import Sidebar from "@/components/layout/sidebar";
 import { projectService } from "@/services/project.service";
 import { milestoneService } from "@/services/milestone.service";
-// Changed Task to CheckSquare
 import { ChevronRight, CheckSquare, AlarmClock, Network, Info, Search, Bell, HelpCircle } from "lucide-react";
 
 const milestoneSchema = z.object({
-  title: z.string().min(2, "Milestone name must be at least 2 characters"),
+  name: z.string().min(2, "Milestone name must be at least 2 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  dueDate: z.string().min(1, "Deadline is required"),
-  status: z.enum(["planning", "in-progress", "review", "completed"]),
+  due_date: z.string().min(1, "Deadline is required"),
+  initialStatus: z.enum(["draft", "pending", "active", "on_hold", "completed", "cancelled"]),
 });
 
 type MilestoneFormData = z.infer<typeof milestoneSchema>;
@@ -34,7 +33,7 @@ export default function CreateMilestonePage() {
   } = useForm<MilestoneFormData>({
     resolver: zodResolver(milestoneSchema),
     defaultValues: {
-      status: "planning",
+      initialStatus: "draft",
     },
   });
 
@@ -55,7 +54,7 @@ export default function CreateMilestonePage() {
       setLoading(true);
       await milestoneService.createMilestone(projectId, {
         ...data,
-        dueDate: new Date(data.dueDate),
+        dueDate: new Date(data.due_date),
       } as any);
 
       toast.success("Milestone created successfully");
@@ -120,11 +119,11 @@ export default function CreateMilestonePage() {
                   <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Milestone Name</label>
                     <input
-                      {...register("title")}
+                      {...register("name")}
                       className="w-full bg-slate-50 border-none rounded-lg py-3 px-4 text-[#0f172a] focus:ring-2 focus:ring-[#197fe6] transition-all"
                       placeholder="e.g. Beta API Integration"
                     />
-                    {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
+                    {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                   </div>
 
                   <div>
@@ -142,23 +141,24 @@ export default function CreateMilestonePage() {
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Deadline</label>
                       <input
-                        {...register("dueDate")}
+                        {...register("due_date")}
                         type="date"
                         className="w-full bg-slate-50 border-none rounded-lg py-3 px-4 text-[#0f172a] focus:ring-2 focus:ring-[#197fe6] transition-all"
                       />
-                      {errors.dueDate && <p className="text-red-500 text-xs mt-1">{errors.dueDate.message}</p>}
+                      {errors.due_date && <p className="text-red-500 text-xs mt-1">{errors.due_date.message}</p>}
                     </div>
 
                     <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Milestone Status</label>
                       <select
-                        {...register("status")}
+                        {...register("initialStatus")}
                         className="w-full bg-slate-50 border-none rounded-lg py-3 px-4 text-[#0f172a] focus:ring-2 focus:ring-[#197fe6] transition-all"
                       >
-                        <option value="planning">Planning</option>
-                        <option value="in-progress">In-Progress</option>
-                        <option value="review">Review</option>
+                        <option value="draft">draft</option>
+                        <option value="pending">pending</option>
+                        <option value="active">active</option>
                         <option value="completed">Completed</option>
+                        <option value="on_hold"> on hold </option>
                       </select>
                     </div>
                   </div>
@@ -188,7 +188,6 @@ export default function CreateMilestonePage() {
                 <h3 className="text-xs font-black text-[#197fe6] uppercase tracking-widest mb-4">Quick Guidelines</h3>
                 <ul className="space-y-4">
                   <li className="flex gap-3">
-                    {/* Changed Task to CheckSquare */}
                     <CheckSquare className="text-[#197fe6] w-5 h-5 flex-shrink-0" />
                     <p className="text-xs text-slate-600 leading-relaxed">
                       <strong className="text-[#0f172a] block">Specific Goals</strong>

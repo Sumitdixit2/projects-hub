@@ -5,8 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Sidebar from "@/components/layout/sidebar";
 import { projectService } from "@/services/project.service";
 import { milestoneService } from "@/services/milestone.service";
-import { projectType, projectStatus } from "@/types/project.types";
-import { MilestoneType, MilestoneStatus } from "@/types/milestone.types";
+import { projectStatus } from "@/types/project.types";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
@@ -20,14 +19,23 @@ import {
   Calendar,
   User,
   Briefcase,
-  AlignLeft
+  AlignLeft,
 } from "lucide-react";
+
+export enum MilestoneStatus {
+  draft = "draft",
+  pending = "pending",
+  active = "active",
+  on_hold = "on_hold",
+  completed = "completed",
+  cancelled = "cancelled"
+}
 
 export default function ProjectDetailsPage() {
   const { projectId } = useParams() as { projectId: string };
   const router = useRouter();
   const [project, setProject] = useState<any | null>(null);
-  const [milestones, setMilestones] = useState<MilestoneType[]>([]);
+  const [milestones, setMilestones] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
 
@@ -38,9 +46,17 @@ export default function ProjectDetailsPage() {
           projectService.getMyProject(projectId),
           milestoneService.getMilestones(projectId),
         ]);
-        // Extracting data from API response structure
+
+        console.log("milestones are: ", milestonesResponse);
+        console.log("type is: ", typeof milestonesResponse);
         setProject(projectResponse.data);
-        setMilestones(milestonesResponse.data || []);
+        const data = milestonesResponse.data;
+        if (data) {
+          setMilestones(Array.isArray(data) ? data : [data]);
+        } else {
+          setMilestones([]);
+        }
+
       } catch (error: any) {
         toast.error(error.message || "Failed to fetch project details");
       } finally {
@@ -58,6 +74,23 @@ export default function ProjectDetailsPage() {
       toast.success(`Project status changed to ${newStatus.replace("_", " ")}`);
     } catch (error: any) {
       toast.error(error.message || "Failed to update status");
+    }
+  };
+
+  const getMilestoneStatusStyles = (status: MilestoneStatus) => {
+    switch (status) {
+      case MilestoneStatus.completed:
+        return "bg-green-50 text-green-700 border-green-200";
+      case MilestoneStatus.active:
+        return "bg-blue-50 text-blue-700 border-blue-200";
+      case MilestoneStatus.pending:
+        return "bg-amber-50 text-amber-700 border-amber-200";
+      case MilestoneStatus.on_hold:
+        return "bg-orange-50 text-orange-700 border-orange-200";
+      case MilestoneStatus.cancelled:
+        return "bg-red-50 text-red-700 border-red-200";
+      default:
+        return "bg-slate-50 text-slate-600 border-slate-200";
     }
   };
 
@@ -132,7 +165,7 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          {/* NEW SECTION: Project Description */}
+          {/* Project Description */}
           <div className="px-4 mt-6">
             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
               <div className="flex items-center gap-2 mb-3 text-[#0e141b]">
@@ -145,7 +178,7 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          {/* Project Details Grid (Added "Started At") */}
+          {/* Quick Stats Grid */}
           <h3 className="text-[#0e141b] text-lg font-bold px-4 pb-2 pt-8">Quick Stats</h3>
           <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-xl border border-slate-200">
@@ -156,7 +189,6 @@ export default function ProjectDetailsPage() {
               <p className="text-[#0e141b] font-medium">{project.client}</p>
             </div>
 
-            {/* NEW: Started At Field */}
             <div className="bg-white p-4 rounded-xl border border-slate-200">
               <div className="flex items-center gap-2 text-[#4e7397] mb-1">
                 <Calendar className="w-4 h-4" />
@@ -186,7 +218,6 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          {/* Milestones Section */}
           <div className="flex items-center justify-between px-4 mt-8">
             <h3 className="text-[#0e141b] text-lg font-bold">Milestones</h3>
             <button
@@ -211,17 +242,19 @@ export default function ProjectDetailsPage() {
                   {milestones.length > 0 ? (
                     milestones.map((m) => (
                       <tr key={m.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-6 py-4 text-sm text-[#0e141b] font-medium">{m.title}</td>
-                        <td className="px-6 py-4 text-sm text-[#4e7397]">{new Date(m.dueDate).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 text-sm text-[#0e141b] font-medium">{m.name}</td>
+                        <td className="px-6 py-4 text-sm text-[#4e7397]">
+                          {m.due_date ? new Date(m.due_date).toLocaleDateString() : "N/A"}
+                        </td>
                         <td className="px-6 py-4 text-center">
-                          <button
+                          <span
                             className={cn(
-                              "px-3 py-1 rounded-full text-xs font-bold border",
-                              m.status === "completed" ? "bg-green-50 text-green-700 border-green-200" : "bg-slate-50 text-slate-600 border-slate-200"
+                              "px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider",
+                              getMilestoneStatusStyles(m.milestone_status)
                             )}
                           >
-                            {m.status === "completed" ? "✓ Completed" : "Mark Done"}
-                          </button>
+                            {m.milestone_status.replace("_", " ")}
+                          </span>
                         </td>
                       </tr>
                     ))

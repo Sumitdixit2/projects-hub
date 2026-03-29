@@ -1,4 +1,4 @@
-export enum milestoneStatus {
+export enum MilestoneStatus {
   draft = "draft",
   pending = "pending",
   active = "active",
@@ -11,7 +11,7 @@ export type MilestoneType = {
   name: string,
   description: string,
   due_date: Date,
-  initialStatus: milestoneStatus
+  initialStatus: MilestoneStatus
 }
 
 
