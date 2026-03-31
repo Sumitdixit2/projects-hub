@@ -16,7 +16,7 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
       isLoading: false,
 
-      hasHydrated: false, // 🔥 important
+      hasHydrated: false, 
 
       setUser: (user) => set({ user }),
       setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthStore>()(
       }),
 
       onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true); // 🔥 THIS FIXES YOUR ISSUE
+        state?.setHasHydrated(true);  
       },
     }
   )

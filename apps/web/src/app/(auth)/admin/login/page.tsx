@@ -16,7 +16,7 @@ import {
 import { authService } from "@/services/auth.service";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth.store";
-import { UserRole } from "@/types/auth.types";
+import { adminLoginDataType, UserRole } from "@/types/auth.types";
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -72,13 +72,16 @@ export default function SignupPage() {
       };
 
       const response = await authService.adminLogin(cleanedData);
+      console.log("response is: ",response);
 
       toast.success(response?.message || "Login successful!");
+      console.log("fullanme is :",response.fullname);
 
       login({
-        id: response?.id,
+        id: response.data?.id,
         email: cleanedData.email,
         role: data.admin_role as UserRole,
+        fullname: response.data?.fullname,
         agency_id: data.agencyId,
       });
 

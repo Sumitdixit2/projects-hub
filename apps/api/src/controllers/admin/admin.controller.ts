@@ -130,29 +130,27 @@ export const adminLogin = asyncHandler(async (req, res) => {
 
   if (!password || !email || !agencyId || !admin_role) throw new ApiError(400, "Enter all the required fields");
 
-  const check = await pool.query('SELECT id,password FROM admin WHERE admin_role = $1 AND email = $2 AND agency_id = $3', [admin_role, email, agencyId]);
+  const check = await pool.query('SELECT id,fullname,password FROM admin WHERE admin_role = $1 AND email = $2 AND agency_id = $3', [admin_role, email, agencyId]);
 
   if (!check.rowCount) throw new ApiError(404, "no such admin found registered");
 
   const hashedPassword = check.rows[0].password;
-
-  console.log("hashedPassword: ", hashedPassword);
 
   const verify = await bcrypt.compare(password, hashedPassword);
 
   if (!verify) throw new ApiError(400, "enter a valid password");
 
   const id = check.rows[0].id;
+  const fullname = check.rows[0].fullname;
 
   const { AccessToken, RefreshToken } = await generateAccessAndRefreshToken(id, userType.admin);
-  console.log("tokens are : ", AccessToken);
 
   const options = {
     httpOnly: true,
     secure: true
   };
 
-  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(200, id, "admin logged in successfully"));
+  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(200, {id,fullname}, "admin logged in successfully"));
 
 });
 
