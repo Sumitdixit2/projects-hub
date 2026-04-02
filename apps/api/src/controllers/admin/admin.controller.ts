@@ -283,6 +283,20 @@ export const getAdmins = asyncHandler(async (req, res) => {
   if (!result.rowCount) throw new ApiError(404, "no admin found");
 
   return res.json(new ApiResponse(200, result.rows, "admins fetched"));
+});
+
+export const logoutAdmin = asyncHandler(async(req,res) => {
+
+  const {id} = req.params;
+
+  if(!id) throw new ApiError(400, "admin id is required");
+
+  await pool.query('UPDATE admin SET refreshtoken = NULL , token_expiry = NULL WHERE id = $1',[id]);
+
+  res.clearCookie('accessToken');
+  res.clearCookie('refreshToken');
+
+  return res.status(200).json(new ApiResponse(200, "admin logged out successfully"));
 })
 
 export const deleteClient = asyncHandler(async (req, res) => {
