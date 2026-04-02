@@ -297,7 +297,7 @@ export const logoutAdmin = asyncHandler(async(req,res) => {
   res.clearCookie('refreshToken');
 
   return res.status(200).json(new ApiResponse(200, "admin logged out successfully"));
-})
+});
 
 export const deleteClient = asyncHandler(async (req, res) => {
 

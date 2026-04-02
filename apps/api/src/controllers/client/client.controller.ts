@@ -60,3 +60,17 @@ export const clientLogin = asyncHandler(async (req, res) => {
   return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(200, "client logged in successfully"));
 
 });
+
+export const logoutClient = asyncHandler(async(req,res) => {
+
+  const {id} = req.params;
+
+  if(!id) throw new ApiError(400, "id is required for logout");
+
+  await pool.query('UPDATE client refreshtoken = NULL , token_expiry = NULL WHERE id = $1',[id]);
+
+  res.clearCookie('accessToken');
+  res.clearCookie('refreshToken');
+
+  return res.status(200).json(new ApiResponse(200, "client logout successfully"));
+})
