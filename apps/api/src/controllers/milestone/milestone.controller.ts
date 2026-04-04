@@ -10,11 +10,6 @@ export const createMilestones = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name, description, due_date, initialStatus } = req.body;
 
-  console.log("name is: ", name);
-  console.log("description is : ", description);
-  console.log("due_date is : ", due_date);
-  console.log("initialStatus is : ", initialStatus);
-
   if (!id) throw new ApiError(400, "id must be provided");
   if (!name?.trim() || !description?.trim() || !due_date?.trim()) throw new ApiError(400, "Enter all the required fields");
 
