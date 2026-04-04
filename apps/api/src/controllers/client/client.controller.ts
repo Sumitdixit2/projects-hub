@@ -50,7 +50,6 @@ export const clientLogin = asyncHandler(async (req, res) => {
   const id = check.rows[0].id;
 
   const { AccessToken, RefreshToken } = await generateAccessAndRefreshToken(id, userType.client);
-  console.log("tokens are : ", AccessToken);
 
   const options = {
     httpOnly: true,
@@ -64,11 +63,11 @@ export const clientLogin = asyncHandler(async (req, res) => {
 export const logoutClient = asyncHandler(async(req,res) => {
 
   const {id} = req.params;
+  console.log("hey , is this api even being hit?");
 
   if(!id) throw new ApiError(400, "id is required for logout");
 
-  await pool.query('UPDATE client refreshtoken = NULL , token_expiry = NULL WHERE id = $1',[id]);
-
+  await pool.query('UPDATE client SET refreshtoken = NULL , token_expiry = NULL WHERE id = $1',[id]);
   res.clearCookie('accessToken');
   res.clearCookie('refreshToken');
 

@@ -14,7 +14,7 @@ const fetchUser = async (userId: string, userType: userType) => {
     return response;
   }
 
-  const response = await pool.query('SELECT id , agency_id , fullname , email FROM client WHERE id = $1 AND NOW() < token_expiry', [userId]);
+  const response = await pool.query('SELECT id , agency_id , name , email FROM client WHERE id = $1 AND NOW() < token_expiry', [userId]);
   return response;
 }
 
