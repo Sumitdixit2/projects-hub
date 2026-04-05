@@ -27,5 +27,13 @@ export const milestoneService = {
     } catch (error: any) {
       throw error.response?.data || error;
     }
+  },
+
+  async getMilestone(milestoneId: string) {
+    try {
+      const response = await api.get()
+    } catch (error: any) {
+      
+    }
   }
 }

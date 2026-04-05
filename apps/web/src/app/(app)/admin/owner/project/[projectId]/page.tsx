@@ -121,7 +121,6 @@ export default function ProjectDetailsPage() {
             <span className="text-[#0e141b] text-base font-medium">{project.name}</span>
           </div>
 
-          {/* Header */}
           <div className="flex flex-wrap justify-between items-center gap-3 p-4">
             <div className="flex flex-col gap-1">
               <h1 className="text-[#0e141b] text-[32px] font-bold leading-tight">{project.name}</h1>
@@ -165,7 +164,6 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          {/* Project Description */}
           <div className="px-4 mt-6">
             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
               <div className="flex items-center gap-2 mb-3 text-[#0e141b]">
@@ -178,7 +176,6 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          {/* Quick Stats Grid */}
           <h3 className="text-[#0e141b] text-lg font-bold px-4 pb-2 pt-8">Quick Stats</h3>
           <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-xl border border-slate-200">
@@ -241,7 +238,7 @@ export default function ProjectDetailsPage() {
                 <tbody className="divide-y divide-slate-100">
                   {milestones.length > 0 ? (
                     milestones.map((m) => (
-                      <tr key={m.id} className="hover:bg-slate-50 transition-colors">
+                      <tr key={m.id} onClick={() => router.push(`/admin/owner/milestone/${m.id}`)} className="hover:bg-slate-50 transition-colors">
                         <td className="px-6 py-4 text-sm text-[#0e141b] font-medium">{m.name}</td>
                         <td className="px-6 py-4 text-sm text-[#4e7397]">
                           {m.due_date ? new Date(m.due_date).toLocaleDateString() : "N/A"}

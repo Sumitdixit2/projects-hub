@@ -50,10 +50,21 @@ export const getMyMilestone = asyncHandler(async (req, res) => {
 
   if (!id) throw new ApiError(400, "id is required");
 
-  const result = await pool.query('SELECT id, name , due_date , created_at , milestone_status , description FROM milestone WHERE project_id = $1', [id]);
+  const result = await pool.query('SELECT id, name , due_date ,  milestone_status  FROM milestone WHERE project_id = $1', [id]);
 
   return res.json(new ApiResponse(200, result.rows, "milestones fetched for the project"));
 });
+
+export const getMilestone = asyncHandler(async(req,res) => {
+
+  const {id} = req.params;
+
+  if(!id) throw new ApiError(400, "id is required");
+
+  const result = await pool.query('SELECT name, due_date,created_at , milestone_status, description FROM milestone WHERE id = $1',[id]);
+
+  return res.json(new ApiResponse(200, result.rows[0], "milestone fetched"));
+})
 
 export const deleteMilestone = asyncHandler(async (req, res) => {
 
