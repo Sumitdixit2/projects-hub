@@ -52,7 +52,7 @@ export const getMyMilestone = asyncHandler(async (req, res) => {
 
   const result = await pool.query('SELECT id, name , due_date , created_at , milestone_status , description FROM milestone WHERE project_id = $1', [id]);
 
-  return res.json(new ApiResponse(200, result.rows[0], "milestones fetched for the project"));
+  return res.json(new ApiResponse(200, result.rows, "milestones fetched for the project"));
 });
 
 export const deleteMilestone = asyncHandler(async (req, res) => {
