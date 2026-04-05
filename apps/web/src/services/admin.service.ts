@@ -48,7 +48,7 @@ export const adminService = {
 
   async logout(adminId: string) {
     try {
-      const response = await api.get(`/admin/logout/${adminId}`);
+      const response = await api.post(`/admin/logout/${adminId}`);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error;

@@ -9,4 +9,13 @@ export const clientService = {
       throw error.response?.data || error;
     }
   },
+
+  async logout(clientId: string) {
+    try {
+      const response = await api.post(`/client/logout/${clientId}`);
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || error;
+    }
+  }
 }
