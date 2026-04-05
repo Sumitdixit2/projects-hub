@@ -29,7 +29,6 @@ const sendOtpToEmail = async (email: string) => {
   const codeExpiry = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
 
   const response = await pool.query('UPDATE agency SET verify_code = $1,code_expiry = $2 WHERE email = $3 RETURNING *', [hashedOtp, codeExpiry, email]);
-
   await resend.emails.send({
     from: "Acme <onboarding@resend.dev>",
     to: [`${email}`],
