@@ -29,7 +29,7 @@ export const createMilestones = asyncHandler(async (req, res) => {
 
 });
 
-export const changeStatus = asyncHandler(async (req, res) => {
+export const changeMilestoneStatus = asyncHandler(async (req, res) => {
 
   const { id } = req.params;
   const { newStatus } = req.body;
@@ -38,9 +38,11 @@ export const changeStatus = asyncHandler(async (req, res) => {
 
   if (!isProjectStatus(newStatus)) throw new ApiError(400, "enter a valid status");
 
-  await pool.query('UPDATE milestone SET milestone_status = $1 WHERE id = $2');
+  const response = await pool.query('UPDATE milestone SET milestone_status = $1 WHERE id = $2 RETURNING *',[newStatus,id]);
 
-  return res.json(new ApiResponse(200, "milestone status changed successfully"));
+  console.log("milestone update is: ",response.rows[0]);
+
+  return res.json(new ApiResponse(200,response.rows[0], "milestone status changed successfully"));
 
 });
 

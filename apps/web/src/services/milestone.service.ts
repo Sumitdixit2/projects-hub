@@ -14,6 +14,7 @@ export const milestoneService = {
   async changeMilestoneStatus(milestoneId: string, newStatus: MilestoneStatus) {
     try {
       const response = await api.patch(`/milestone/changeMilestoneStatus/${milestoneId}`, { newStatus });
+      console.log("change status is : ",response.data);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error;
@@ -31,9 +32,10 @@ export const milestoneService = {
 
   async getMilestone(milestoneId: string) {
     try {
-      const response = await api.get()
+      const response = await api.get(`/milestone/getMilestone/${milestoneId}`);
+      return response.data;
     } catch (error: any) {
-      
+      throw error.response?.data || error;
     }
   }
 }
