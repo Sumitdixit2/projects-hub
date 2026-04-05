@@ -44,5 +44,14 @@ export const adminService = {
     } catch (error: any) {
       throw error.response?.data || error;
     }
+  },
+
+  async logout(adminId: string) {
+    try {
+      const response = await api.get(`/admin/logout/${adminId}`);
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || error;
+    }
   }
 }

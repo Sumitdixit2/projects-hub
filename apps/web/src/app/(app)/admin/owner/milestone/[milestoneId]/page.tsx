@@ -88,9 +88,7 @@ export default function MilestoneDetailsPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Details Card */}
             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
               <div className="flex items-center gap-2 mb-4 text-[#0e141b]">
                 <AlignLeft className="w-5 h-5 text-blue-600" />
@@ -101,7 +99,6 @@ export default function MilestoneDetailsPage() {
               </p>
             </div>
 
-            {/* Schedule Info Card */}
             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
               <div className="flex items-center gap-2 mb-4 text-[#0e141b]">
                 <Calendar className="w-5 h-5 text-blue-600" />
@@ -124,7 +121,6 @@ export default function MilestoneDetailsPage() {
             </div>
           </div>
 
-          {/* Sidebar / Status Actions */}
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
               <h3 className="text-sm font-bold text-[#0e141b] mb-4 uppercase tracking-wider">Current Status</h3>
