@@ -130,7 +130,7 @@ export const adminLogin = asyncHandler(async (req, res) => {
 
   if (!password || !email || !agencyId || !admin_role) throw new ApiError(400, "Enter all the required fields");
 
-  const check = await pool.query('SELECT id,fullname,password FROM admin WHERE admin_role = $1 AND email = $2 AND agency_id = $3', [admin_role, email, agencyId]);
+  const check = await pool.query('SELECT id,fullname,password,admin_role FROM admin WHERE admin_role = $1 AND email = $2 AND agency_id = $3', [admin_role, email, agencyId]);
 
   if (!check.rowCount) throw new ApiError(404, "no such admin found registered");
 
@@ -150,7 +150,7 @@ export const adminLogin = asyncHandler(async (req, res) => {
     secure: true
   };
 
-  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(200, {id,fullname}, "admin logged in successfully"));
+  return res.cookie("accessToken", AccessToken, options).cookie("refreshToken", RefreshToken, options).json(new ApiResponse(200, {id,fullname,admin_role}, "admin logged in successfully"));
 
 });
 

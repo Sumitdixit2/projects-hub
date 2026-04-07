@@ -48,7 +48,7 @@ export interface User {
   email: string;
   name?: string;
   fullname?: string;
-  role?: UserRole;
+  admin_role?: UserRole;
   agency_id: string;
 }
 
