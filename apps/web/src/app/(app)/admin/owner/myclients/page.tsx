@@ -36,7 +36,10 @@ export default function ClientsPage() {
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
-      <Sidebar role="admin" />
+
+      <aside className="hidden md:flex w-64 bg-white border-r">
+       <Sidebar role="admin" />
+       </aside>
 
       <div className="flex flex-col flex-1 overflow-y-auto">
         <div className="layout-content-container flex flex-col max-w-[960px] w-full mx-auto">

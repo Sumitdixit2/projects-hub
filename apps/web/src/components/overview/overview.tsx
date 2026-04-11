@@ -73,6 +73,7 @@ export default function Overview() {
   const activeProjects = projects.filter(p => p.project_status === "active").length;
   const completedProjects = projects.filter(p => p.project_status === "completed").length;
   const totalClients = new Set(projects.map(p => p.clientId)).size;
+  console.log("total clients are: ",totalClients);
 
   const totalProjects = projects.length;
 

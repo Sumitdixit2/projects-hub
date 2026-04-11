@@ -31,7 +31,6 @@ export default function GenerateClientKeyPage() {
     setLoading(true);
     try {
       const response = await adminService.generateClientKey(data);
-      // The backend returns the key in response.data.key_hash
       setClientKey(response.data.key_hash);
       toast.success("Client invite key generated successfully!");
       setCopied(false);
@@ -53,7 +52,10 @@ export default function GenerateClientKeyPage() {
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
       {/* Replaced manual sidebar with shared Sidebar component for consistency */}
+
+      <aside className="hidden md:flex w-64 bg-white border-r">
       <Sidebar role="admin" />
+      </aside>
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <header className="h-16 flex items-center justify-between px-8 bg-white border-b border-[#d0dbe7]">

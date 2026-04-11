@@ -55,7 +55,9 @@ export default function GenerateAdminKeyPage() {
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
+      <aside className="hidden md:flex w-64 bg-white border-r">
       <Sidebar role="admin" />
+      </aside>
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <header className="h-16 flex items-center justify-between px-8 bg-white border-b border-[#d0dbe7]">

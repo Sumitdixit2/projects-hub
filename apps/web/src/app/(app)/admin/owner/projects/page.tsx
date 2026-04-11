@@ -39,8 +39,10 @@ export default function AdminProjectsPage() {
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
-      {/* Sidebar Integration */}
-      <Sidebar role="admin" />
+
+      <aside className="hidden md:flex w-64 bg-white border-r">
+        <Sidebar role="admin" />
+      </aside>
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         <div className="layout-content-container flex flex-col max-w-[960px] w-full mx-auto">
