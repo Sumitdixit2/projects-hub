@@ -1,6 +1,9 @@
 'use client';
 
+import { useRouter } from "next/navigation";
+
 export default function loginAs() {
+  const router = useRouter();
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col justify-center">
       <div className="max-w-4xl mx-auto w-full px-6 py-12">
@@ -29,7 +32,7 @@ export default function loginAs() {
               <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
                 Full access to manage projects, handle client accounts, track team billable hours, and oversee agency-wide analytics.
               </p>
-              <div className="mt-auto">
+              <div className="mt-auto" onClick={() => router.push('admin/login')}>
                 <a className="inline-flex items-center justify-center w-full px-6 py-3.5 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 focus:ring-4 focus:ring-primary/20 transition-all text-sm uppercase tracking-wide" href="#">
                   Login as Admin
                 </a>
@@ -47,7 +50,7 @@ export default function loginAs() {
               <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
                 Access your active project milestones, approve deliverables, view invoices, and communicate with your project manager.
               </p>
-              <div className="mt-auto">
+              <div className="mt-auto" onClick={() => router.push('client/login')}>
                 <a className="inline-flex items-center justify-center w-full px-6 py-3.5 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 focus:ring-4 focus:ring-primary/20 transition-all text-sm uppercase tracking-wide" href="#">
                   Login as Client
                 </a>

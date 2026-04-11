@@ -22,8 +22,9 @@ interface SidebarProps {
 export default function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
+  console.log("user is: ",user);
   
-  const adminRole = user?.admin_role; 
+  const adminRole = user?.role; 
 
   const navItems = [
     {
