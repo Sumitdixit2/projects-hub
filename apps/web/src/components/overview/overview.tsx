@@ -1,5 +1,6 @@
 "use client";
 
+import { adminService } from "@/services/admin.service";
 import { projectService } from "@/services/project.service";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -44,6 +45,7 @@ export default function Overview() {
     const fetchProjects = async () => {
       try {
         const response = await projectService.getAllProjects();
+        const client = await adminService.getAllClients();
 
         const data = Array.isArray(response?.data)
           ? response.data

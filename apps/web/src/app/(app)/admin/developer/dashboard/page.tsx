@@ -19,7 +19,6 @@ export default function DevDashboardPage() {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      {/* Sidebar remains consistent with the admin role layout */}
       <aside className="hidden md:flex w-64 bg-white border-r">
         <Sidebar role="admin" />
       </aside>

@@ -308,4 +308,15 @@ export const deleteClient = asyncHandler(async (req, res) => {
   await pool.query('DELETE FROM client WHERE id = $1', [id]);
 
   return res.status(204).json(new ApiResponse(204, "Client deleted successfully"));
-})
+});
+
+export const getStats = asyncHandler(async (req,res) => {
+
+  const user = (req as any).user;
+  const agency_id = user.agency_id;
+
+  const response = await pool.query('SELECT COUNT(*) AS projects ,  (SELECT COUNT(*) FROM client WHERE agency_id=$1) AS total_clients FROM project WHERE agency_id=$1',[agency_id]);
+
+  return res.status(200).json(new ApiResponse(200, response.rows[0] , "agency status fetched"));
+
+});

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createAdminKey, signUp, createClientKey, adminLogin, getClients, getAdmins, deleteClient, getClient, logoutAdmin } from "../../controllers/admin/admin.controller";
+import { createAdminKey, signUp, createClientKey, adminLogin, getClients, getAdmins, deleteClient, getClient, logoutAdmin, getStats } from "../../controllers/admin/admin.controller";
 import { verifyJWT } from "../../middlewares/verifyJwt";
 import { requireAdmin } from "../../middlewares/validateUser.middleware";
 import { validateAdmin } from "../../middlewares/validate.middleware";
@@ -17,5 +17,6 @@ adminRouter.route('/getClient/:clientId').get(verifyJWT, requireAdmin, validateS
 adminRouter.route('/getAllAdmins').get(verifyJWT, requireAdmin, validateStaff, getAdmins);
 adminRouter.route('/deleteClient/:id').delete(verifyJWT, requireAdmin, validateAdmin, deleteClient);
 adminRouter.route('/logout/:id').post(verifyJWT,isMyId,logoutAdmin);
+adminRouter.route('/getStats').get(verifyJWT,validateStaff,getStats);
 
 export default adminRouter;
