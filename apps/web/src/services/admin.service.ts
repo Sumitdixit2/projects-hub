@@ -53,5 +53,15 @@ export const adminService = {
     } catch (error: any) {
       throw error.response?.data || error;
     }
+  },
+
+  async getStats() {
+    try {
+      const response = await api.get(`/admin/getStats`);
+      console.log("stats are : ",response.data);
+      return response.data;
+    } catch (error:any) {
+      throw error.response?.data || error;
+    }
   }
 }

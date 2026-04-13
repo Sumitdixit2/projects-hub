@@ -310,12 +310,12 @@ export const deleteClient = asyncHandler(async (req, res) => {
   return res.status(204).json(new ApiResponse(204, "Client deleted successfully"));
 });
 
-export const getStats = asyncHandler(async (req,res) => {
 
+export const getStats = asyncHandler(async (req,res) => {
   const user = (req as any).user;
   const agency_id = user.agency_id;
 
-  const response = await pool.query('SELECT COUNT(*) AS projects ,  (SELECT COUNT(*) FROM client WHERE agency_id=$1) AS total_clients FROM project WHERE agency_id=$1',[agency_id]);
+  const response = await pool.query(` SELECT json_build_object('draft_projects', COUNT(*) FILTER (WHERE project_status = 'draft'),'pending_projects', COUNT(*) FILTER (WHERE project_status = 'pending'),'active_projects', COUNT(*) FILTER (WHERE project_status = 'active'),'on_hold_projects', COUNT(*) FILTER (WHERE project_status = 'on_hold'),'completed_projects', COUNT(*) FILTER (WHERE project_status = 'completed'),'cancelled_projects', COUNT(*) FILTER (WHERE project_status = 'cancelled')) AS projects,(SELECT COUNT(*) FROM client WHERE agency_id = $1) AS clients FROM project WHERE agency_id = $1`, [agency_id]);
 
   return res.status(200).json(new ApiResponse(200, response.rows[0] , "agency status fetched"));
 

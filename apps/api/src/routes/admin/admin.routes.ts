@@ -17,6 +17,6 @@ adminRouter.route('/getClient/:clientId').get(verifyJWT, requireAdmin, validateS
 adminRouter.route('/getAllAdmins').get(verifyJWT, requireAdmin, validateStaff, getAdmins);
 adminRouter.route('/deleteClient/:id').delete(verifyJWT, requireAdmin, validateAdmin, deleteClient);
 adminRouter.route('/logout/:id').post(verifyJWT,isMyId,logoutAdmin);
-adminRouter.route('/getStats').get(verifyJWT,validateStaff,getStats);
+adminRouter.route('/getStats').get(verifyJWT,requireAdmin,validateStaff,getStats);
 
 export default adminRouter;

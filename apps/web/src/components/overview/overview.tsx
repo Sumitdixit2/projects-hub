@@ -38,21 +38,20 @@ const STATUS_COLORS: Record<projectStatus, string> = {
 };
 
 export default function Overview() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState({});
+  const [clients , setClients] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const getStats = async () => {
       try {
-        const response = await projectService.getAllProjects();
-        const client = await adminService.getAllClients();
+        const response = await adminService.getStats();
 
-        const data = Array.isArray(response?.data)
-          ? response.data
-          : [];
+       const data = response.data; 
+       console.log("data is: ",data);
 
-
-        setProjects(data);
+        setProjects(data.projects);
+        setClients(data.clients);
       } catch (error: any) {
         console.error(
           "Failed to fetch projects",
@@ -69,30 +68,10 @@ export default function Overview() {
       }
     };
 
-    fetchProjects();
+    getStats();
   }, []);
 
-  const activeProjects = projects.filter(p => p.project_status === "active").length;
-  const completedProjects = projects.filter(p => p.project_status === "completed").length;
-  const totalClients = new Set(projects.map(p => p.clientId)).size;
-  console.log("total clients are: ",totalClients);
-
-  const totalProjects = projects.length;
-
-  const statusCounts = ALL_STATUSES.reduce((acc, status) => {
-    acc[status] = projects.filter(p => p.project_status === status).length; // Correct property 'project_status'
-    return acc;
-  }, {} as Record<projectStatus, number>);
-
-  const projectStats = ALL_STATUSES.map(status => ({
-    status,
-    label: status.replace("_", " ").toUpperCase(),
-    value: totalProjects
-      ? Math.round((statusCounts[status] / totalProjects) * 100)
-      : 0,
-    count: statusCounts[status],
-  }));
-
+   
   if (loading) {
     return (
       <div className="p-4 text-center text-gray-500">
