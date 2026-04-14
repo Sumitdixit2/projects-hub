@@ -111,7 +111,9 @@ export default function ProjectDetailsPage() {
   return (
     <div className="relative flex h-full min-h-screen w-full bg-slate-50 overflow-x-hidden font-inter">
       <div className="layout-container flex h-full grow">
+     <aside className="hidden md:flex w-64 bg-white border-r sticky top-0 h-screen">
         <Sidebar role="admin" />
+      </aside>
 
         <main className="flex-1 flex flex-col max-w-[960px] mx-auto py-5 px-6 ml-80">
           {/* Breadcrumbs */}

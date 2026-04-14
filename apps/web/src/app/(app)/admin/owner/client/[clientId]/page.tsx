@@ -68,7 +68,9 @@ export default function ClientDetailPage() {
 
   return (
     <div className="relative flex h-screen w-full bg-slate-50 group/design-root overflow-hidden">
+    <aside className="hidden md:flex w-64 bg-white border-r sticky top-0 h-screen">
       <Sidebar role="admin" />
+      </aside>
 
       <div className="flex flex-1 flex-col overflow-y-auto">
         <div className="layout-content-container flex flex-col max-w-[960px] flex-1 mx-auto w-full">

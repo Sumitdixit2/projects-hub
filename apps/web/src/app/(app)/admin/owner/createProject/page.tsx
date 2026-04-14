@@ -87,13 +87,11 @@ export default function AddProjectPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      console.log("error is: ", form.formState.errors);
-      console.log("form data is :", data);
       setLoading(true);
       await projectService.createProject(data);
       form.reset();
       setClientName("");
-      toast.success("Project created successfully 🚀");
+      toast.success("Project created successfully ");
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     } finally {
@@ -106,7 +104,9 @@ export default function AddProjectPage() {
 
   return (
     <div className="flex min-h-screen w-full bg-slate-100 font-sans">
+    <aside className="hidden md:flex w-64 bg-white border-r sticky top-0 h-screen">
       <Sidebar role="admin" />
+    </aside>
 
       <div className="flex flex-1 justify-center px-6 py-10">
         <div className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-sm">
