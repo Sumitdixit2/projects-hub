@@ -3,6 +3,8 @@ import ApiError from '../../utils/apiError';
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 import { projectStatus, projectType } from '../../types/project.type';
+import { actionType, entityType, loggerType } from '../../types/logger.type';
+import { logger } from '../../utils/logger';
 
 export const createProject = asyncHandler(async (req, res) => {
 
@@ -23,7 +25,15 @@ export const createProject = asyncHandler(async (req, res) => {
 
   const create = await pool.query('INSERT INTO project (name , description , client_id , admin_id , deadline,agency_id , project_status) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *', [name, description, clientId, id, deadline, agency_id, project_status]);
 
-  if (!create.rowCount) throw new ApiError(500, "Error while creating project");
+  const data: loggerType = {
+    admin_id: user.id,
+    action: `project ${create.rows[0].name} created`,
+    action_type: actionType.CREATE,
+    entity_type: entityType.Project,
+    entity_id: create.rows[0].id
+  }
+
+  await logger(data);
 
   return res.json(new ApiResponse(201, create.rows[0], "new project created successfully"));
 
@@ -48,12 +58,24 @@ export const changeStatus = asyncHandler(async (req, res) => {
 
   const { id } = req.params;
   const { newStatus } = req.body;
+  const user = (req as any).user;
 
   if (!id || !newStatus) throw new ApiError(400, "id and new Status are required to be provided");
 
   if (!isProjectStatus(newStatus)) throw new ApiError(400, "Enter a valid status");
 
-  await pool.query('UPDATE project SET project_status = $1 WHERE id = $2', [newStatus, id]);
+  const result = await pool.query('UPDATE project SET project_status = $1 WHERE id = $2 RETURNING *', [newStatus, id]);
+  if(!result.rowCount) throw new ApiError(404 , "Project not found");
+  
+  const data : loggerType = {
+    admin_id: user.id,
+    action: `Project ${result.rows[0].name} status changed to ${result.rows[0].project_status}`,
+    action_type: actionType.UPDATE,
+    entity_type: entityType.Project,
+    entity_id: result.rows[0].id
+  }
+
+  await logger(data);
 
   return res.json(new ApiResponse(200, "project status updated successfully"));
 
@@ -76,6 +98,7 @@ export const getMyProject = asyncHandler(async (req, res) => {
 export const deleteProject = asyncHandler(async (req, res) => {
 
   const { id } = req.params;
+  const user = (req as any).user;
 
   if (!id) throw new ApiError(400, "id must be provided");
 
@@ -84,7 +107,17 @@ export const deleteProject = asyncHandler(async (req, res) => {
   if (!project.rows[0].exists) throw new ApiError(404, "project not found");
 
   await pool.query('DELETE FROM milestone WHERE project_id = $1', [id]);
-  await pool.query('DELETE FROM project WHERE id = $1', [id]);
+  const result = await pool.query('DELETE FROM project WHERE id = $1 RETURNING *', [id]);
+
+  const data : loggerType = {
+    admin_id: user.id,
+    action: `Project ${result.rows[0].name} has been deleted`,
+    action_type: actionType.DELETE,
+    entity_type: entityType.Project,
+    entity_id: result.rows[0].id
+  }
+
+  await logger(data);
 
   return res.status(204).json(new ApiResponse(204, "project has been deleted successfully"));
 });

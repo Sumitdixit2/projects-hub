@@ -4,9 +4,9 @@ import { loggerType } from "../types/logger.type";
 
 export const logger = async(data:loggerType)  => {
     try {
-      const {admin_id , action , entity_type, entity_id} = data;
+      const {admin_id , action ,action_type, entity_type, entity_id} = data;
 
-      if(!admin_id || !entity_id || !action || !entity_type) throw new Error("Missing required fields");
+      if(!admin_id || !entity_id || !action || !action_type || !entity_type) throw new Error("Missing required fields");
 
       const res = await pool.query('INSERT INTO activity_log(admin_id, action , entity_type , entity_id) VALUES ($1,$2,$3,$4) RETURNING *',[admin_id,action,entity_type,entity_id]); 
       return res.rows[0];

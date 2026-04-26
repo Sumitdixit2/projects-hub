@@ -7,7 +7,7 @@ import { ApiResponse } from '../../utils/apiResponse';
 import { createHmac } from 'node:crypto';
 import { Request, Response } from "express";
 import { logger } from '../../utils/logger';
-import { entityType, loggerType } from '../../types/logger.type';
+import { actionType, entityType, loggerType } from '../../types/logger.type';
 
 export enum userType {
   admin = "admin",
@@ -201,6 +201,7 @@ export const createAdminKey = asyncHandler(async (req: Request, res: Response) =
   const data:loggerType = {
     admin_id: user.id,
     action: `Admin Key for email ${email} was created`,
+    action_type: actionType.CREATE,
     entity_type: entityType.Key,
     entity_id: result.id
   }
@@ -234,6 +235,16 @@ export const createClientKey = asyncHandler(async (req, res) => {
   const response = await pool.query('INSERT INTO key(key_hash , key_expiry , email , agency_id) VALUES ($1 , $2 ,$3 , $4) RETURNING *', [key, keyExpiry, email, user.agency_id]);
 
   const result = response.rows[0];
+
+  const data: loggerType = {
+      admin_id: user.id,
+      action: `Client key created for email ${email}`,
+      action_type: actionType.CREATE,
+      entity_type: entityType.Key,
+      entity_id: result.id
+  }
+
+  await logger(data);
 
   return res.json(new ApiResponse(201, result, "key generated successfully!"));
 
@@ -312,10 +323,27 @@ export const logoutAdmin = asyncHandler(async(req,res) => {
 export const deleteClient = asyncHandler(async (req, res) => {
 
   const { id } = req.params;
+  const user = (req as any).user;
 
   if (!id) throw new ApiError(400, "Client id is required");
 
-  await pool.query('DELETE FROM client WHERE id = $1', [id]);
+  const check = await pool.query('SELECT EXISTS (SELECT 1 FROM client WHERE id = $1)',[id]);
+
+  if(!check.rows[0].exists) throw new ApiError(400, "Client not found");
+
+  const result = await pool.query('DELETE FROM client WHERE id = $1 RETURNING name,id', [id]);
+
+  const client = result.rows[0].name;
+
+  const data : loggerType = {
+    admin_id: user.id,
+    action: `Client ${client} has been deleted`,
+    action_type:  actionType.DELETE,
+    entity_type: entityType.Client,
+    entity_id: result.rows[0].id
+  }
+
+  await logger(data);
 
   return res.status(204).json(new ApiResponse(204, "Client deleted successfully"));
 });

@@ -6,9 +6,17 @@ export enum entityType {
   Key = "Key"
 }
 
+export enum actionType {
+  CREATE = "CREATE",
+  READ = "READ",
+  UPDATE = "UPDATE",
+  DELETE = "DELETE"
+}
+
 export type loggerType = {
   admin_id: string,
   action: string,
+  action_type: actionType,
   entity_type: entityType,
   entity_id : string,
 }
