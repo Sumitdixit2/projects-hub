@@ -1,8 +1,9 @@
-enum entityType {
+export enum entityType {
   Project = "Project",
   Milestone = "Milestone",
   Admin = "Admin",
-  Client = "Client"
+  Client = "Client",
+  Key = "Key"
 }
 
 export type loggerType = {

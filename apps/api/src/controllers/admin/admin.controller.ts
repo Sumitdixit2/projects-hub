@@ -6,6 +6,8 @@ import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 import { createHmac } from 'node:crypto';
 import { Request, Response } from "express";
+import { logger } from '../../utils/logger';
+import { entityType, loggerType } from '../../types/logger.type';
 
 export enum userType {
   admin = "admin",
@@ -159,7 +161,6 @@ const SECRET = process.env.INVITE_SECRET!;
 const createKey = (email: string, role: string = "Client") => {
   const raw = `${email}:${role}:${Date.now()}`;
 
-  console.log("so is the hash not working?");
   console.log("SECRET IS OF TYPE", typeof SECRET);
   const hash = createHmac("sha256", SECRET)
     .update(raw)
@@ -196,6 +197,15 @@ export const createAdminKey = asyncHandler(async (req: Request, res: Response) =
 
   if (response.rows[0].exits) throw new ApiError(500, "Failed to insert key in the database");
   const result = response.rows[0];
+
+  const data:loggerType = {
+    admin_id: user.id,
+    action: `Admin Key for email ${email} was created`,
+    entity_type: entityType.Key,
+    entity_id: result.id
+  }
+
+  await logger(data);
 
   return res.json(new ApiResponse(201, result, "key generated successfully!"));
 
