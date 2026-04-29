@@ -14,7 +14,7 @@ export const getMyActivity = asyncHandler(async(req,res) => {
 
   const result = await pool.query('SELECT * FROM activity_log WHERE admin_id = $1 LIMIT $2 OFFSET $3', [id,limit,offset]);
 
-  return res.status(200).json(new ApiResponse(200, result.rows[0], "activity_log fetched"));
+  return res.status(200).json(new ApiResponse(200, result.rows, "activity_log fetched"));
 
 });
 
@@ -30,6 +30,6 @@ export const getAdminActivity = asyncHandler(async(req,res) => {
 
   const result = await pool.query('SELECT * FROM activity_log WHERE admin_id = $1 LIMIT $2 OFFSET $3',[id,limit,offset]);
 
-  return res.status(200).json(new ApiResponse(200, result.rows[0], "activity_log log fetched"));
+  return res.status(200).json(new ApiResponse(200, result.rows, "activity_log log fetched"));
   
 })
