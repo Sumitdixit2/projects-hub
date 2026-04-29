@@ -8,6 +8,7 @@ import clientRouter from "./routes/client/client.routes";
 import projectRouter from "./routes/project/project.route";
 import milestoneRouter from "./routes/milestone/milestone.route";
 import ApiError from "./utils/apiError";
+import activityRouter from "./routes/activity/activity.routes";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use('/api/v1/token', tokenRouter);
 app.use('/api/v1/client', clientRouter);
 app.use('/api/v1/project', projectRouter);
 app.use('/api/v1/milestone', milestoneRouter);
+app.use('/api/v1/activity',activityRouter);
 
 app.use((err: any, req: any, res: any, next: any) => {
   console.error("GLOBAL ERROR:", err);
