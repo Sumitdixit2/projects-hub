@@ -25,6 +25,7 @@ export const createMilestones = asyncHandler(async (req, res) => {
     const create = await pool.query('INSERT INTO milestone (name , description , due_date , project_id , milestone_status) VALUES ($1 , $2 , $3, $4, $5) RETURNING *', [name, description, due_date, id, initialStatus]);
 
     const data :loggerType = {
+      agency_id: user.agency_id,
       admin_id: user.id,
       action: `Milestone ${name} has been created for project ${projectName}`,
       action_type: actionType.CREATE,
@@ -39,6 +40,7 @@ export const createMilestones = asyncHandler(async (req, res) => {
     const create = await pool.query('INSERT INTO milestone (name , description , due_date , project_id) VALUES ($1 , $2 , $3, $4) RETURNING *', [name, description, due_date, id]);
 
     const data :loggerType = {
+      agency_id: user.agency_id,
       admin_id: user.id,
       action: `Milestone ${name} has been created for project ${projectName}`,
       action_type: actionType.CREATE,
@@ -68,6 +70,7 @@ export const changeMilestoneStatus = asyncHandler(async (req, res) => {
   if(!response.rowCount) throw new ApiError(404, "Milestone not found");
 
   const data: loggerType = {
+    agency_id: user.agency_id,
     admin_id: user.id,
     action: `milestone ${response.rows[0].name} status updated to ${newStatus}`,
     action_type: actionType.UPDATE,
@@ -114,6 +117,7 @@ export const deleteMilestone = asyncHandler(async (req, res) => {
   if(!result.rowCount) throw new ApiError(404, "Milestone not found");
 
   const data: loggerType = {
+    agency_id: user.agency_id,
     admin_id: user.id,
     action: `Milestone ${result.rows[0].name}`,
     action_type: actionType.DELETE,

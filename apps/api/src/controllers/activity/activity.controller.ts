@@ -10,6 +10,8 @@ export const getMyActivity = asyncHandler(async(req,res) => {
   if(!page || !limit ) throw new ApiError(400 , "page and limit query are required");
 
   const offset = (page - 1) * limit;
+  const user = (req as any).user;
+  console.log("user is: ",user);
   const id = (req as any).user.id;
 
   const result = await pool.query('SELECT * FROM activity_log WHERE admin_id = $1 LIMIT $2 OFFSET $3', [id,limit,offset]);

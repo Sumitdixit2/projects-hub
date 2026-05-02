@@ -26,6 +26,7 @@ export const createProject = asyncHandler(async (req, res) => {
   const create = await pool.query('INSERT INTO project (name , description , client_id , admin_id , deadline,agency_id , project_status) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *', [name, description, clientId, id, deadline, agency_id, project_status]);
 
   const data: loggerType = {
+    agency_id: user.agency_id,
     admin_id: user.id,
     action: `project ${create.rows[0].name} created`,
     action_type: actionType.CREATE,
@@ -68,6 +69,7 @@ export const changeStatus = asyncHandler(async (req, res) => {
   if(!result.rowCount) throw new ApiError(404 , "Project not found");
   
   const data : loggerType = {
+    agency_id: user.agency_id,
     admin_id: user.id,
     action: `Project ${result.rows[0].name} status changed to ${result.rows[0].project_status}`,
     action_type: actionType.UPDATE,
@@ -110,6 +112,7 @@ export const deleteProject = asyncHandler(async (req, res) => {
   const result = await pool.query('DELETE FROM project WHERE id = $1 RETURNING *', [id]);
 
   const data : loggerType = {
+    agency_id: user.agency_id,
     admin_id: user.id,
     action: `Project ${result.rows[0].name} has been deleted`,
     action_type: actionType.DELETE,

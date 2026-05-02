@@ -14,6 +14,7 @@ export enum actionType {
 }
 
 export type loggerType = {
+  agency_id: string,
   admin_id: string,
   action: string,
   action_type: actionType,

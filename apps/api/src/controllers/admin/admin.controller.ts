@@ -199,6 +199,7 @@ export const createAdminKey = asyncHandler(async (req: Request, res: Response) =
   const result = response.rows[0];
 
   const data:loggerType = {
+    agency_id: user.agency_id,
     admin_id: user.id,
     action: `Admin Key for email ${email} was created`,
     action_type: actionType.CREATE,
@@ -237,6 +238,7 @@ export const createClientKey = asyncHandler(async (req, res) => {
   const result = response.rows[0];
 
   const data: loggerType = {
+      agency_id: user.agency_id,
       admin_id: user.id,
       action: `Client key created for email ${email}`,
       action_type: actionType.CREATE,
@@ -336,6 +338,7 @@ export const deleteClient = asyncHandler(async (req, res) => {
   const client = result.rows[0].name;
 
   const data : loggerType = {
+    agency_id: user.agency_id,
     admin_id: user.id,
     action: `Client ${client} has been deleted`,
     action_type:  actionType.DELETE,
