@@ -14,8 +14,8 @@ export enum entityType {
 }
 
 export type activityInputType = {
-    limit: string,
-    page: string,
+    limit: string;
+    page: string;
 }
 
 export type activityOutputType = {
