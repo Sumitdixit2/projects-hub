@@ -201,7 +201,7 @@ export const createAdminKey = asyncHandler(async (req: Request, res: Response) =
   const data:loggerType = {
     agency_id: user.agency_id,
     admin_id: user.id,
-    action: `Admin Key for email ${email} was created`,
+    action: `Admin Key for email "${email}" was created`,
     action_type: actionType.CREATE,
     entity_type: entityType.Key,
     entity_id: result.id
@@ -240,7 +240,7 @@ export const createClientKey = asyncHandler(async (req, res) => {
   const data: loggerType = {
       agency_id: user.agency_id,
       admin_id: user.id,
-      action: `Client key created for email ${email}`,
+      action: `Client key created for email "${email}"`,
       action_type: actionType.CREATE,
       entity_type: entityType.Key,
       entity_id: result.id
@@ -340,7 +340,7 @@ export const deleteClient = asyncHandler(async (req, res) => {
   const data : loggerType = {
     agency_id: user.agency_id,
     admin_id: user.id,
-    action: `Client ${client} has been deleted`,
+    action: `Client "${client}" has been deleted`,
     action_type:  actionType.DELETE,
     entity_type: entityType.Client,
     entity_id: result.rows[0].id

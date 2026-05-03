@@ -20,11 +20,8 @@ export type activityInputType = {
 
 export type activityOutputType = {
   id: string;
-  admin_id: string;
-  agency_id: string;
   action: string;
-  action_type: actionType;
+  name: string;
   entity_type: entityType;
-  entity_id: string;
   created_at: string;
 }

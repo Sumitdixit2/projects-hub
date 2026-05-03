@@ -28,7 +28,7 @@ export const createProject = asyncHandler(async (req, res) => {
   const data: loggerType = {
     agency_id: user.agency_id,
     admin_id: user.id,
-    action: `project ${create.rows[0].name} created`,
+    action: `project "${create.rows[0].name}" created`,
     action_type: actionType.CREATE,
     entity_type: entityType.Project,
     entity_id: create.rows[0].id
@@ -71,7 +71,7 @@ export const changeStatus = asyncHandler(async (req, res) => {
   const data : loggerType = {
     agency_id: user.agency_id,
     admin_id: user.id,
-    action: `Project ${result.rows[0].name} status changed to ${result.rows[0].project_status}`,
+    action: `Project "${result.rows[0].name}" status changed to "${result.rows[0].project_status}"`,
     action_type: actionType.UPDATE,
     entity_type: entityType.Project,
     entity_id: result.rows[0].id
@@ -114,7 +114,7 @@ export const deleteProject = asyncHandler(async (req, res) => {
   const data : loggerType = {
     agency_id: user.agency_id,
     admin_id: user.id,
-    action: `Project ${result.rows[0].name} has been deleted`,
+    action: `Project "${result.rows[0].name}" has been deleted`,
     action_type: actionType.DELETE,
     entity_type: entityType.Project,
     entity_id: result.rows[0].id

@@ -27,7 +27,7 @@ export const createMilestones = asyncHandler(async (req, res) => {
     const data :loggerType = {
       agency_id: user.agency_id,
       admin_id: user.id,
-      action: `Milestone ${name} has been created for project ${projectName}`,
+      action: `Milestone "${name}" has been created for project "${projectName}"`,
       action_type: actionType.CREATE,
       entity_type: entityType.Milestone,
       entity_id: create.rows[0].id
@@ -42,7 +42,7 @@ export const createMilestones = asyncHandler(async (req, res) => {
     const data :loggerType = {
       agency_id: user.agency_id,
       admin_id: user.id,
-      action: `Milestone ${name} has been created for project ${projectName}`,
+      action: `Milestone "${name}" has been created for project "${projectName}"`,
       action_type: actionType.CREATE,
       entity_type: entityType.Milestone,
       entity_id: create.rows[0].id
@@ -72,7 +72,7 @@ export const changeMilestoneStatus = asyncHandler(async (req, res) => {
   const data: loggerType = {
     agency_id: user.agency_id,
     admin_id: user.id,
-    action: `milestone ${response.rows[0].name} status updated to ${newStatus}`,
+    action: `milestone "${response.rows[0].name}" status updated to "${newStatus}"`,
     action_type: actionType.UPDATE,
     entity_type: entityType.Milestone,
     entity_id: response.rows[0].id
@@ -119,7 +119,7 @@ export const deleteMilestone = asyncHandler(async (req, res) => {
   const data: loggerType = {
     agency_id: user.agency_id,
     admin_id: user.id,
-    action: `Milestone ${result.rows[0].name}`,
+    action: `Milestone "${result.rows[0].name}"`,
     action_type: actionType.DELETE,
     entity_type: entityType.Milestone,
     entity_id: result.rows[0].id

@@ -82,7 +82,7 @@ export default function ActivityPage() {
                   {activity.action}
                 </p>
                 <p className="text-[#4e7397] text-base font-normal leading-normal">
-                  {activity.user?.name || "System"} • {new Date(activity.created_at).toLocaleString()}
+                  {activity.name || "System"} • {new Date(activity.created_at).toLocaleString()}
                 </p>
               </div>
             </React.Fragment>

@@ -12,7 +12,7 @@ export const getAgencyActivity = asyncHandler(async(req,res) => {
   const offset = (page - 1) * limit;
   const agency_id = (req as any).user.agency_id;
 
-  const result = await pool.query('SELECT * FROM activity_log WHERE agency_id = $1 LIMIT $2 OFFSET $3', [agency_id,limit,offset]);
+  const result = await pool.query('SELECT activity_log.id, activity_log.action , activity_log.entity_type , activity_log.created_at , admin.fullname AS name FROM activity_log INNER JOIN admin ON activity_log.admin_id = admin.id WHERE activity_log.agency_id = $1 LIMIT $2 OFFSET $3', [agency_id,limit,offset]);
 
   return res.status(200).json(new ApiResponse(200, result.rows, "activity_log fetched"));
 
