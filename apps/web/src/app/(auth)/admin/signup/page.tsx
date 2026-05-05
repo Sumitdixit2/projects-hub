@@ -30,7 +30,7 @@ const ownerSchema = baseSchema.extend({
 });
 
 const memberSchema = baseSchema.extend({
-  admin_role: z.enum(["staff", "dev"]),
+  admin_role: z.enum(["staff", "developer"]),
   inviteKey: z.string().min(1, "Invite key is required"),
 });
 
@@ -65,7 +65,6 @@ export default function SignupPage() {
 
   const role = form.watch("admin_role");
 
-  // Cleanup unused fields
   useEffect(() => {
     if (role === "owner") {
       form.unregister("inviteKey");
@@ -75,7 +74,6 @@ export default function SignupPage() {
     }
   }, [role, form]);
 
-  // Fetch agencies
   useEffect(() => {
     const fetchAgencies = async () => {
       try {
@@ -126,7 +124,6 @@ export default function SignupPage() {
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
 
-          {/* Role */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium">Role</label>
             <select
@@ -134,12 +131,11 @@ export default function SignupPage() {
               className="input"
             >
               <option value="staff">Staff</option>
-              <option value="dev">Developer</option>
+              <option value="developer">Developer</option>
               <option value="owner">Owner</option>
             </select>
           </div>
 
-          {/* Full Name */}
           <div className="flex flex-col gap-1.5">
             <label>Full Name</label>
             <input {...form.register("fullname")} className="input" />
@@ -148,7 +144,6 @@ export default function SignupPage() {
             )}
           </div>
 
-          {/* Email */}
           <div className="flex flex-col gap-1.5">
             <label>Email</label>
             <input type="email" {...form.register("email")} className="input" />
@@ -157,7 +152,6 @@ export default function SignupPage() {
             )}
           </div>
 
-          {/* Agency Combobox */}
           <div className="flex flex-col gap-1.5">
             <label>Select Agency</label>
 

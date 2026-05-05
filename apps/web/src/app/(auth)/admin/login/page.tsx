@@ -22,7 +22,7 @@ const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   agencyId: z.string().uuid("Valid agency selection is required"),
-  admin_role: z.enum(["staff", "dev", "owner"]),
+  admin_role: z.enum(["staff", "developer", "owner"]),
 });
 
 type RegisterFormType = z.infer<typeof registerSchema>;
@@ -116,7 +116,7 @@ export default function SignupPage() {
             <label className="text-sm font-medium">Role</label>
             <select {...form.register("admin_role")} className="input">
               <option value="staff">Staff</option>
-              <option value="dev">Developer</option>
+              <option value="developer">Developer</option>
               <option value="owner">Owner</option>
             </select>
           </div>
