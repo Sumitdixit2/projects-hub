@@ -2,7 +2,7 @@ import { Router } from "express";
 import { verifyJWT } from "../../middlewares/verifyJwt";
 import { requireAdmin } from "../../middlewares/validateUser.middleware";
 import { changeMilestoneStatus, createMilestones, deleteMilestone, getMilestone, getMyMilestone } from "../../controllers/milestone/milestone.controller";
-import { validateStaff } from "../../middlewares/validateStaff.route";
+import { validateStaff } from "../../middlewares/validateStaff.middleware";
 
 const milestoneRouter = Router();
 

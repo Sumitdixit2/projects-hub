@@ -4,12 +4,13 @@ import { verifyJWT } from "../../middlewares/verifyJwt";
 import { requireAdmin } from "../../middlewares/validateUser.middleware";
 import { validateAdmin } from "../../middlewares/validate.middleware";
 import { isMyId } from "../../middlewares/isMyId.middleware";
-import { validateStaff } from "../../middlewares/validateStaff.route";
+import { validateStaff } from "../../middlewares/validateStaff.middleware";
+import { loginIpLimiter, signupIpLimiter } from "../../middlewares/ipRateLimiter.middleware";
 
 const adminRouter = Router();
 
-adminRouter.route('/signup').post(signUp);
-adminRouter.route('/login').post(adminLogin);
+adminRouter.route('/signup').post(signupIpLimiter,signUp);
+adminRouter.route('/login').post(loginIpLimiter,adminLogin);
 adminRouter.route('/generateAdminKey').post(verifyJWT, requireAdmin, validateAdmin, createAdminKey);
 adminRouter.route('/generateClientKey').post(verifyJWT, requireAdmin,validateStaff, createClientKey);
 adminRouter.route('/getAllClients').get(verifyJWT, requireAdmin, validateStaff, getClients);

@@ -4,7 +4,8 @@ import { verifyJWT } from "../../middlewares/verifyJwt";
 import { requireAdmin } from "../../middlewares/validateUser.middleware";
 import { validateAdmin } from "../../middlewares/validate.middleware";
 import { isMyProject } from "../../middlewares/isMyProject.middleware";
-import { validateStaff } from "../../middlewares/validateStaff.route";
+import { validateStaff } from "../../middlewares/validateStaff.middleware";
+
 
 const projectRouter = Router();
 
