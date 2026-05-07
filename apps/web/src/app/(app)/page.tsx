@@ -10,6 +10,7 @@ import { ActivityTimeline } from "@/components/ui/activity-timeline";
 import { ArrowRight, Terminal, Workflow, Users, Shield, Cpu, Layers } from "lucide-react";
 import Link from "next/link";
 import { BackgroundGrid } from "@/components/ui/background-grid";
+import { CollaborativeCursors } from "@/components/ui/collaborative-cursors";
 
 export default function Home() {
   const router = useRouter();
@@ -62,20 +63,27 @@ export default function Home() {
           </div>
           
           {/* Dashboard Preview */}
-          <div className="mt-20 relative w-full border border-border rounded-xl overflow-hidden bg-[#0a0a0a] shadow-2xl">
-            {/* Window Controls */}
-            <div className="h-10 border-b border-border bg-[#111] flex items-center px-4 gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
-              <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
-              <div className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
-              <div className="ml-4 flex-1 flex justify-center">
-                <div className="w-64 h-6 bg-black border border-border rounded-md flex items-center justify-center">
-                  <span className="text-[10px] text-muted-foreground font-mono">dashboard.projecthub.dev</span>
+          <div className="mt-20 relative w-full border border-border/80 rounded-xl overflow-hidden bg-[#0a0a0a] shadow-2xl ring-1 ring-white/5">
+            <CollaborativeCursors />
+            
+            {/* Window Controls - Restrained Technical Chrome */}
+            <div className="h-9 border-b border-border/80 bg-[#0e0e0e] flex items-center px-4 gap-2.5 relative">
+              <div className="flex gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-zinc-800" />
+                <div className="w-2 h-2 rounded-full bg-zinc-800" />
+                <div className="w-2 h-2 rounded-full bg-zinc-800" />
+              </div>
+              <div className="absolute left-1/2 -translate-x-1/2 flex justify-center">
+                <div className="w-72 h-5 bg-black/50 border border-border/50 rounded flex items-center justify-center backdrop-blur-md">
+                  <span className="text-[9px] text-muted-foreground/80 font-mono tracking-widest flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                    dashboard.projecthub.dev
+                  </span>
                 </div>
               </div>
             </div>
             {/* Interface Mock */}
-            <div className="p-6 flex flex-col md:flex-row gap-6">
+            <div className="p-6 flex flex-col md:flex-row gap-6 relative z-10">
               <div className="w-full md:w-64 flex-shrink-0 space-y-4 hidden md:block">
                 <div className="h-8 bg-[#111] rounded-md border border-border" />
                 <div className="h-4 bg-[#111] rounded border border-border w-3/4" />
