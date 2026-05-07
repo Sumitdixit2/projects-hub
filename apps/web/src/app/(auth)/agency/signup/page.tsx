@@ -58,148 +58,123 @@ function SignUpAgency() {
   };
 
   return (
-    <div
-      className="relative flex min-h-screen w-full flex-col bg-white overflow-x-hidden"
-      style={{ fontFamily: 'Inter, "Noto Sans", sans-serif' }}
-    >
-      <div className="flex flex-col h-full grow">
-        {/* Header */}
-        <header className="flex items-center justify-between border-b px-10 py-3">
-          <div className="flex items-center gap-4 text-[#111417]">
-            <div className="size-4">
-              <svg viewBox="0 0 48 48" fill="none">
-                <path d="M24 18.4L42 11.4V34.3L24 42V18.4Z" fill="currentColor" />
-                <path d="M24 8.18L33.4 11.57L24 15.2L14.5 11.57L24 8.18Z" fill="currentColor" />
-              </svg>
-            </div>
-            <h2 className="text-lg font-bold">Projects-Hub</h2>
+    <div className="min-h-screen flex items-center justify-center p-6 bg-black text-foreground selection:bg-primary/30 relative">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
+      
+      <div className="w-full max-w-[420px] bg-[#0a0a0a] border border-border rounded-xl p-8 relative z-10 shadow-2xl my-12">
+        <div className="mb-8 flex flex-col items-center">
+          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center mb-6">
+            <div className="w-2 h-2 bg-black" />
           </div>
-        </header>
-
-        {/* Form */}
-        <div className="flex justify-center px-4 py-10">
-          <div className="w-full max-w-[512px]">
-            <h2 className="text-2xl font-bold text-center mb-6">
-              Create your agency account
-            </h2>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Initialize Root Workspace
+          </h1>
+          <p className="text-[13px] text-muted-foreground mt-1 text-center">
+            Register a new agency account.
+          </p>
+        </div>
 
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-
               {/* Name */}
-              <label className="flex flex-col">
-                <span className="font-medium mb-1">Agency Name</span>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-medium text-foreground">Agency Name</label>
                 <input
                   {...form.register("name")}
-                  placeholder="Enter your agency name"
-                  className="input"
+                  placeholder="Acme Corp"
+                  className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
                 />
                 {form.formState.errors.name && (
-                  <p className="error">{form.formState.errors.name.message}</p>
+                  <p className="text-[11px] font-mono text-destructive">{form.formState.errors.name.message}</p>
                 )}
-              </label>
+              </div>
 
               {/* Email */}
-              <label className="flex flex-col">
-                <span className="font-medium mb-1">Email</span>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-medium text-foreground">Email Address</label>
                 <input
                   {...form.register("email")}
-                  placeholder="Enter your email"
-                  className="input"
+                  placeholder="admin@agency.com"
+                  className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
                 />
                 {form.formState.errors.email && (
-                  <p className="error">{form.formState.errors.email.message}</p>
+                  <p className="text-[11px] font-mono text-destructive">{form.formState.errors.email.message}</p>
                 )}
-              </label>
+              </div>
 
               {/* Phone */}
-              <label className="flex flex-col">
-                <span className="font-medium mb-1">Phone (Optional)</span>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-medium text-foreground">Phone Number (Optional)</label>
                 <input
                   {...form.register("phone")}
-                  placeholder="Enter phone number"
-                  className="input"
+                  placeholder="+1 (555) 000-0000"
+                  className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
                 />
-              </label>
+              </div>
 
               {/* Password */}
-              <label className="flex flex-col">
-                <span className="font-medium mb-1">Password</span>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-medium text-foreground">Secure Passphrase</label>
                 <input
                   type="password"
                   {...form.register("password")}
-                  placeholder="Enter your password"
-                  className="input"
+                  placeholder="••••••••"
+                  className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
                 />
                 {form.formState.errors.password && (
-                  <p className="error">
+                  <p className="text-[11px] font-mono text-destructive">
                     {form.formState.errors.password.message}
                   </p>
                 )}
-              </label>
+              </div>
 
               {/* Website */}
-              <label className="flex flex-col">
-                <span className="font-medium mb-1">Website</span>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-medium text-foreground">Website (Optional)</label>
                 <input
                   {...form.register("website")}
-                  placeholder="Enter website URL"
-                  className="input"
+                  placeholder="https://agency.com"
+                  className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
                 />
                 {form.formState.errors.website && (
-                  <p className="error">
+                  <p className="text-[11px] font-mono text-destructive">
                     {form.formState.errors.website.message}
                   </p>
                 )}
-              </label>
+              </div>
 
               {/* Description */}
-              <label className="flex flex-col">
-                <span className="font-medium mb-1">Description</span>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-medium text-foreground">Description (Optional)</label>
                 <input
                   {...form.register("description")}
-                  placeholder="Enter description"
-                  className="input"
+                  placeholder="Digital product agency..."
+                  className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
                 />
-              </label>
+              </div>
 
               {/* Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#2080df] text-white py-3 rounded-lg font-semibold disabled:opacity-50"
-              >
-                {loading ? "Creating..." : "Sign Up"}
-              </button>
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2 rounded-md transition-colors disabled:opacity-50 text-[13px] flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      <span>Registering Workspace...</span>
+                    </>
+                  ) : (
+                    "Initialize Workspace"
+                  )}
+                </button>
+              </div>
             </form>
 
-            <p className="text-center text-sm mt-4 underline cursor-pointer">
-              Already have an account? Sign In
+            <p className="text-center text-[12px] text-muted-foreground mt-6 cursor-pointer hover:text-foreground transition-colors" onClick={() => router.push('/admin/login')}>
+              Already have a workspace? Authenticate Session
             </p>
-
-            {loading && (
-              <p className="text-center mt-3 text-sm text-gray-500">
-                Processing...
-              </p>
-            )}
-          </div>
-        </div>
       </div>
-
-      {/* Tailwind reusable classes */}
-      <style jsx>{`
-        .input {
-          height: 50px;
-          border: 1px solid #dce0e5;
-          border-radius: 8px;
-          padding: 12px;
-          font-size: 14px;
-        }
-        .error {
-          font-size: 12px;
-          color: red;
-          margin-top: 4px;
-        }
-      `}</style>
     </div>
   );
 }

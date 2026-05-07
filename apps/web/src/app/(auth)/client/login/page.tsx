@@ -88,45 +88,44 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950">
-      <div className="w-full max-w-[480px] bg-white dark:bg-slate-900 rounded-lg shadow-sm border">
-
-        {/* Header */}
-        <div className="flex justify-center mt-5 items-center">
-          <h2 className="text-lg font-bold">Project Hub</h2>
-        </div>
-
-        <div className="px-8 pt-8 pb-6">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Login to your account
+    <div className="min-h-screen flex items-center justify-center p-6 bg-black text-foreground selection:bg-primary/30 relative">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
+      
+      <div className="w-full max-w-[420px] bg-[#0a0a0a] border border-border rounded-xl p-8 relative z-10 shadow-2xl">
+        <div className="mb-8 flex flex-col items-center">
+          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center mb-6">
+            <div className="w-2 h-2 bg-black" />
+          </div>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Client Authentication
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
-            Access your project dashboard
+          <p className="text-[13px] text-muted-foreground mt-1 text-center">
+            Access your tenant portal.
           </p>
         </div>
 
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="px-8 pb-8 space-y-5"
+          className="space-y-4"
         >
 
           {/* Email */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">Email Address</label>
+            <label className="text-[13px] font-medium text-foreground">Email Address</label>
             <input
               type="email"
               placeholder="name@company.com"
-              className="input"
+              className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
               {...form.register("email")}
             />
             {form.formState.errors.email && (
-              <p className="error">{form.formState.errors.email.message}</p>
+              <p className="text-[11px] font-mono text-destructive">{form.formState.errors.email.message}</p>
             )}
           </div>
 
           {/* Agency */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">Select Agency</label>
+            <label className="text-[13px] font-medium text-foreground">Tenant Target</label>
 
             <Combobox
               items={agencies.map((a) => a.name)}
@@ -141,14 +140,14 @@ export default function LoginPage() {
                 }
               }}
             >
-              <ComboboxInput placeholder="Search agency..." />
+              <ComboboxInput placeholder="Search system tenants..." className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary" />
 
-              <ComboboxContent>
-                <ComboboxEmpty>No agencies found.</ComboboxEmpty>
+              <ComboboxContent className="bg-[#111] border border-border text-foreground">
+                <ComboboxEmpty className="py-4 text-center text-[13px] text-muted-foreground">No tenants found.</ComboboxEmpty>
 
                 <ComboboxList>
                   {agencies.map((agency) => (
-                    <ComboboxItem key={agency.id} value={agency.name}>
+                    <ComboboxItem key={agency.id} value={agency.name} className="text-[13px] hover:bg-black cursor-pointer">
                       {agency.name}
                     </ComboboxItem>
                   ))}
@@ -159,7 +158,7 @@ export default function LoginPage() {
             <input type="hidden" {...form.register("agency_id")} />
 
             {form.formState.errors.agency_id && (
-              <p className="error">
+              <p className="text-[11px] font-mono text-destructive">
                 {form.formState.errors.agency_id.message}
               </p>
             )}
@@ -167,49 +166,39 @@ export default function LoginPage() {
 
           {/* Password */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium">Password</label>
+            <label className="text-[13px] font-medium text-foreground">Secure Passphrase</label>
             <input
               type="password"
-              className="input"
+              className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
+              placeholder="••••••••"
               {...form.register("password")}
             />
             {form.formState.errors.password && (
-              <p className="error">
+              <p className="text-[11px] font-mono text-destructive">
                 {form.formState.errors.password.message}
               </p>
             )}
           </div>
 
           {/* Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white font-medium py-2.5 rounded disabled:opacity-50"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
+          <div className="pt-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2 rounded-md transition-colors disabled:opacity-50 text-[13px] flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                  <span>Authenticating...</span>
+                </>
+              ) : (
+                "Initialize Session"
+              )}
+            </button>
+          </div>
         </form>
-
-        {loading && (
-          <p className="text-center text-sm mt-3 text-gray-500">
-            Processing...
-          </p>
-        )}
       </div>
-
-      {/* Reusable styles */}
-      <style jsx>{`
-        .input {
-          width: 100%;
-          padding: 10px;
-          border-radius: 6px;
-          border: 1px solid #ccc;
-        }
-        .error {
-          font-size: 12px;
-          color: red;
-        }
-      `}</style>
     </div>
   );
 }

@@ -1,79 +1,98 @@
 'use client';
 
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Shield, User } from "lucide-react";
 
-export default function loginAs() {
+export default function LoginAs() {
   const router = useRouter();
+
   return (
-    <div className="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col justify-center">
-      <div className="max-w-4xl mx-auto w-full px-6 py-12">
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <div className="w-12 h-12 bg-primary flex items-center justify-center rounded-lg shadow-sm">
-              <span className="text-white text-3xl">Projects hub</span>
-            </div>
+    <div className="min-h-screen flex flex-col bg-black text-foreground selection:bg-primary/30 relative">
+      {/* Decorative Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
+
+      {/* Header */}
+      <nav className="w-full h-14 border-b border-border flex justify-center items-center relative z-10 bg-black/50 backdrop-blur-sm">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 bg-primary rounded-sm flex items-center justify-center">
+            <div className="w-1.5 h-1.5 bg-black" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-            Welcome back.
-          </h1>
-          <p className="mt-3 text-lg text-slate-600 dark:text-slate-400">
-            Please select your account type to continue to your dashboard.
-          </p>
+          <span className="text-[13px] font-semibold tracking-tight uppercase">
+            Project Hub
+          </span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="group relative bg-white dark:bg-slate-800 border border-neutral-border dark:border-slate-700 rounded-xl p-8 hover:border-primary/50 dark:hover:border-primary/50 transition-colors duration-200">
-            <div className="flex flex-col h-full">
+      </nav>
+
+      {/* Content */}
+      <main className="flex-grow flex flex-col items-center justify-center px-6 py-12 relative z-10">
+        <div className="w-full max-w-3xl">
+          <div className="text-center mb-12">
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-3">
+              Authentication Portal
+            </h1>
+            <p className="text-[15px] text-muted-foreground">
+              Select your authorization context to proceed.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="group border-border bg-[#0a0a0a] hover:bg-[#111] transition-colors p-8 flex flex-col min-h-[280px]">
               <div className="mb-6">
-                <div className="w-14 h-14 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center">
-                  <span className="material-icons text-primary text-3xl">admin_panel_settings</span>
+                <div className="w-10 h-10 border border-border bg-black rounded-md flex items-center justify-center group-hover:border-primary/50 transition-colors">
+                  <Shield className="w-5 h-5 text-primary" />
                 </div>
               </div>
-              <h2 className="text-xl font-bold mb-3">Agency Admin</h2>
-              <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
-                Full access to manage projects, handle client accounts, track team billable hours, and oversee agency-wide analytics.
+              <h2 className="text-[17px] font-medium text-foreground mb-2">Agency Admin</h2>
+              <p className="text-[13px] text-muted-foreground leading-relaxed flex-grow">
+                Full operational access. Manage client tenants, project orchestration, and telemetry ledgers.
               </p>
-              <div className="mt-auto" onClick={() => router.push('admin/login')}>
-                <a className="inline-flex items-center justify-center w-full px-6 py-3.5 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 focus:ring-4 focus:ring-primary/20 transition-all text-sm uppercase tracking-wide" href="#">
-                  Login as Admin
-                </a>
+              <div className="mt-8">
+                <Button 
+                  onClick={() => router.push('/admin/login')} 
+                  className="w-full rounded-md"
+                >
+                  Authenticate as Admin
+                </Button>
               </div>
-            </div>
-          </div>
-          <div className="group relative bg-white dark:bg-slate-800 border border-neutral-border dark:border-slate-700 rounded-xl p-8 hover:border-primary/50 dark:hover:border-primary/50 transition-colors duration-200">
-            <div className="flex flex-col h-full">
+            </Card>
+
+            <Card className="group border-border bg-[#0a0a0a] hover:bg-[#111] transition-colors p-8 flex flex-col min-h-[280px]">
               <div className="mb-6">
-                <div className="w-14 h-14 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center">
-                  <span className="material-icons text-primary text-3xl">person_outline</span>
+                <div className="w-10 h-10 border border-border bg-black rounded-md flex items-center justify-center group-hover:border-primary/50 transition-colors">
+                  <User className="w-5 h-5 text-primary" />
                 </div>
               </div>
-              <h2 className="text-xl font-bold mb-3">Client Portal</h2>
-              <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
-                Access your active project milestones, approve deliverables, view invoices, and communicate with your project manager.
+              <h2 className="text-[17px] font-medium text-foreground mb-2">Client Portal</h2>
+              <p className="text-[13px] text-muted-foreground leading-relaxed flex-grow">
+                Tenant access. View project milestones, approve deliverables, and securely communicate with your agency.
               </p>
-              <div className="mt-auto" onClick={() => router.push('client/login')}>
-                <a className="inline-flex items-center justify-center w-full px-6 py-3.5 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 focus:ring-4 focus:ring-primary/20 transition-all text-sm uppercase tracking-wide" href="#">
-                  Login as Client
-                </a>
+              <div className="mt-8">
+                <Button 
+                  onClick={() => router.push('/client/login')} 
+                  variant="outline"
+                  className="w-full rounded-md border-border bg-black"
+                >
+                  Authenticate as Client
+                </Button>
               </div>
-            </div>
+            </Card>
+          </div>
+
+          {/* Footer Navigation */}
+          <div className="mt-16 text-center">
+            <nav className="flex justify-center space-x-4 text-[12px] font-mono text-muted-foreground uppercase tracking-wider">
+              <a className="hover:text-foreground transition-colors" href="/">Return to System</a>
+              <span>|</span>
+              <a className="hover:text-foreground transition-colors" href="#">Security Docs</a>
+            </nav>
+            <p className="mt-6 text-[11px] font-mono text-muted-foreground">
+              © {new Date().getFullYear()} Project Hub. All systems nominal.
+            </p>
           </div>
         </div>
-        <div className="mt-16 text-center">
-          <nav className="flex justify-center space-x-6 text-sm font-medium text-slate-500 dark:text-slate-400">
-            <a className="hover:text-primary transition-colors" href="#">Return to main site</a>
-            <span className="text-slate-300 dark:text-slate-700">|</span>
-            <a className="hover:text-primary transition-colors" href="#">Help Center</a>
-            <span className="text-slate-300 dark:text-slate-700">|</span>
-            <a className="hover:text-primary transition-colors" href="#">Security</a>
-          </nav>
-          <p className="mt-8 text-xs text-slate-400 dark:text-slate-500">
-            © 2024 AgencyConnect Professional. All rights reserved.
-          </p>
-        </div>
-      </div>
-      <div className="fixed top-0 left-0 w-full h-1 bg-primary/10">
-        <div className="w-1/3 h-full bg-primary"></div>
-      </div>
+      </main>
     </div>
   );
 }
