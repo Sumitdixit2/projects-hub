@@ -5,23 +5,35 @@ import { useEffect, useState } from "react";
 import { projectService } from "@/services/project.service";
 import { toast } from "sonner";
 import { projectType, projectStatus } from "@/types/project.types";
-import Sidebar from "@/components/layout/sidebar";
 import { LayoutGrid, Clock, CheckCircle2 } from "lucide-react";
+import AppShell from "@/components/layout/app-shell";
+import DashboardLayout from "@/components/layout/dashboard-layout";
+import { DataLedgerTable } from "@/components/ui/data-ledger-table";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { MetricStrip } from "@/components/ui/metric-strip";
+import { Button } from "@/components/ui/button";
 
-const STATUS_STYLES: Record<projectStatus, string> = {
-  draft: "bg-gray-100 text-gray-700",
-  pending: "bg-yellow-100 text-yellow-700",
-  active: "bg-blue-100 text-blue-700",
-  on_hold: "bg-orange-100 text-orange-700",
-  completed: "bg-green-100 text-green-700",
-  cancelled: "bg-red-100 text-red-700",
+// ─── Status Badge Map (PRESERVED — same logic, new visual tokens) ─────────────
+
+const STATUS_BADGE: Record<projectStatus, "info" | "warning" | "success" | "error" | "neutral" | "draft"> = {
+  draft:     "draft",
+  pending:   "warning",
+  active:    "info",
+  on_hold:   "warning",
+  completed: "success",
+  cancelled: "error",
 };
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function DevProjectsPage() {
   const router = useRouter();
+
+  // ── State (PRESERVED EXACTLY) ──────────────────────────────────────────────
   const [projects, setProjects] = useState<projectType[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // ── Fetch (PRESERVED EXACTLY) ─────────────────────────────────────────────
   useEffect(() => {
     const fetchMyProjects = async () => {
       try {
@@ -37,106 +49,108 @@ export default function DevProjectsPage() {
     fetchMyProjects();
   }, []);
 
-  return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
-      <aside className="hidden md:flex w-64 bg-white border-r">
-        <Sidebar role="admin" />
-      </aside>
+  // ── Derived State (PRESERVED EXACTLY) ─────────────────────────────────────
+  const activeCount    = projects.filter((p) => p.project_status === "active").length;
+  const completedCount = projects.filter((p) => p.project_status === "completed").length;
 
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <div className="layout-content-container flex flex-col max-w-[960px] w-full mx-auto p-4 md:p-6">
-          
-          <header className="mb-8">
-            <h1 className="text-[#0e141b] text-[32px] font-bold leading-tight">My Projects</h1>
-            <p className="text-[#4e7397] text-sm">Track and manage your assigned development tasks.</p>
-          </header>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <StatCard 
-              icon={<LayoutGrid size={20} />} 
-              label="Assigned" 
-              value={projects.length} 
-              color="text-blue-600" 
-              bgColor="bg-blue-50"
-            />
-            <StatCard 
-              icon={<Clock size={20} />} 
-              label="In Progress" 
-              value={projects.filter(p => p.project_status === 'active').length} 
-              color="text-orange-600" 
-              bgColor="bg-orange-50"
-            />
-            <StatCard 
-              icon={<CheckCircle2 size={20} />} 
-              label="Completed" 
-              value={projects.filter(p => p.project_status === 'completed').length} 
-              color="text-green-600" 
-              bgColor="bg-green-50"
-            />
-          </div>
-
-          <div className="bg-white rounded-xl border border-[#d0dbe7] shadow-sm overflow-hidden">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-[#d0dbe7]">
-                  <th className="p-4 text-sm font-semibold">Project</th>
-                  <th className="p-4 text-sm font-semibold">Status</th>
-                  <th className="p-4 text-sm font-semibold">Deadline</th>
-                  <th className="p-4 text-sm font-semibold text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                {loading ? (
-                  <tr><td colSpan={4} className="p-10 text-center text-gray-400">Loading your projects...</td></tr>
-                ) : projects.length === 0 ? (
-                  <tr><td colSpan={4} className="p-10 text-center text-gray-400">No projects assigned yet.</td></tr>
-                ) : (
-                  projects.map((project) => (
-                    <tr key={project.id} className="border-t border-[#d0dbe7] hover:bg-slate-50 transition-colors">
-                      <td className="p-4">
-                        <div className="flex flex-col">
-                          <span className="font-bold text-[#0e141b]">{project.name}</span>
-                          <span className="text-xs text-[#4e7397] line-clamp-1">{project.description}</span>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${STATUS_STYLES[project.project_status] || "bg-gray-100"}`}>
-                          {project.project_status.replace("_", " ")}
-                        </span>
-                      </td>
-                      <td className="p-4 text-[#4e7397]">
-                        {project.deadline ? new Date(project.deadline).toLocaleDateString() : 'N/A'}
-                      </td>
-                      <td className="p-4 text-right">
-                        <button
-                          onClick={() => router.push(`/admin/owner/project/${project.id}`)}
-                          className="text-blue-600 hover:underline font-medium"
-                        >
-                          View Details
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+  // ── Table Columns ─────────────────────────────────────────────────────────
+  const columns = [
+    {
+      header: "Project",
+      cell: (p: projectType) => (
+        <div className="min-w-0">
+          <p className="text-[13px] font-medium text-foreground truncate">{p.name}</p>
+          {p.description && (
+            <p className="text-[11px] text-muted-foreground truncate mt-0.5 max-w-xs">{p.description}</p>
+          )}
         </div>
-      </main>
-    </div>
-  );
-}
+      ),
+    },
+    {
+      header: "Status",
+      cell: (p: projectType) => (
+        <StatusBadge
+          status={STATUS_BADGE[p.project_status] ?? "neutral"}
+          label={p.project_status.replace("_", " ").toUpperCase()}
+        />
+      ),
+    },
+    {
+      header: "Deadline",
+      cell: (p: projectType) => {
+        if (!p.deadline) return <span className="text-[12px] font-mono text-muted-foreground">—</span>;
+        const daysLeft = Math.ceil((new Date(p.deadline).getTime() - Date.now()) / 86400000);
+        const isUrgent = daysLeft >= 0 && daysLeft < 7;
+        return (
+          <div>
+            <span className="text-[12px] font-mono text-muted-foreground">
+              {new Date(p.deadline).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+            </span>
+            {isUrgent && (
+              <p className="text-[10px] font-mono text-amber-400 mt-0.5">
+                {daysLeft === 0 ? "TODAY" : `${daysLeft}d left`}
+              </p>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      header: "",
+      className: "text-right",
+      cell: (p: projectType) => (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push(`/admin/owner/project/${p.id}`)}
+            className="h-7 text-[11px] px-3 bg-transparent hover:bg-white/5"
+          >
+            Open
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
-function StatCard({ icon, label, value, color, bgColor }: { icon: any, label: string, value: number, color: string, bgColor: string }) {
   return (
-    <div className="bg-white p-4 rounded-xl border border-[#d0dbe7] flex items-center gap-3 shadow-sm">
-      <div className={`p-2 ${bgColor} ${color} rounded-lg`}>
-        {icon}
-      </div>
-      <div>
-        <p className="text-xs text-[#4e7397] font-medium uppercase">{label}</p>
-        <p className="text-xl font-bold text-[#0e141b]">{value}</p>
-      </div>
-    </div>
+    <AppShell role="admin">
+      <DashboardLayout
+        title="My Projects"
+        subtitle="Assigned development workload and execution pipeline."
+      >
+        {/* ── Execution Metrics Strip ── */}
+        <MetricStrip
+          metrics={[
+            {
+              label: "Assigned",
+              value: loading ? "—" : String(projects.length),
+              icon: <LayoutGrid className="w-3.5 h-3.5" />,
+            },
+            {
+              label: "Active",
+              value: loading ? "—" : String(activeCount),
+              icon: <Clock className="w-3.5 h-3.5" />,
+            },
+            {
+              label: "Completed",
+              value: loading ? "—" : String(completedCount),
+              icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+            },
+          ]}
+        />
+
+        {/* ── Project Ledger ── */}
+        <div className="mt-4">
+          <DataLedgerTable
+            data={projects}
+            columns={columns}
+            keyExtractor={(p) => p.id}
+            onRowClick={(p) => router.push(`/admin/owner/project/${p.id}`)}
+            emptyStateMessage={loading ? "Synchronizing project assignments..." : "No projects assigned."}
+          />
+        </div>
+      </DashboardLayout>
+    </AppShell>
   );
 }
