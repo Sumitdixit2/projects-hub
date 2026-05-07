@@ -26,6 +26,7 @@ import DashboardLayout from "@/components/layout/dashboard-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { SkeletonDetailPage } from "@/components/ui/skeletons";
 
 // ─── Status Config ────────────────────────────────────────────────────────────
 
@@ -87,9 +88,9 @@ export default function MilestoneDetailsPage() {
   if (loading) {
     return (
       <AppShell role="admin">
-        <div className="flex h-full items-center justify-center text-muted-foreground text-[13px] font-mono">
-          Resolving milestone state...
-        </div>
+        <DashboardLayout title="" subtitle="">
+          <SkeletonDetailPage />
+        </DashboardLayout>
       </AppShell>
     );
   }

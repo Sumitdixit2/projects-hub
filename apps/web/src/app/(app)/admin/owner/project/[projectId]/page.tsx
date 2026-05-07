@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { DataLedgerTable } from "@/components/ui/data-ledger-table";
 import { Card } from "@/components/ui/card";
+import { SkeletonDetailPage } from "@/components/ui/skeletons";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -121,9 +122,9 @@ export default function ProjectDetailsPage() {
   if (loading) {
     return (
       <AppShell role="admin">
-        <div className="flex h-full items-center justify-center text-muted-foreground text-[13px] font-mono">
-          Fetching project telemetry...
-        </div>
+        <DashboardLayout title="" subtitle="">
+          <SkeletonDetailPage />
+        </DashboardLayout>
       </AppShell>
     );
   }

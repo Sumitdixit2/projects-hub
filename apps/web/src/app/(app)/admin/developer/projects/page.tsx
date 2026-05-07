@@ -12,6 +12,7 @@ import { DataLedgerTable } from "@/components/ui/data-ledger-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { MetricStrip } from "@/components/ui/metric-strip";
 import { Button } from "@/components/ui/button";
+import { SkeletonMetricStrip, SkeletonTable } from "@/components/ui/skeletons";
 
 // ─── Status Badge Map (PRESERVED — same logic, new visual tokens) ─────────────
 
@@ -119,37 +120,43 @@ export default function DevProjectsPage() {
         title="My Projects"
         subtitle="Assigned development workload and execution pipeline."
       >
-        {/* ── Execution Metrics Strip ── */}
-        <MetricStrip
-          metrics={[
-            {
-              label: "Assigned",
-              value: loading ? "—" : String(projects.length),
-              icon: <LayoutGrid className="w-3.5 h-3.5" />,
-            },
-            {
-              label: "Active",
-              value: loading ? "—" : String(activeCount),
-              icon: <Clock className="w-3.5 h-3.5" />,
-            },
-            {
-              label: "Completed",
-              value: loading ? "—" : String(completedCount),
-              icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-            },
-          ]}
-        />
-
-        {/* ── Project Ledger ── */}
-        <div className="mt-4">
-          <DataLedgerTable
-            data={projects}
-            columns={columns}
-            keyExtractor={(p) => p.id}
-            onRowClick={(p) => router.push(`/admin/owner/project/${p.id}`)}
-            emptyStateMessage={loading ? "Synchronizing project assignments..." : "No projects assigned."}
-          />
-        </div>
+        {loading ? (
+          <div className="space-y-4">
+            <SkeletonMetricStrip count={3} />
+            <SkeletonTable rows={5} cols={4} />
+          </div>
+        ) : (
+          <>
+            <MetricStrip
+              metrics={[
+                {
+                  label: "Assigned",
+                  value: String(projects.length),
+                  icon: <LayoutGrid className="w-3.5 h-3.5" />,
+                },
+                {
+                  label: "Active",
+                  value: String(activeCount),
+                  icon: <Clock className="w-3.5 h-3.5" />,
+                },
+                {
+                  label: "Completed",
+                  value: String(completedCount),
+                  icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+                },
+              ]}
+            />
+            <div className="mt-4">
+              <DataLedgerTable
+                data={projects}
+                columns={columns}
+                keyExtractor={(p) => p.id}
+                onRowClick={(p) => router.push(`/admin/owner/project/${p.id}`)}
+                emptyStateMessage="No projects assigned."
+              />
+            </div>
+          </>
+        )}
       </DashboardLayout>
     </AppShell>
   );

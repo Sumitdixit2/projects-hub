@@ -13,6 +13,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { DataLedgerTable } from "@/components/ui/data-ledger-table";
 import { Mail, Phone, MapPin, ArrowLeft, Briefcase, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SkeletonCard, SkeletonTable } from "@/components/ui/skeletons";
 
 // ─── Types (PRESERVED EXACTLY) ───────────────────────────────────────────────
 
@@ -88,9 +89,12 @@ export default function ClientDetailPage() {
   if (loading) {
     return (
       <AppShell role="admin">
-        <div className="flex h-full items-center justify-center text-muted-foreground text-[13px] font-mono">
-          Resolving client profile...
-        </div>
+        <DashboardLayout title="" subtitle="">
+          <div className="space-y-8 mt-4 max-w-3xl">
+            <SkeletonCard lines={3} />
+            <SkeletonTable rows={3} cols={3} />
+          </div>
+        </DashboardLayout>
       </AppShell>
     );
   }

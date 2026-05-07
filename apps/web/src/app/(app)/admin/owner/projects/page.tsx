@@ -12,6 +12,7 @@ import { DataLedgerTable } from "@/components/ui/data-ledger-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { MetricStrip } from "@/components/ui/metric-strip";
+import { SkeletonMetricStrip, SkeletonTable } from "@/components/ui/skeletons";
 
 const mapStatusToType = (status: projectStatus): "success" | "warning" | "error" | "info" | "neutral" => {
   switch(status) {
@@ -99,20 +100,28 @@ export default function AdminProjectsPage() {
           </Button>
         }
       >
-        <MetricStrip 
-          metrics={[
-            { label: "Total Projects", value: loading ? "-" : projects.length.toString(), icon: <LayoutGrid className="w-3.5 h-3.5" /> }
-          ]} 
-        />
-
-        <div className="mt-4">
-          <DataLedgerTable 
-            data={projects}
-            columns={columns}
-            keyExtractor={(item) => item.id}
-            emptyStateMessage={loading ? "Synchronizing pipeline data..." : "No projects found."}
-          />
-        </div>
+        {loading ? (
+          <div className="space-y-4">
+            <SkeletonMetricStrip count={1} />
+            <SkeletonTable rows={6} cols={5} />
+          </div>
+        ) : (
+          <>
+            <MetricStrip 
+              metrics={[
+                { label: "Total Projects", value: projects.length.toString(), icon: <LayoutGrid className="w-3.5 h-3.5" /> }
+              ]} 
+            />
+            <div className="mt-4">
+              <DataLedgerTable 
+                data={projects}
+                columns={columns}
+                keyExtractor={(item) => item.id}
+                emptyStateMessage="No projects found."
+              />
+            </div>
+          </>
+        )}
       </DashboardLayout>
     </AppShell>
   );

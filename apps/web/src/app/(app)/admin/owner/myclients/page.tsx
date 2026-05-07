@@ -11,6 +11,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Plus, Users } from "lucide-react";
 import { MetricStrip } from "@/components/ui/metric-strip";
+import { SkeletonMetricStrip, SkeletonTable } from "@/components/ui/skeletons";
 
 type Client = {
   id: string;
@@ -90,20 +91,28 @@ export default function ClientsPage() {
           </Button>
         }
       >
-        <MetricStrip 
-          metrics={[
-            { label: "Total Clients", value: loading ? "-" : clients.length.toString(), icon: <Users className="w-3.5 h-3.5" /> }
-          ]} 
-        />
-
-        <div className="mt-4">
-          <DataLedgerTable 
-            data={clients}
-            columns={columns}
-            keyExtractor={(item) => item.id}
-            emptyStateMessage={loading ? "Synchronizing client directory..." : "No clients found."}
-          />
-        </div>
+        {loading ? (
+          <div className="space-y-4">
+            <SkeletonMetricStrip count={1} />
+            <SkeletonTable rows={5} cols={4} />
+          </div>
+        ) : (
+          <>
+            <MetricStrip 
+              metrics={[
+                { label: "Total Clients", value: clients.length.toString(), icon: <Users className="w-3.5 h-3.5" /> }
+              ]} 
+            />
+            <div className="mt-4">
+              <DataLedgerTable 
+                data={clients}
+                columns={columns}
+                keyExtractor={(item) => item.id}
+                emptyStateMessage="No clients found."
+              />
+            </div>
+          </>
+        )}
       </DashboardLayout>
     </AppShell>
   );
