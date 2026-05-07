@@ -3,6 +3,9 @@
 import { adminService } from "@/services/admin.service";
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
+import { DenseStatsGrid } from "@/components/ui/dense-stats-grid";
+import { TelemetryCard } from "@/components/ui/telemetry-card";
+import { Card } from "@/components/ui/card";
 
 interface StatsData {
   projects: {
@@ -25,10 +28,10 @@ export type projectStatus =
   | "cancelled";
 
 const STATUS_COLORS: Record<projectStatus, string> = {
-  draft: "bg-gray-400",
-  pending: "bg-yellow-400",
+  draft: "bg-zinc-600",
+  pending: "bg-yellow-500",
   active: "bg-blue-500",
-  on_hold: "bg-orange-400",
+  on_hold: "bg-orange-500",
   completed: "bg-green-500",
   cancelled: "bg-red-500",
 };
@@ -75,51 +78,45 @@ export default function Overview() {
   }, [stats]);
 
   if (loading) {
-    return <div className="p-4 text-center text-gray-500">Loading overview...</div>;
+    return (
+      <div className="flex items-center justify-center h-48 border border-border bg-black rounded-lg">
+        <div className="flex items-center gap-3">
+          <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <span className="text-[13px] font-mono text-muted-foreground uppercase tracking-widest">Loading Telemetry...</span>
+        </div>
+      </div>
+    );
   }
 
   if (!stats) return null;
 
   return (
-    <>
-      <div className="flex justify-between p-4">
-        <p className="text-[32px] font-bold">Overview</p>
-      </div>
+    <div className="space-y-6">
+      <DenseStatsGrid columns={3}>
+        <TelemetryCard title="Active Projects" value={stats.projects.active_projects.toString()} className="bg-black" />
+        <TelemetryCard title="Completed Projects" value={stats.projects.completed_projects.toString()} className="bg-black" />
+        <TelemetryCard title="Total Clients" value={stats.clients.toString()} className="bg-black" />
+      </DenseStatsGrid>
 
-      <div className="flex flex-wrap gap-4 p-4">
-        <StatCard title="Active Projects" value={stats.projects.active_projects} />
-        <StatCard title="Completed Projects" value={stats.projects.completed_projects} />
-        <StatCard title="Total Clients" value={stats.clients} />
-      </div>
-
-      <section className="mt-6 p-4">
-        <h2 className="text-xl font-bold mb-4">Projects by Status</h2>
-
-        <div className="space-y-4">
+      <Card className="p-6 bg-black border-border shadow-2xl">
+        <h3 className="text-sm font-semibold text-foreground tracking-tight mb-6">Project Distribution</h3>
+        <div className="space-y-5">
           {projectStatsList.map((item) => (
             <div key={item.status}>
-              <p className="text-sm font-medium mb-1">
-                {item.label} ({item.count})
-              </p>
-              <div className="w-full bg-gray-200 rounded h-3">
+              <div className="flex items-center justify-between mb-2 text-[13px]">
+                <span className="text-muted-foreground font-medium">{item.label}</span>
+                <span className="font-mono text-foreground">{item.count}</span>
+              </div>
+              <div className="w-full bg-[#111] rounded-full h-1.5 overflow-hidden border border-border/50">
                 <div
-                  className={`${STATUS_COLORS[item.status]} h-3 rounded transition-all duration-500`}
+                  className={`${STATUS_COLORS[item.status]} h-full transition-all duration-500`}
                   style={{ width: `${item.percentage}%` }}
                 />
               </div>
             </div>
           ))}
         </div>
-      </section>
-    </>
-  );
-}
-
-function StatCard({ title, value }: { title: string; value: number }) {
-  return (
-    <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 border border-[#d0dbe7]">
-      <p className="text-base font-medium">{title}</p>
-      <p className="text-2xl font-bold">{value}</p>
+      </Card>
     </div>
   );
 }

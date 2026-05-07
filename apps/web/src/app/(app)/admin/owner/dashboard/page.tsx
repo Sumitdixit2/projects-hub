@@ -1,10 +1,14 @@
 "use client";
 
 import Overview from "@/components/overview/overview";
-import Sidebar from "@/components/layout/sidebar";
+import AppShell from "@/components/layout/app-shell";
+import DashboardLayout from "@/components/layout/dashboard-layout";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { ActivityTimeline } from "@/components/ui/activity-timeline";
+import { SectionHeader } from "@/components/ui/section-header";
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
@@ -15,63 +19,28 @@ export default function DashboardPage() {
     if (hasHydrated && !user) {
       router.push("/admin/login");
     }
-  }, [hasHydrated, user]); const projectStats = [
-    { label: "In Progress", value: 60 },
-    { label: "Completed", value: 20 },
-    { label: "On Hold", value: 40 },
-    { label: "Planning", value: 80 },
-  ];
+  }, [hasHydrated, user]);
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-
-      <aside className="hidden md:flex w-64 bg-white border-r">
-        <Sidebar role="admin" />
-      </aside>
-
-      <main className="flex-1 p-4 md:p-6">
-
+    <AppShell role="admin">
+      <DashboardLayout title="System Overview" subtitle="Realtime aggregate operations">
         <Overview />
 
-        <section className="mt-8">
-          <h2 className="text-xl font-bold mb-4">
-            Recent Activity
-          </h2>
-
-          <div className="space-y-4 text-sm">
-            <ActivityItem
-              title="Project 'Website Redesign' started"
-              time="2 hours ago"
+        <div className="mt-8">
+          <SectionHeader title="System Activity" description="Recent structural events" />
+          <Card className="p-6 mt-4 bg-black border-border shadow-2xl">
+            <ActivityTimeline 
+              events={[
+                { id: '1', actor: 'System', action: "started", target: "Project 'Website Redesign'", timestamp: "2 hours ago" },
+                { id: '2', actor: 'Admin', action: "added", target: "Client 'Tech Solutions Inc.'", timestamp: "4 hours ago", isImportant: true },
+                { id: '3', actor: 'System', action: "completed", target: "Project 'Mobile App'", timestamp: "1 day ago" },
+                { id: '4', actor: 'Admin', action: "sent message", target: "to 'Global Corp'", timestamp: "2 days ago" },
+                { id: '5', actor: 'System', action: "joined", target: "User 'Sarah'", timestamp: "3 days ago" },
+              ]}
             />
-            <ActivityItem
-              title="Client 'Tech Solutions Inc.' added"
-              time="4 hours ago"
-            />
-            <ActivityItem
-              title="Project 'Mobile App Development' completed"
-              time="1 day ago"
-            />
-            <ActivityItem
-              title="Message sent to client 'Global Corp'"
-              time="2 days ago"
-            />
-            <ActivityItem
-              title="New user 'Sarah' joined"
-              time="3 days ago"
-            />
-          </div>
-        </section>
-
-      </main>
-    </div>
-  );
-}
-
-function ActivityItem({ title, time }: { title: string; time: string }) {
-  return (
-    <div className="border-l-2 border-gray-300 pl-4">
-      <p className="font-medium">{title}</p>
-      <p className="text-gray-500 text-xs">{time}</p>
-    </div>
+          </Card>
+        </div>
+      </DashboardLayout>
+    </AppShell>
   );
 }
