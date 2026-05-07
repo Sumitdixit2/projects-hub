@@ -21,6 +21,7 @@ interface DataLedgerTableProps<T> {
   columns: Column<T>[];
   keyExtractor: (item: T) => string;
   emptyStateMessage?: string;
+  onRowClick?: (item: T) => void;
 }
 
 export function DataLedgerTable<T>({
@@ -28,6 +29,7 @@ export function DataLedgerTable<T>({
   columns,
   keyExtractor,
   emptyStateMessage = "No data found.",
+  onRowClick,
 }: DataLedgerTableProps<T>) {
   return (
     <div className="rounded-sm border border-border bg-black">
@@ -50,7 +52,11 @@ export function DataLedgerTable<T>({
             </TableRow>
           ) : (
             data.map((item) => (
-              <TableRow key={keyExtractor(item)}>
+              <TableRow
+                key={keyExtractor(item)}
+                onClick={onRowClick ? () => onRowClick(item) : undefined}
+                className={onRowClick ? "cursor-pointer" : ""}
+              >
                 {columns.map((col, i) => {
                   let content: React.ReactNode;
                   if (col.cell) {
@@ -60,8 +66,8 @@ export function DataLedgerTable<T>({
                   }
 
                   return (
-                    <TableCell 
-                      key={i} 
+                    <TableCell
+                      key={i}
                       className={col.isMono ? "font-mono text-muted-foreground" : ""}
                     >
                       {content}

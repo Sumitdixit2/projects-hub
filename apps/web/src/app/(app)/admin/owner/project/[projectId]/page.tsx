@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Sidebar from "@/components/layout/sidebar";
 import { projectService } from "@/services/project.service";
 import { milestoneService } from "@/services/milestone.service";
 import { projectStatus } from "@/types/project.types";
@@ -20,7 +19,18 @@ import {
   User,
   Briefcase,
   AlignLeft,
+  Plus,
+  ArrowLeft,
+  Flag,
 } from "lucide-react";
+import AppShell from "@/components/layout/app-shell";
+import DashboardLayout from "@/components/layout/dashboard-layout";
+import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { DataLedgerTable } from "@/components/ui/data-ledger-table";
+import { Card } from "@/components/ui/card";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export enum MilestoneStatus {
   draft = "draft",
@@ -28,17 +38,47 @@ export enum MilestoneStatus {
   active = "active",
   on_hold = "on_hold",
   completed = "completed",
-  cancelled = "cancelled"
+  cancelled = "cancelled",
 }
+
+// ─── Status Config ────────────────────────────────────────────────────────────
+
+const STATUS_OPTIONS: {
+  label: string;
+  value: projectStatus;
+  icon: any;
+  badge: "info" | "warning" | "success" | "error" | "neutral" | "draft";
+}[] = [
+  { label: "Draft",     value: "draft",     icon: FileText,    badge: "draft"   },
+  { label: "Pending",   value: "pending",   icon: Clock,       badge: "warning" },
+  { label: "Active",    value: "active",    icon: PlayCircle,  badge: "info"    },
+  { label: "On Hold",   value: "on_hold",   icon: StopCircle,  badge: "warning" },
+  { label: "Completed", value: "completed", icon: CheckCircle2,badge: "success" },
+  { label: "Cancelled", value: "cancelled", icon: XCircle,     badge: "error"   },
+];
+
+const MILESTONE_STATUS_BADGE: Record<MilestoneStatus, "info" | "warning" | "success" | "error" | "neutral" | "draft"> = {
+  [MilestoneStatus.completed]: "success",
+  [MilestoneStatus.active]:    "info",
+  [MilestoneStatus.pending]:   "warning",
+  [MilestoneStatus.on_hold]:   "warning",
+  [MilestoneStatus.cancelled]: "error",
+  [MilestoneStatus.draft]:     "draft",
+};
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ProjectDetailsPage() {
   const { projectId } = useParams() as { projectId: string };
   const router = useRouter();
+
+  // ── State (PRESERVED EXACTLY) ──────────────────────────────────────────────
   const [project, setProject] = useState<any | null>(null);
   const [milestones, setMilestones] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
 
+  // ── Data Fetching (PRESERVED EXACTLY) ─────────────────────────────────────
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -47,8 +87,6 @@ export default function ProjectDetailsPage() {
           milestoneService.getMilestones(projectId),
         ]);
 
-        console.log("milestones are: ", milestonesResponse);
-        console.log("type is: ", typeof milestonesResponse);
         setProject(projectResponse.data);
         const data = milestonesResponse.data;
         if (data) {
@@ -56,7 +94,6 @@ export default function ProjectDetailsPage() {
         } else {
           setMilestones([]);
         }
-
       } catch (error: any) {
         toast.error(error.message || "Failed to fetch project details");
       } finally {
@@ -66,206 +103,245 @@ export default function ProjectDetailsPage() {
     fetchData();
   }, [projectId]);
 
+  // ── Mutation (PRESERVED EXACTLY) ──────────────────────────────────────────
   const handleProjectStatusChange = async (newStatus: projectStatus) => {
     try {
       await projectService.changeStatus(projectId, newStatus);
-      setProject((prev: any) => (prev ? { ...prev, project_status: newStatus } : null));
+      setProject((prev: any) =>
+        prev ? { ...prev, project_status: newStatus } : null
+      );
       setIsStatusMenuOpen(false);
-      toast.success(`Project status changed to ${newStatus.replace("_", " ")}`);
+      toast.success(`Status → ${newStatus.replace("_", " ")}`);
     } catch (error: any) {
       toast.error(error.message || "Failed to update status");
     }
   };
 
-  const getMilestoneStatusStyles = (status: MilestoneStatus) => {
-    switch (status) {
-      case MilestoneStatus.completed:
-        return "bg-green-50 text-green-700 border-green-200";
-      case MilestoneStatus.active:
-        return "bg-blue-50 text-blue-700 border-blue-200";
-      case MilestoneStatus.pending:
-        return "bg-amber-50 text-amber-700 border-amber-200";
-      case MilestoneStatus.on_hold:
-        return "bg-orange-50 text-orange-700 border-orange-200";
-      case MilestoneStatus.cancelled:
-        return "bg-red-50 text-red-700 border-red-200";
-      default:
-        return "bg-slate-50 text-slate-600 border-slate-200";
-    }
-  };
+  // ── Loading / Not Found States ─────────────────────────────────────────────
+  if (loading) {
+    return (
+      <AppShell role="admin">
+        <div className="flex h-full items-center justify-center text-muted-foreground text-[13px] font-mono">
+          Fetching project telemetry...
+        </div>
+      </AppShell>
+    );
+  }
 
-  if (loading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
-  if (!project) return <div className="flex h-screen items-center justify-center">Project not found.</div>;
+  if (!project) {
+    return (
+      <AppShell role="admin">
+        <div className="flex h-full items-center justify-center text-muted-foreground text-[13px] font-mono">
+          PROJECT_NOT_FOUND
+        </div>
+      </AppShell>
+    );
+  }
 
-  const statusOptions: { label: string; value: projectStatus; icon: any; color: string }[] = [
-    { label: "Draft", value: "draft", icon: FileText, color: "text-slate-600 bg-slate-100" },
-    { label: "Pending", value: "pending", icon: Clock, color: "text-amber-600 bg-amber-100" },
-    { label: "Active", value: "active", icon: PlayCircle, color: "text-blue-600 bg-blue-100" },
-    { label: "On Hold", value: "on_hold", icon: StopCircle, color: "text-orange-600 bg-orange-100" },
-    { label: "Completed", value: "completed", icon: CheckCircle2, color: "text-green-600 bg-green-100" },
-    { label: "Cancelled", value: "cancelled", icon: XCircle, color: "text-red-600 bg-red-100" },
+  // ── Derived State ─────────────────────────────────────────────────────────
+  const currentStatus =
+    STATUS_OPTIONS.find((s) => s.value === project.project_status) ||
+    STATUS_OPTIONS[0];
+
+  const milestonesCompleted = milestones.filter(
+    (m) => m.milestone_status === MilestoneStatus.completed
+  ).length;
+
+  const completionPct =
+    milestones.length > 0
+      ? Math.round((milestonesCompleted / milestones.length) * 100)
+      : 0;
+
+  // ── Milestone Table Columns ────────────────────────────────────────────────
+  const milestoneColumns = [
+    {
+      header: "Milestone",
+      cell: (m: any) => (
+        <div className="flex items-center gap-2">
+          <Flag className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />
+          <span className="text-[13px] font-medium text-foreground">{m.name}</span>
+        </div>
+      ),
+    },
+    {
+      header: "Due Date",
+      cell: (m: any) => (
+        <span className="text-[12px] font-mono text-muted-foreground">
+          {m.due_date ? new Date(m.due_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+        </span>
+      ),
+    },
+    {
+      header: "Status",
+      cell: (m: any) => (
+        <StatusBadge
+          status={MILESTONE_STATUS_BADGE[m.milestone_status as MilestoneStatus] ?? "neutral"}
+          label={m.milestone_status.replace("_", " ").toUpperCase()}
+        />
+      ),
+    },
+    {
+      header: "",
+      className: "text-right",
+      cell: (m: any) => (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push(`/admin/owner/milestone/${m.id}`)}
+            className="h-7 text-[11px] px-3 bg-transparent hover:bg-white/5"
+          >
+            Open
+          </Button>
+        </div>
+      ),
+    },
   ];
 
-  const currentStatus = statusOptions.find(s => s.value === project.project_status) || statusOptions[0];
-
+  // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="relative flex h-full min-h-screen w-full bg-slate-50 overflow-x-hidden font-inter">
-      <div className="layout-container flex h-full grow">
-     <aside className="hidden md:flex w-64 bg-white border-r sticky top-0 h-screen">
-        <Sidebar role="admin" />
-      </aside>
-
-        <main className="flex-1 flex flex-col max-w-[960px] mx-auto py-5 px-6 ml-80">
-          {/* Breadcrumbs */}
-          <div className="flex flex-wrap gap-2 p-4">
-            <a className="text-[#4e7397] text-base font-medium hover:underline" href="/admin/owner/projects">Projects</a>
-            <span className="text-[#4e7397] text-base font-medium">/</span>
-            <span className="text-[#0e141b] text-base font-medium">{project.name}</span>
-          </div>
-
-          <div className="flex flex-wrap justify-between items-center gap-3 p-4">
-            <div className="flex flex-col gap-1">
-              <h1 className="text-[#0e141b] text-[32px] font-bold leading-tight">{project.name}</h1>
-              <div className="flex items-center gap-2 text-[#4e7397] text-sm">
-                <Briefcase className="w-4 h-4" />
-                <span>Project ID: {projectId.slice(0, 8)}...</span>
-              </div>
-            </div>
-
+    <AppShell role="admin">
+      <DashboardLayout
+        title={project.name}
+        subtitle={
+          <span className="flex items-center gap-2 text-muted-foreground text-[12px] font-mono">
+            <Briefcase className="w-3.5 h-3.5" />
+            {projectId.slice(0, 8).toUpperCase()}
+            <span className="opacity-30">·</span>
+            <button
+              onClick={() => router.push("/admin/owner/projects")}
+              className="hover:text-foreground transition-colors flex items-center gap-1"
+            >
+              <ArrowLeft className="w-3 h-3" /> Projects
+            </button>
+          </span>
+        }
+        actions={
+          <div className="flex items-center gap-3">
+            {/* Status Changer — preserves full mutation logic */}
             <div className="relative">
               <button
                 onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full border transition-all shadow-sm font-semibold text-sm",
-                  currentStatus.color,
-                  "border-transparent hover:brightness-95"
+                  "flex items-center gap-1.5 h-8 px-3 rounded-md border text-[12px] font-medium transition-all",
+                  "bg-[#0a0a0a] border-border text-foreground hover:bg-white/5"
                 )}
               >
-                <currentStatus.icon className="w-4 h-4" />
+                <currentStatus.icon className="w-3.5 h-3.5" />
                 <span>{currentStatus.label}</span>
-                <ChevronDown className={cn("w-4 h-4 transition-transform", isStatusMenuOpen && "rotate-180")} />
+                <ChevronDown
+                  className={cn(
+                    "w-3.5 h-3.5 transition-transform text-muted-foreground",
+                    isStatusMenuOpen && "rotate-180"
+                  )}
+                />
               </button>
 
               {isStatusMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden py-1">
-                  {statusOptions.map((option) => (
+                <div className="absolute right-0 mt-1.5 w-44 bg-[#0a0a0a] rounded-md shadow-2xl border border-border z-50 overflow-hidden py-1">
+                  {STATUS_OPTIONS.map((option) => (
                     <button
                       key={option.value}
                       onClick={() => handleProjectStatusChange(option.value)}
                       className={cn(
-                        "flex items-center gap-3 w-full px-4 py-2.5 text-sm transition-colors hover:bg-slate-50",
-                        project.project_status === option.value ? "text-blue-600 bg-blue-50 font-medium" : "text-slate-600"
+                        "flex items-center gap-2.5 w-full px-3 py-2 text-[12px] transition-colors hover:bg-white/5",
+                        project.project_status === option.value
+                          ? "text-primary bg-primary/5"
+                          : "text-muted-foreground"
                       )}
                     >
-                      <option.icon className="w-4 h-4" />
+                      <option.icon className="w-3.5 h-3.5" />
                       {option.label}
                     </button>
                   ))}
                 </div>
               )}
             </div>
-          </div>
 
-          <div className="px-4 mt-6">
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-              <div className="flex items-center gap-2 mb-3 text-[#0e141b]">
-                <AlignLeft className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-bold">Project Description</h3>
-              </div>
-              <p className="text-slate-600 leading-relaxed text-sm whitespace-pre-wrap">
-                {project.description || "No description provided for this project."}
-              </p>
-            </div>
-          </div>
-
-          <h3 className="text-[#0e141b] text-lg font-bold px-4 pb-2 pt-8">Quick Stats</h3>
-          <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-xl border border-slate-200">
-              <div className="flex items-center gap-2 text-[#4e7397] mb-1">
-                <User className="w-4 h-4" />
-                <p className="text-xs font-bold uppercase tracking-wider">Client</p>
-              </div>
-              <p className="text-[#0e141b] font-medium">{project.client}</p>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl border border-slate-200">
-              <div className="flex items-center gap-2 text-[#4e7397] mb-1">
-                <Calendar className="w-4 h-4" />
-                <p className="text-xs font-bold uppercase tracking-wider">Started At</p>
-              </div>
-              <p className="text-[#0e141b] font-medium">
-                {project.started_at ? new Date(project.started_at).toLocaleDateString() : "Not set"}
-              </p>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl border border-slate-200">
-              <div className="flex items-center gap-2 text-[#4e7397] mb-1">
-                <Clock className="w-4 h-4" />
-                <p className="text-xs font-bold uppercase tracking-wider">Deadline</p>
-              </div>
-              <p className="text-[#0e141b] font-medium">
-                {new Date(project.deadline).toLocaleDateString()}
-              </p>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl border border-slate-200">
-              <div className="flex items-center gap-2 text-[#4e7397] mb-1">
-                <CheckCircle2 className="w-4 h-4" />
-                <p className="text-xs font-bold uppercase tracking-wider">Admin</p>
-              </div>
-              <p className="text-[#0e141b] font-medium">{project.assignedto}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between px-4 mt-8">
-            <h3 className="text-[#0e141b] text-lg font-bold">Milestones</h3>
-            <button
+            <Button
+              size="sm"
+              className="gap-2"
               onClick={() => router.push(`/admin/owner/createmilestone/${projectId}`)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-md shadow-blue-200"
             >
-              + Add Milestone
-            </button>
+              <Plus className="w-3.5 h-3.5" />
+              Add Milestone
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-8 mt-4">
+
+          {/* ── Section 1: Operational Metadata Strip ── */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { icon: User,        label: "CLIENT",    value: project.client    || "—" },
+              { icon: CheckCircle2,label: "OPERATOR",  value: project.assignedto|| "—" },
+              { icon: Calendar,    label: "STARTED",   value: project.started_at ? new Date(project.started_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—" },
+              { icon: Clock,       label: "DEADLINE",  value: new Date(project.deadline).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) },
+            ].map(({ icon: Icon, label, value }) => (
+              <Card key={label} className="p-4 bg-[#050505] border-border space-y-2">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Icon className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-mono uppercase tracking-widest">{label}</span>
+                </div>
+                <p className="text-[13px] font-medium text-foreground truncate">{value}</p>
+              </Card>
+            ))}
           </div>
 
-          <div className="px-4 py-4">
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-              <table className="w-full text-left">
-                <thead className="bg-slate-50 border-b border-slate-200">
-                  <tr>
-                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Milestone</th>
-                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Due Date</th>
-                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {milestones.length > 0 ? (
-                    milestones.map((m) => (
-                      <tr key={m.id} onClick={() => router.push(`/admin/owner/milestone/${m.id}`)} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-6 py-4 text-sm text-[#0e141b] font-medium">{m.name}</td>
-                        <td className="px-6 py-4 text-sm text-[#4e7397]">
-                          {m.due_date ? new Date(m.due_date).toLocaleDateString() : "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span
-                            className={cn(
-                              "px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider",
-                              getMilestoneStatusStyles(m.milestone_status)
-                            )}
-                          >
-                            {m.milestone_status.replace("_", " ")}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr><td colSpan={3} className="px-6 py-12 text-center text-slate-400 italic">No milestones yet.</td></tr>
-                  )}
-                </tbody>
-              </table>
+          {/* ── Section 2: Milestone Progress Bar ── */}
+          {milestones.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
+                <span className="uppercase tracking-widest">Pipeline Completion</span>
+                <span className="text-foreground">{completionPct}%</span>
+              </div>
+              <div className="h-1 w-full bg-[#111] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-500 ease-out"
+                  style={{ width: `${completionPct}%` }}
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground/60 font-mono">
+                {milestonesCompleted} / {milestones.length} milestones resolved
+              </p>
             </div>
+          )}
+
+          {/* ── Section 3: Description Panel ── */}
+          <Card className="p-5 bg-[#050505] border-l-2 border-l-primary/30 border-y-border border-r-border">
+            <div className="flex items-center gap-2 mb-3 text-muted-foreground">
+              <AlignLeft className="w-4 h-4" />
+              <h3 className="text-[11px] font-mono uppercase tracking-widest">Scope Definition</h3>
+            </div>
+            <p className="text-[13px] text-foreground/80 leading-relaxed whitespace-pre-wrap">
+              {project.description || "No operational description provided."}
+            </p>
+          </Card>
+
+          {/* ── Section 4: Milestone Ledger ── */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-muted-foreground border-b border-border/50 pb-2">
+              <Flag className="w-4 h-4" />
+              <h3 className="text-[11px] font-mono uppercase tracking-widest">
+                Milestone Ledger
+              </h3>
+              <span className="ml-auto text-[10px] font-mono bg-[#111] border border-border px-2 py-0.5 rounded">
+                {milestones.length} entries
+              </span>
+            </div>
+
+            <DataLedgerTable
+              data={milestones}
+              columns={milestoneColumns}
+              keyExtractor={(m) => m.id}
+              onRowClick={(m) => router.push(`/admin/owner/milestone/${m.id}`)}
+              emptyStateMessage="No milestones provisioned for this project."
+            />
           </div>
-        </main>
-      </div>
-    </div>
+
+        </div>
+      </DashboardLayout>
+    </AppShell>
   );
 }

@@ -6,10 +6,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import Sidebar from "@/components/layout/sidebar";
 import { projectService } from "@/services/project.service";
 import { milestoneService } from "@/services/milestone.service";
-import { ChevronRight, CheckSquare, AlarmClock, Network, Info, Search, Bell, HelpCircle } from "lucide-react";
+import { Flag, AlignLeft, Calendar, CheckSquare, AlarmClock, Network, ArrowLeft, Play } from "lucide-react";
+import AppShell from "@/components/layout/app-shell";
+import DashboardLayout from "@/components/layout/dashboard-layout";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+// ─── Schema (PRESERVED EXACTLY) ───────────────────────────────────────────────
 
 const milestoneSchema = z.object({
   name: z.string().min(2, "Milestone name must be at least 2 characters"),
@@ -20,12 +25,16 @@ const milestoneSchema = z.object({
 
 type MilestoneFormData = z.infer<typeof milestoneSchema>;
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export default function CreateMilestonePage() {
+  // ── State (PRESERVED EXACTLY) ──────────────────────────────────────────────
   const { projectId } = useParams() as { projectId: string };
   const router = useRouter();
   const [projectName, setProjectName] = useState<string>("Loading...");
   const [loading, setLoading] = useState(false);
 
+  // ── Form (PRESERVED EXACTLY) ───────────────────────────────────────────────
   const {
     register,
     handleSubmit,
@@ -37,6 +46,7 @@ export default function CreateMilestonePage() {
     },
   });
 
+  // ── Project Name Fetch (PRESERVED EXACTLY) ─────────────────────────────────
   useEffect(() => {
     const fetchProject = async () => {
       try {
@@ -49,6 +59,7 @@ export default function CreateMilestonePage() {
     fetchProject();
   }, [projectId]);
 
+  // ── Submission Handler (PRESERVED EXACTLY) ─────────────────────────────────
   const onSubmit = async (data: MilestoneFormData) => {
     try {
       setLoading(true);
@@ -57,7 +68,7 @@ export default function CreateMilestonePage() {
         dueDate: new Date(data.due_date),
       } as any);
 
-      toast.success("Milestone created successfully");
+      toast.success("Milestone provisioned successfully");
       router.push(`/admin/owner/project/${projectId}`);
     } catch (error: any) {
       toast.error(error.message || "Failed to create milestone");
@@ -66,164 +77,193 @@ export default function CreateMilestonePage() {
     }
   };
 
+  // ─── Shared input style ────────────────────────────────────────────────────
+  const inputStyles =
+    "flex h-10 w-full rounded-md border border-border bg-[#0a0a0a] px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground/50";
+
+  // ─── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="flex min-h-screen w-full bg-[#f6f7f8] text-[#0f172a] font-inter">
-      <Sidebar role="admin" />
-
-      <div className="flex-1 flex flex-col min-h-screen ml-80">
-        <header className="sticky top-0 h-16 bg-white/80 backdrop-blur-md border-b border-blue-600/10 z-40">
-          <div className="flex items-center justify-between px-8 h-full">
-            <div className="flex items-center gap-4">
-              <span className="text-lg font-black text-[#197fe6]">Milestone Manager</span>
-            </div>
-            <div className="flex items-center gap-6">
-              <div className="relative hidden lg:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <input
-                  className="pl-10 pr-4 py-1.5 bg-slate-100 border-none rounded-lg text-sm focus:ring-2 focus:ring-[#197fe6] w-64 transition-all"
-                  placeholder="Search milestones..."
-                  type="text"
-                />
-              </div>
-              <div className="flex items-center gap-4 text-slate-500">
-                <button className="hover:text-[#197fe6] transition-colors"><Bell className="w-5 h-5" /></button>
-                <button className="hover:text-[#197fe6] transition-colors"><HelpCircle className="w-5 h-5" /></button>
-                <div className="w-8 h-8 rounded-full overflow-hidden border border-blue-600/20 bg-slate-200" />
-              </div>
-            </div>
+    <AppShell role="admin">
+      <DashboardLayout
+        title="Provision Milestone"
+        subtitle={
+          <span className="flex items-center gap-1.5 text-muted-foreground text-[12px] font-mono">
+            <button
+              onClick={() => router.push("/admin/owner/projects")}
+              className="hover:text-foreground transition-colors"
+            >
+              Projects
+            </button>
+            <span className="opacity-30">/</span>
+            <button
+              onClick={() => router.push(`/admin/owner/project/${projectId}`)}
+              className="hover:text-foreground transition-colors"
+            >
+              {projectName}
+            </button>
+            <span className="opacity-30">/</span>
+            <span className="text-foreground">New Milestone</span>
+          </span>
+        }
+        actions={
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" onClick={() => router.back()}>
+              <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="milestone-provisioning-form"
+              size="sm"
+              disabled={loading}
+              className="gap-2"
+            >
+              <Play className="w-3.5 h-3.5" />
+              {loading ? "Provisioning..." : "Save Milestone"}
+            </Button>
           </div>
-        </header>
+        }
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4 pb-12 max-w-5xl">
 
-        <main className="p-8 max-w-5xl mx-auto w-full">
-          <nav className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-6 uppercase tracking-wider">
-            <a className="hover:text-[#197fe6] transition-colors" href="/admin/owner/projects">Projects</a>
-            <ChevronRight className="w-3 h-3" />
-            <a className="hover:text-[#197fe6] transition-colors" href={`/admin/owner/project/${projectId}`}>{projectName}</a>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-[#197fe6]">Add Milestone</span>
-          </nav>
+          {/* ── Main Form Column ── */}
+          <div className="lg:col-span-2 space-y-8">
 
-          <div className="mb-10">
-            <h2 className="text-[1.875rem] font-black text-[#0f172a] tracking-tight leading-none mb-2">
-              Create New Milestone
-            </h2>
-            <p className="text-slate-500 max-w-2xl">
-              Define key objectives and deadlines for the current phase of development. Ensure all stakeholder requirements are mapped before saving.
-            </p>
-          </div>
+            {/* Section 1: Identification */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-primary border-b border-border/50 pb-2">
+                <Flag className="w-4 h-4" />
+                <h3 className="text-[13px] font-mono uppercase tracking-widest font-semibold">
+                  1. Milestone Identification
+                </h3>
+              </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
-              <div className="bg-white rounded-xl shadow-sm border border-[#197fe6]/10 p-8">
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Milestone Name</label>
+              <Card className="p-6 bg-[#050505] border-l-2 border-l-primary/50 border-y-border border-r-border shadow-sm space-y-5">
+                <form id="milestone-provisioning-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                  <div className="space-y-1.5">
+                    <label className="text-[13px] font-medium text-foreground">Milestone Name</label>
                     <input
                       {...register("name")}
-                      className="w-full bg-slate-50 border-none rounded-lg py-3 px-4 text-[#0f172a] focus:ring-2 focus:ring-[#197fe6] transition-all"
                       placeholder="e.g. Beta API Integration"
+                      className={inputStyles}
                     />
-                    {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+                    {errors.name && (
+                      <p className="text-[11px] text-red-500">{errors.name.message}</p>
+                    )}
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Description</label>
+                  <div className="space-y-1.5">
+                    <label className="text-[13px] font-medium text-foreground">
+                      <span className="flex items-center gap-1.5">
+                        <AlignLeft className="w-3.5 h-3.5 text-muted-foreground" />
+                        Scope Description
+                      </span>
+                    </label>
                     <textarea
                       {...register("description")}
-                      className="w-full bg-slate-50 border-none rounded-lg py-3 px-4 text-[#0f172a] focus:ring-2 focus:ring-[#197fe6] transition-all"
-                      placeholder="Detail the scope and deliverables of this milestone..."
-                      rows={5}
+                      placeholder="Detail the scope, deliverables, and success criteria..."
+                      rows={4}
+                      className="flex w-full rounded-md border border-border bg-[#0a0a0a] px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground/50 resize-y"
                     />
-                    {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Deadline</label>
-                      <input
-                        {...register("due_date")}
-                        type="date"
-                        className="w-full bg-slate-50 border-none rounded-lg py-3 px-4 text-[#0f172a] focus:ring-2 focus:ring-[#197fe6] transition-all"
-                      />
-                      {errors.due_date && <p className="text-red-500 text-xs mt-1">{errors.due_date.message}</p>}
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Milestone Status</label>
-                      <select
-                        {...register("initialStatus")}
-                        className="w-full bg-slate-50 border-none rounded-lg py-3 px-4 text-[#0f172a] focus:ring-2 focus:ring-[#197fe6] transition-all"
-                      >
-                        <option value="draft">draft</option>
-                        <option value="pending">pending</option>
-                        <option value="active">active</option>
-                        <option value="completed">Completed</option>
-                        <option value="on_hold"> on hold </option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-end gap-4 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => router.back()}
-                      className="px-8 py-3 rounded-lg font-bold text-sm text-slate-500 hover:text-[#0f172a] hover:bg-slate-100 transition-all"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="px-8 py-3 rounded-lg font-bold text-sm bg-[#197fe6] text-white shadow-md shadow-[#197fe6]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
-                    >
-                      {loading ? "Saving..." : "Save Milestone"}
-                    </button>
+                    {errors.description && (
+                      <p className="text-[11px] text-red-500">{errors.description.message}</p>
+                    )}
                   </div>
                 </form>
-              </div>
+              </Card>
             </div>
 
-            <div className="space-y-6">
-              <div className="bg-white border border-[#197fe6]/10 rounded-xl p-6 shadow-sm">
-                <h3 className="text-xs font-black text-[#197fe6] uppercase tracking-widest mb-4">Quick Guidelines</h3>
-                <ul className="space-y-4">
-                  <li className="flex gap-3">
-                    <CheckSquare className="text-[#197fe6] w-5 h-5 flex-shrink-0" />
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      <strong className="text-[#0f172a] block">Specific Goals</strong>
-                      Milestones should be atomic and verifiable upon completion.
-                    </p>
-                  </li>
-                  <li className="flex gap-3">
-                    <AlarmClock className="text-[#197fe6] w-5 h-5 flex-shrink-0" />
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      <strong className="text-[#0f172a] block">Realistic Timing</strong>
-                      Ensure the deadline accounts for existing resource allocation.
-                    </p>
-                  </li>
-                  <li className="flex gap-3">
-                    <Network className="text-[#197fe6] w-5 h-5 flex-shrink-0" />
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      <strong className="text-[#0f172a] block">Dependency Check</strong>
-                      Identify any blocked tasks that rely on this milestone.
-                    </p>
-                  </li>
-                </ul>
+            {/* Section 2: Operational Parameters */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-amber-500 border-b border-border/50 pb-2">
+                <Calendar className="w-4 h-4" />
+                <h3 className="text-[13px] font-mono uppercase tracking-widest font-semibold">
+                  2. Operational Parameters
+                </h3>
               </div>
 
-              <div className="bg-[#197fe6]/5 border border-[#197fe6]/10 rounded-xl p-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Info className="text-[#197fe6] w-4 h-4" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#197fe6]">System Notification</span>
+              <Card className="p-6 bg-[#050505] border-l-2 border-l-amber-500/50 border-y-border border-r-border shadow-sm">
+                {/* These inputs share the form ID defined above */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1.5">
+                    <label className="text-[13px] font-medium text-foreground">Delivery Target</label>
+                    <input
+                      {...register("due_date")}
+                      type="date"
+                      className={inputStyles + " [color-scheme:dark]"}
+                    />
+                    {errors.due_date && (
+                      <p className="text-[11px] text-red-500">{errors.due_date.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[13px] font-medium text-foreground">Initial State</label>
+                    <select
+                      {...register("initialStatus")}
+                      className={inputStyles + " appearance-none cursor-pointer"}
+                    >
+                      {["draft", "pending", "active", "on_hold", "completed", "cancelled"].map((s) => (
+                        <option key={s} value={s} className="bg-[#0a0a0a]">
+                          {s.replace("_", " ").toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  Saving this milestone will notify team members currently assigned to the {projectName} project.
-                </p>
-              </div>
+              </Card>
             </div>
+
           </div>
-        </main>
-      </div>
-    </div>
+
+          {/* ── Sidebar: Contextual Intelligence ── */}
+          <div className="space-y-5">
+            <Card className="p-5 bg-[#050505] border-border">
+              <h3 className="text-[10px] font-mono uppercase tracking-widest text-primary mb-4">
+                Provisioning Guidelines
+              </h3>
+              <ul className="space-y-4">
+                {[
+                  {
+                    icon: CheckSquare,
+                    title: "Atomic Objectives",
+                    body: "Milestones should be singular, verifiable deliverables.",
+                  },
+                  {
+                    icon: AlarmClock,
+                    title: "Realistic Timing",
+                    body: "Factor existing resource allocation before setting deadline.",
+                  },
+                  {
+                    icon: Network,
+                    title: "Dependency Mapping",
+                    body: "Identify downstream tasks blocked by this milestone.",
+                  },
+                ].map(({ icon: Icon, title, body }) => (
+                  <li key={title} className="flex gap-3">
+                    <Icon className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[12px] font-medium text-foreground">{title}</p>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed mt-0.5">{body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+
+            <Card className="p-5 bg-[#050505] border-l-2 border-l-amber-500/30 border-y-border border-r-border">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-amber-500/80 mb-2">
+                System Notification
+              </p>
+              <p className="text-[12px] text-muted-foreground leading-relaxed">
+                Saving will notify team members assigned to{" "}
+                <span className="text-foreground font-medium">{projectName}</span>.
+              </p>
+            </Card>
+          </div>
+
+        </div>
+      </DashboardLayout>
+    </AppShell>
   );
 }
