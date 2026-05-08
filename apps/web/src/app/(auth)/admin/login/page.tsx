@@ -60,7 +60,7 @@ export default function SignupPage() {
       }
     };
     fetchAgencies();
-  }, []);
+ }, []);
 
   const onSubmit = async (data: RegisterFormType) => {
     setLoading(true);
