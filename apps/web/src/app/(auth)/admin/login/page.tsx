@@ -16,7 +16,7 @@ import {
 import { authService } from "@/services/auth.service";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth.store";
-import { adminLoginDataType, UserRole } from "@/types/auth.types";
+import { UserRole } from "@/types/auth.types";
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -87,14 +87,14 @@ export default function SignupPage() {
 
       router.push(`/admin/${data.admin_role}/dashboard`);
     } catch (error: any) {
-      console.error(
-        "Login failed",
-        error?.response?.data?.message || error.message
-      );
-
+      console.error("login admin failed: ",error?.error || error?.response?.data?.error ||
+           
+        "Login failed"
+)
+      
       const message =
-        error?.response?.data?.message ||
-        error?.message ||
+        error?.error || error?.response?.data?.error ||
+        error?.message ||   
         "Login failed";
 
       toast.error(message);

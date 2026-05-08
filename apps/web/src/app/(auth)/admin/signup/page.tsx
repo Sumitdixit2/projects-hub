@@ -105,6 +105,7 @@ export default function SignupPage() {
       console.error("Registration failed", error);
 
       const message =
+        error?.error || 
         error?.response?.data?.message ||
         error?.message ||
         "Registration failed";

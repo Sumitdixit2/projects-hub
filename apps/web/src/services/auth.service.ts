@@ -33,14 +33,21 @@ export const authService = {
   async adminLogin(credentials: adminLoginDataType) {
     const { email, password, agencyId, admin_role } = credentials;
 
+    try {
     const response = await api.post('admin/login', {
       email,
       password,
       agencyId,
       admin_role
     });
-
+  
     return response.data;
+
+    } catch (error: any) {
+      throw error.response?.data || error;
+    }
+    
+
   },
 
   async registerClient(data: clientRegisterDataType) {

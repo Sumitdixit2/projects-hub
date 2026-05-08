@@ -14,7 +14,7 @@ export const loginIpLimiter = rateLimit({
 	}),
   handler: (req, res) => {
     res.status(429).json({
-      error: 'Rate limit exceeded',
+      error: "Too many login attempts. Please try again later.",
       retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)    });
   },
 });
@@ -30,7 +30,7 @@ export const signupIpLimiter = rateLimit({
 	}),
   handler: (req, res) => {
     res.status(429).json({
-      error: 'Rate limit exceeded',
+      error: "Too many signup attempts. Please try again later.",
       retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)    });
   },
 });
