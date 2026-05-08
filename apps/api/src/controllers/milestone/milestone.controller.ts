@@ -16,7 +16,7 @@ export const createMilestones = asyncHandler(async (req, res) => {
   if (!id) throw new ApiError(400, "id must be provided");
   if (!name?.trim() || !description?.trim() || !due_date?.trim()) throw new ApiError(400, "Enter all the required fields");
 
-  const project = await pool.query('SELECT name FROM project WHERE id = $1)', [id]);
+  const project = await pool.query('SELECT name FROM project WHERE id = $1', [id]);
   const projectName = project.rows[0].name;
 
   if (!project.rowCount) throw new ApiError(404, "Project not found");

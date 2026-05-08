@@ -82,6 +82,7 @@ export default function SignupPage() {
       );
 
       const message =
+        error?.error ||
         error?.response?.data?.message ||
         error?.message ||
         "Registration failed";

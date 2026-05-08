@@ -10,7 +10,7 @@ export const loginIpLimiter = rateLimit({
   legacyHeaders: false,
   store: new RedisStore({
 		sendCommand: (...args: string[]) => client.sendCommand(args),
-    prefix:'rl:',
+    prefix:'login_rl:',
 	}),
   handler: (req, res) => {
     res.status(429).json({
@@ -26,7 +26,7 @@ export const signupIpLimiter = rateLimit({
   legacyHeaders: false,
   store: new RedisStore({
 		sendCommand: (...args: string[]) => client.sendCommand(args),
-    prefix:'signrl:',
+    prefix:'signup_rl:',
 	}),
   handler: (req, res) => {
     res.status(429).json({
@@ -43,11 +43,11 @@ export const otpIpLimiter = rateLimit({
   legacyHeaders: false,
   store: new RedisStore({
 		sendCommand: (...args: string[]) => client.sendCommand(args),
-    prefix:'rl:',
+    prefix:'otp_rl:',
 	}),
   handler: (req, res) => {
     res.status(429).json({
-      error: 'Rate limit exceeded',
+      error: "Too many otp attempts. Please try again later.",
       retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)    });
   },
 });
@@ -59,11 +59,11 @@ export const resetPassIpLimiter = rateLimit({
   legacyHeaders: false,
   store: new RedisStore({
 		sendCommand: (...args: string[]) => client.sendCommand(args),
-    prefix:'rl:',
+    prefix:'passreset_rl:',
 	}),
   handler: (req, res) => {
     res.status(429).json({
-      error: 'Rate limit exceeded',
+      error: "Too many attempts to reset password, try again later.",
       retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)    });
   },
 });

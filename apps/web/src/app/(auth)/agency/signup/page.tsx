@@ -47,11 +47,7 @@ function SignUpAgency() {
       toast.success("Agency successfully registered!");
       router.push(`/agency/verify?email=${encodeURIComponent(data.email)}`);
     } catch (error: any) {
-      console.error(
-        "agency not created",
-        error?.response?.data?.message || error.message
-      );
-      toast.error(error?.response?.data?.message || "Registration failed");
+      toast.error(error?.error ||error?.response?.data?.message || error?.message ||  "Registration failed");
     } finally {
       setIsLoading(false);
     }
