@@ -2,7 +2,7 @@ import { client } from "../config/client";
 import { tocketBucketType } from "../types/tockenBucket.type";
 import asyncHandler from "./asyncHandler";
 
-export const createTokenBucketLimiter = ({capacity,refillRate,prefix,message} : tocketBucketType) => {
+export const createTokenBucketLimiter = ({capacity,refillRate,prefix,message,type} : tocketBucketType) => {
   const TokenBucketLimiter = asyncHandler(async(req,res,next) => {
     
     const user = (req as any).user;
@@ -30,7 +30,7 @@ export const createTokenBucketLimiter = ({capacity,refillRate,prefix,message} : 
 
     tokens = Math.min(capacity , tokens + refill);
 
-    if(tokens < 1) {
+        if(tokens < 1) {
       return res.status(429).json({
         message ,
       });

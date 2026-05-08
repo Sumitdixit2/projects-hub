@@ -6,18 +6,19 @@ import { validateAdmin } from "../../middlewares/validate.middleware";
 import { isMyId } from "../../middlewares/isMyId.middleware";
 import { validateStaff } from "../../middlewares/validateStaff.middleware";
 import { loginIpLimiter, signupIpLimiter } from "../../middlewares/ipRateLimiter.middleware";
+import { readApiRateLimiter, sensitiveApiRateLimiter } from "../../middlewares/tokenBucketRateLimit.middleware";
 
 const adminRouter = Router();
 
 adminRouter.route('/signup').post(signupIpLimiter,signUp);
 adminRouter.route('/login').post(loginIpLimiter,adminLogin);
-adminRouter.route('/generateAdminKey').post(verifyJWT, requireAdmin, validateAdmin, createAdminKey);
-adminRouter.route('/generateClientKey').post(verifyJWT, requireAdmin,validateStaff, createClientKey);
-adminRouter.route('/getAllClients').get(verifyJWT, requireAdmin, validateStaff, getClients);
-adminRouter.route('/getClient/:clientId').get(verifyJWT, requireAdmin, validateStaff, getClient);
-adminRouter.route('/getAllAdmins').get(verifyJWT, requireAdmin, validateStaff, getAdmins);
-adminRouter.route('/deleteClient/:id').delete(verifyJWT, requireAdmin, validateAdmin, deleteClient);
-adminRouter.route('/logout/:id').post(verifyJWT,isMyId,logoutAdmin);
-adminRouter.route('/getStats').get(verifyJWT,requireAdmin,validateStaff,getStats);
+adminRouter.route('/generateAdminKey').post(verifyJWT, requireAdmin, validateAdmin,sensitiveApiRateLimiter, createAdminKey);
+adminRouter.route('/generateClientKey').post(verifyJWT, requireAdmin,validateStaff,sensitiveApiRateLimiter, createClientKey);
+adminRouter.route('/getAllClients').get(verifyJWT, requireAdmin, validateStaff,readApiRateLimiter, getClients);
+adminRouter.route('/getClient/:clientId').get(verifyJWT, requireAdmin, validateStaff,readApiRateLimiter, getClient);
+adminRouter.route('/getAllAdmins').get(verifyJWT, requireAdmin, validateStaff,readApiRateLimiter, getAdmins);
+adminRouter.route('/deleteClient/:id').delete(verifyJWT, requireAdmin, validateAdmin,sensitiveApiRateLimiter, deleteClient);
+adminRouter.route('/logout/:id').post(verifyJWT,isMyId,sensitiveApiRateLimiter,logoutAdmin);
+adminRouter.route('/getStats').get(verifyJWT,requireAdmin,readApiRateLimiter,validateStaff,getStats);
 
 export default adminRouter;
