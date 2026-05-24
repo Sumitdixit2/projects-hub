@@ -102,27 +102,58 @@ describe("verifyCode controller",() => {
   });
 
   test("return 400 if wrong OTP",async() => {
-    const hashedCode = "fafhjahdsfdaf";
-    pool.query.mockResolvedValue({
+    const data = {
       rowCount: 1,
       rows: [
         {
-          is_verified: true,
-          verify_code: "1234"
+          is_verified: false,
+          verify_code: "123476"
         }
       ]
-    });
+    }
+    const hashedCode = "fafhjahdsfdaf";
+    pool.query.mockResolvedValue(data);
 
     bcrypt.compare.mockResolvedValue(false);
 
-    await verifyCode(req,res);
+    await verifyCode(req,res,next);
 
     expect(pool.query).toHaveBeenCalledWith('SELECT verify_code,is_verified FROM agency WHERE email = $1 AND code_expiry > NOW()', [req.body.email]);
-    expect(bcrypt.compare).toHaveBeenCalledWith(req.body.Code,hashedCode);
+    expect(bcrypt.compare).toHaveBeenCalledWith(req.body.Code,data.rows[0].verify_code);
     expect(next).toHaveBeenCalledWith(
       expect.objectContaining({
         statusCode: 400,
         message: "invalid OTP"
+      })
+    );
+  });
+
+  test("return 200 with data if successful verification",async() => {
+    const data = {
+      rowCount: 1,
+      rows: [
+        {
+          is_verified: false,
+          verify_code: "1234"
+        }
+      ]
+    };
+
+    const match = true;
+
+    pool.query.mockResolvedValue(data);
+    bcrypt.compare.mockResolvedValue(match);
+
+    await verifyCode(req,res,next);
+
+    expect(pool.query).toHaveBeenCalledWith('SELECT verify_code,is_verified FROM agency WHERE email = $1 AND code_expiry > NOW()', [req.body.email]);
+    expect(pool.query).toHaveBeenCalledWith('UPDATE agency SET is_verified = $1 WHERE email = $2 ', [match, req.body.email])
+    expect(bcrypt.compare).toHaveBeenCalledWith(req.body.Code,data.rows[0].verify_code);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 200,
+        message: "verified successfully!",
+        data: match
       })
     )
   })
