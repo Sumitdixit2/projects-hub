@@ -1,10 +1,10 @@
 import {beforeEach, expect, test, vi,describe} from "vitest"
-import { pool } from "../../../postgress-config";
-import { getAgencies } from "../../controllers/agency/agency.controller";
 import { Resend } from "resend";
+import { pool } from "../../../../../postgress-config";
+import { getAgencies } from "../../../../controllers/agency/agency.controller";
 
 
-vi.mock("../../../postgress-config",() => ({
+vi.mock("../../../../../postgress-config",() => ({
   pool: {
     query: vi.fn()
   }
@@ -25,7 +25,9 @@ describe("getAgencies Controller",() => {
   let res:any;
 
   beforeEach(() => {
-    req = {}
+    req = {
+      name: ""
+    }
     res = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn()
@@ -48,6 +50,7 @@ describe("getAgencies Controller",() => {
     await getAgencies(req,res);
 
     expect(pool.query).toHaveBeenCalledWith("SELECT name , id FROM agency WHERE is_verified = true");
+    expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(
     expect.objectContaining({
     statusCode: 200,

@@ -15,14 +15,14 @@ export const getAgencies = asyncHandler(async (req, res) => {
 
   let result = [];
   result = response.rows;
-  return res.json(new ApiResponse(200, result, "fetched all agencies name and id"))
+  return res.status(200).json(new ApiResponse(200, result, "fetched all agencies name and id"))
 
 });
 
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const sendOtpToEmail = async (email: string) => {
+export const sendOtpToEmail = async (email: string) => {
   const otp = generateOtp();
   const hashedOtp = await hashOtp(otp);
   const OTP_EXPIRY_MINUTES = 10;
