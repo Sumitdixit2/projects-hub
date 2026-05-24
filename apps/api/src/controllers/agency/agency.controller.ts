@@ -6,6 +6,7 @@ import { ApiResponse } from '../../utils/apiResponse';
 import { Resend } from "resend";
 import { generateOtp } from '../../utils/otpGenerator';
 import { hashOtp } from '../../utils/hashOtp';
+import { sendOtpToEmail } from '../../utils/sendOtpToEmail';
 
 
 
@@ -18,26 +19,6 @@ export const getAgencies = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, result, "fetched all agencies name and id"))
 
 });
-
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-export const sendOtpToEmail = async (email: string) => {
-  const otp = generateOtp();
-  const hashedOtp = await hashOtp(otp);
-  const OTP_EXPIRY_MINUTES = 10;
-  const codeExpiry = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
-
-  const response = await pool.query('UPDATE agency SET verify_code = $1,code_expiry = $2 WHERE email = $3 RETURNING *', [hashedOtp, codeExpiry, email]);
-  await resend.emails.send({
-    from: "Acme <onboarding@resend.dev>",
-    to: [`${email}`],
-    subject: "verification code for project-hub",
-    html: `<strong>${otp}</strong>`,
-  });
-
-  return response.rows[0];
-}
 
 
 type registerType = {
@@ -63,15 +44,7 @@ export const registerAgency = asyncHandler(async (req, res) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const response = await pool.query('INSERT INTO agency (name , email , password , phone , website , description ) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *', [name, email, hashedPassword, phone, website, description])
-  const add_agency = response.rows[0]
-
-
-  if (!add_agency) {
-
-    throw new ApiError(500, "Error While adding agency");
-
-  }
+  await pool.query('INSERT INTO agency (name , email , password , phone , website , description ) VALUES ($1,$2,$3,$4,$5,$6)', [name, email, hashedPassword, phone, website, description])
 
   const result = await sendOtpToEmail(email);
 
