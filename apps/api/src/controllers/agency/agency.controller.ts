@@ -17,7 +17,7 @@ export const getAgencies = asyncHandler(async (req, res) => {
   result = response.rows;
   return res.json(new ApiResponse(200, result, "fetched all agencies name and id"))
 
-})
+});
 
 
 const resend = new Resend(process.env.RESEND_API_KEY);
