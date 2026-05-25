@@ -19,5 +19,5 @@ export const sendOtpToEmail = async (email: string) => {
     html: `<strong>${otp}</strong>`,
   });
 
-  return response.rows[0];
+  return response.rowCount;
 }

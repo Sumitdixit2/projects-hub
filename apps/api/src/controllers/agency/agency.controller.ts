@@ -89,23 +89,22 @@ export const renewCode = asyncHandler(async (req, res) => {
 
   if (!response) throw new ApiError(500, "error while generating and sending OTP")
 
-  return res.json(new ApiResponse(201, "otp successfully renewed"))
+  return res.status(201).json(new ApiResponse(201, "otp successfully renewed"))
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
 
   const { email, newPassword } = req.body;
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-
   if (!email || !newPassword) throw new ApiError(400, "Email and password both are required!");
 
-  const response = await pool.query('UPDATE agency SET password = $1 WHERE email = $2', [hashedPassword, email])
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  const response = await pool.query('UPDATE agency SET password = $1 WHERE email = $2 RETURNING id,email', [hashedPassword, email])
 
   if (!response.rowCount) throw new ApiError(500, "password reset failed");
 
-  return res.json(new ApiResponse(201, response.rows[0], "password successfully changed"))
+  return res.status(201).json(new ApiResponse(201, response.rows[0], "password successfully changed"))
 
 })
 
