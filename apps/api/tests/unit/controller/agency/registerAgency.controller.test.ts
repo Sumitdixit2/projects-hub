@@ -1,10 +1,10 @@
 import { expect, vi,beforeEach,describe,test } from "vitest";
-import { pool } from "../../../../../postgress-config";
+import { pool } from "../../../../postgress-config";
 import bcrypt from "bcrypt"
-import { registerAgency } from "../../../../controllers/agency/agency.controller";
-import { generateOtp } from "../../../../utils/otpGenerator";
-import { hashOtp } from "../../../../utils/hashOtp";
-import { sendOtpToEmail } from "../../../../utils/sendOtpToEmail";
+import { registerAgency } from "../../../../src/controllers/agency/agency.controller";
+import { generateOtp } from "../../../../src/utils/otpGenerator";
+import { hashOtp } from "../../../../src/utils/hashOtp";
+import { sendOtpToEmail } from "../../../../src/utils/sendOtpToEmail";
 
 
 vi.mock("../../../../../postgress-config", () => ({

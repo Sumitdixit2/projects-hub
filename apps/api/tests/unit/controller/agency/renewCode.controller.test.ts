@@ -1,8 +1,8 @@
 import { describe,beforeEach, vi, test, expect } from "vitest";
-import { pool } from "../../../../../postgress-config";
+import { pool } from "../../../../postgress-config";
 import { Resend } from "resend";
-import { sendOtpToEmail } from "../../../../utils/sendOtpToEmail";
-import { renewCode } from "../../../../controllers/agency/agency.controller";
+import { sendOtpToEmail } from "../../../../src/utils/sendOtpToEmail";
+import { renewCode } from "../../../../src/controllers/agency/agency.controller";
 
 vi.mock("../../../../../postgress-config", () => ({
   pool : {

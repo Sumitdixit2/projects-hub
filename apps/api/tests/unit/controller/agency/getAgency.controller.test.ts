@@ -1,10 +1,11 @@
 import {beforeEach, expect, test, vi,describe} from "vitest"
 import { Resend } from "resend";
-import { pool } from "../../../../../postgress-config";
-import { getAgencies } from "../../../../controllers/agency/agency.controller";
+import { getAgencies } from "../../../../src/controllers/agency/agency.controller";
+import {pool} from "../../../../postgress-config.ts"
 
 
-vi.mock("../../../../../postgress-config",() => ({
+
+vi.mock("../../../../postgress-config",() => ({
   pool: {
     query: vi.fn()
   }

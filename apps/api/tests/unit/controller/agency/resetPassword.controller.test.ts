@@ -1,8 +1,8 @@
 import { describe,beforeEach, expect, test, vi } from "vitest";
-import { pool } from "../../../../../postgress-config";
+import { pool } from "../../../../postgress-config";
 import { Resend } from "resend";
 import bcrypt from "bcrypt"
-import { resetPassword } from "../../../../controllers/agency/agency.controller";
+import { resetPassword } from "../../../../src/controllers/agency/agency.controller";
 
 vi.mock("../../../../../postgress-config", () => ({
   pool: {
