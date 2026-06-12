@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import { sendOtpToEmail } from "../../../../src/utils/sendOtpToEmail";
 import { renewCode } from "../../../../src/controllers/agency/agency.controller";
 
-vi.mock("../../../../../postgress-config", () => ({
+vi.mock("../../../../postgress-config", () => ({
   pool : {
     query: vi.fn()
   }
@@ -20,7 +20,7 @@ vi.mock("resend", () => {
   };
 });
 
-vi.mock("../../../../utils/sendOtpToEmail",() => ({
+vi.mock("../../../../src/utils/sendOtpToEmail",() => ({
   sendOtpToEmail: vi.fn()
 }))
 

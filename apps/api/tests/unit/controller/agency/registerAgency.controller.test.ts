@@ -7,7 +7,7 @@ import { hashOtp } from "../../../../src/utils/hashOtp";
 import { sendOtpToEmail } from "../../../../src/utils/sendOtpToEmail";
 
 
-vi.mock("../../../../../postgress-config", () => ({
+vi.mock("../../../../postgress-config", () => ({
   pool : {
     query: vi.fn()
   }
@@ -38,7 +38,7 @@ vi.mock("../../../../utils/hashOtp",() => ({
   hashOtp: vi.fn()
 }));
 
-vi.mock("../../../../utils/sendOtpToEmail",() => ({
+vi.mock("../../../../src/utils/sendOtpToEmail",() => ({
   sendOtpToEmail: vi.fn()
 }))
 

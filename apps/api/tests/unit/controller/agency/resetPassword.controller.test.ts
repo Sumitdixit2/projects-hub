@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import bcrypt from "bcrypt"
 import { resetPassword } from "../../../../src/controllers/agency/agency.controller";
 
-vi.mock("../../../../../postgress-config", () => ({
+vi.mock("../../../../postgress-config", () => ({
   pool: {
     query: vi.fn()
   }
