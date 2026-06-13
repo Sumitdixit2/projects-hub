@@ -1,24 +1,8 @@
 --
 -- PostgreSQL database dump
 --
-
-\restrict 0wPukUYhmfSTEleOQonZYXUCntY3WdgUrBkSdyqtXC4XR2W7lbcVNVrIkENujA0
-
 -- Dumped from database version 18.3
 -- Dumped by pg_dump version 18.3
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
 --
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
@@ -27,14 +11,14 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
 --
--- Name: role; Type: TYPE; Schema: public; Owner: agency_user
+-- Name: role; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.role AS ENUM (
@@ -44,10 +28,8 @@ CREATE TYPE public.role AS ENUM (
 );
 
 
-ALTER TYPE public.role OWNER TO agency_user;
-
 --
--- Name: status; Type: TYPE; Schema: public; Owner: agency_user
+-- Name: status; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.status AS ENUM (
@@ -60,14 +42,12 @@ CREATE TYPE public.status AS ENUM (
 );
 
 
-ALTER TYPE public.status OWNER TO agency_user;
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: activity_log; Type: TABLE; Schema: public; Owner: agency_user
+-- Name: activity_log; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.activity_log (
@@ -82,10 +62,8 @@ CREATE TABLE public.activity_log (
 );
 
 
-ALTER TABLE public.activity_log OWNER TO agency_user;
-
 --
--- Name: admin; Type: TABLE; Schema: public; Owner: agency_user
+-- Name: admin; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.admin (
@@ -102,10 +80,8 @@ CREATE TABLE public.admin (
 );
 
 
-ALTER TABLE public.admin OWNER TO agency_user;
-
 --
--- Name: agency; Type: TABLE; Schema: public; Owner: agency_user
+-- Name: agency; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.agency (
@@ -123,10 +99,8 @@ CREATE TABLE public.agency (
 );
 
 
-ALTER TABLE public.agency OWNER TO agency_user;
-
 --
--- Name: client; Type: TABLE; Schema: public; Owner: agency_user
+-- Name: client; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.client (
@@ -141,10 +115,8 @@ CREATE TABLE public.client (
 );
 
 
-ALTER TABLE public.client OWNER TO agency_user;
-
 --
--- Name: key; Type: TABLE; Schema: public; Owner: agency_user
+-- Name: key; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.key (
@@ -157,10 +129,8 @@ CREATE TABLE public.key (
 );
 
 
-ALTER TABLE public.key OWNER TO agency_user;
-
 --
--- Name: milestone; Type: TABLE; Schema: public; Owner: agency_user
+-- Name: milestone; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.milestone (
@@ -174,10 +144,8 @@ CREATE TABLE public.milestone (
 );
 
 
-ALTER TABLE public.milestone OWNER TO agency_user;
-
 --
--- Name: project; Type: TABLE; Schema: public; Owner: agency_user
+-- Name: project; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.project (
@@ -193,10 +161,8 @@ CREATE TABLE public.project (
 );
 
 
-ALTER TABLE public.project OWNER TO agency_user;
-
 --
--- Name: activity_log activity_log_pkey; Type: CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: activity_log activity_log_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.activity_log
@@ -204,7 +170,7 @@ ALTER TABLE ONLY public.activity_log
 
 
 --
--- Name: admin admin_pkey; Type: CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: admin admin_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.admin
@@ -212,7 +178,7 @@ ALTER TABLE ONLY public.admin
 
 
 --
--- Name: agency agency_pkey; Type: CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: agency agency_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.agency
@@ -220,7 +186,7 @@ ALTER TABLE ONLY public.agency
 
 
 --
--- Name: client client_pkey; Type: CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: client client_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.client
@@ -228,7 +194,7 @@ ALTER TABLE ONLY public.client
 
 
 --
--- Name: key key_pkey; Type: CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: key key_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.key
@@ -236,7 +202,7 @@ ALTER TABLE ONLY public.key
 
 
 --
--- Name: milestone milestone_pkey; Type: CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: milestone milestone_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.milestone
@@ -244,7 +210,7 @@ ALTER TABLE ONLY public.milestone
 
 
 --
--- Name: project project_pkey; Type: CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: project project_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project
@@ -252,7 +218,7 @@ ALTER TABLE ONLY public.project
 
 
 --
--- Name: activity_log fk_admin; Type: FK CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: activity_log fk_admin; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.activity_log
@@ -260,7 +226,7 @@ ALTER TABLE ONLY public.activity_log
 
 
 --
--- Name: admin fk_admin_agency; Type: FK CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: admin fk_admin_agency; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.admin
@@ -268,7 +234,7 @@ ALTER TABLE ONLY public.admin
 
 
 --
--- Name: project fk_admin_id; Type: FK CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: project fk_admin_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project
@@ -276,7 +242,7 @@ ALTER TABLE ONLY public.project
 
 
 --
--- Name: client fk_agency_id; Type: FK CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: client fk_agency_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.client
@@ -284,7 +250,7 @@ ALTER TABLE ONLY public.client
 
 
 --
--- Name: key fk_agency_id; Type: FK CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: key fk_agency_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.key
@@ -292,7 +258,7 @@ ALTER TABLE ONLY public.key
 
 
 --
--- Name: project fk_client_id; Type: FK CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: project fk_client_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project
@@ -300,7 +266,7 @@ ALTER TABLE ONLY public.project
 
 
 --
--- Name: project fk_project_agency; Type: FK CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: project fk_project_agency; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.project
@@ -308,7 +274,7 @@ ALTER TABLE ONLY public.project
 
 
 --
--- Name: milestone fk_project_id; Type: FK CONSTRAINT; Schema: public; Owner: agency_user
+-- Name: milestone fk_project_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.milestone
@@ -316,22 +282,5 @@ ALTER TABLE ONLY public.milestone
 
 
 --
--- Name: SCHEMA public; Type: ACL; Schema: -; Owner: pg_database_owner
---
-
-GRANT ALL ON SCHEMA public TO agency_user;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO agency_user;
-
-
---
 -- PostgreSQL database dump complete
 --
-
-\unrestrict 0wPukUYhmfSTEleOQonZYXUCntY3WdgUrBkSdyqtXC4XR2W7lbcVNVrIkENujA0
-
