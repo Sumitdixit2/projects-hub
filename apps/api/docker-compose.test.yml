@@ -1,17 +1,6 @@
-
 services:
-  postgres-dev:
-    image: postgres:16
-    restart: always
-    environment:
-      POSTGRES_USER: devpostgres
-      POSTGRES_PASSWORD: devpostgres
-      POSTGRES_DB: devdb
-    ports:
-      - "5435:5432"
   postgres-test:
     image: postgres:16
-    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
