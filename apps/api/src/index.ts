@@ -1,8 +1,6 @@
+import "../env"
 import { Request, Response, NextFunction } from "express";
-import dotenv from 'dotenv';
 import app from "./app";
-
-dotenv.config()
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("There seems to be an error:", err.message);
