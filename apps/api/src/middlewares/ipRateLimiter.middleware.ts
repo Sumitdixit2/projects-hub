@@ -35,6 +35,22 @@ export const signupIpLimiter = rateLimit({
   },
 });
 
+export const getAgencyIpLimiter = rateLimit({
+  windowMs:  1 * 60 * 1000,
+  limit: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  store: new RedisStore({
+		sendCommand: (...args: string[]) => client.sendCommand(args),
+    prefix:'getagency_rl:',
+	}),
+  handler: (req, res) => {
+    res.status(429).json({
+      error: "Too many get requests on this api. Please try again later.",
+      retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)    });
+  },
+});
+
 
 export const otpIpLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,

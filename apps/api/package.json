@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn src/index.ts",
-    "test": "vitest",
+    "test": "NODE_ENV=test vitest",
     "migrate": "node-pg-migrate up",
-    "migrate:down": "node-pg-migrate down"
+    "migrate:down": "node-pg-migrate down",
+    "migrate:test": "dotenv -e .env.test -- node-pg-migrate up",
+    "migrate:testdown": "dotenv -e .env.test -- node-pg-migrate down"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,7 @@
     "@types/node": "^20.19.27",
     "@types/pg": "^8.16.0",
     "@types/supertest": "^7.2.0",
+    "dotenv-cli": "^11.0.0",
     "node-pg-migrate": "^8.0.4",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2",

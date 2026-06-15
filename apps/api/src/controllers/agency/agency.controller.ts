@@ -5,8 +5,6 @@ import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
 import { sendOtpToEmail } from '../../utils/sendOtpToEmail';
 
-
-
 export const getAgencies = asyncHandler(async (req, res) => {
 
   const response = await pool.query("SELECT name , id FROM agency WHERE is_verified = true");
