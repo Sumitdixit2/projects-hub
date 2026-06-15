@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { pool } from "../../postgress-config";
 import { hashOtp } from "./hashOtp";
 import { generateOtp } from "./otpGenerator";
+import "../../env"
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 

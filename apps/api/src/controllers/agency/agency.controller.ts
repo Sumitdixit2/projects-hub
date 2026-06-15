@@ -3,9 +3,6 @@ import bcrypt from "bcrypt"
 import ApiError from '../../utils/apiError';
 import asyncHandler from '../../utils/asyncHandler';
 import { ApiResponse } from '../../utils/apiResponse';
-import { Resend } from "resend";
-import { generateOtp } from '../../utils/otpGenerator';
-import { hashOtp } from '../../utils/hashOtp';
 import { sendOtpToEmail } from '../../utils/sendOtpToEmail';
 
 
