@@ -6,4 +6,5 @@ dotenv.config({
     : ".env",
 });
 
-console.log("Loaded env:", process.env.DATABASE_URL);
+console.log("using env",process.env.DATABASE_URL);
+
