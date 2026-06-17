@@ -5,17 +5,18 @@ import { client } from "../config/client";
 
 export const loginIpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 5,
+  limit: 8,
   standardHeaders: true,
   legacyHeaders: false,
   store: new RedisStore({
-		sendCommand: (...args: string[]) => client.sendCommand(args),
-    prefix:'login_rl:',
-	}),
+    sendCommand: (...args: string[]) => client.sendCommand(args),
+    prefix: 'login_rl:',
+  }),
   handler: (req, res) => {
     res.status(429).json({
       error: "Too many login attempts. Please try again later.",
-      retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)    });
+      retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)
+    });
   },
 });
 
@@ -25,29 +26,31 @@ export const signupIpLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   store: new RedisStore({
-		sendCommand: (...args: string[]) => client.sendCommand(args),
-    prefix:'signup_rl:',
-	}),
+    sendCommand: (...args: string[]) => client.sendCommand(args),
+    prefix: 'signup_rl:',
+  }),
   handler: (req, res) => {
     res.status(429).json({
       error: "Too many signup attempts. Please try again later.",
-      retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)    });
+      retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)
+    });
   },
 });
 
 export const getAgencyIpLimiter = rateLimit({
-  windowMs:  1 * 60 * 1000,
+  windowMs: 1 * 60 * 1000,
   limit: 100,
   standardHeaders: true,
   legacyHeaders: false,
   store: new RedisStore({
-		sendCommand: (...args: string[]) => client.sendCommand(args),
-    prefix:'getagency_rl:',
-	}),
+    sendCommand: (...args: string[]) => client.sendCommand(args),
+    prefix: 'getagency_rl:',
+  }),
   handler: (req, res) => {
     res.status(429).json({
       error: "Too many get requests on this api. Please try again later.",
-      retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)    });
+      retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)
+    });
   },
 });
 
@@ -58,13 +61,14 @@ export const otpIpLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   store: new RedisStore({
-		sendCommand: (...args: string[]) => client.sendCommand(args),
-    prefix:'otp_rl:',
-	}),
+    sendCommand: (...args: string[]) => client.sendCommand(args),
+    prefix: 'otp_rl:',
+  }),
   handler: (req, res) => {
     res.status(429).json({
       error: "Too many otp attempts. Please try again later.",
-      retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)    });
+      retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)
+    });
   },
 });
 
@@ -74,13 +78,14 @@ export const resetPassIpLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   store: new RedisStore({
-		sendCommand: (...args: string[]) => client.sendCommand(args),
-    prefix:'passreset_rl:',
-	}),
+    sendCommand: (...args: string[]) => client.sendCommand(args),
+    prefix: 'passreset_rl:',
+  }),
   handler: (req, res) => {
     res.status(429).json({
       error: "Too many attempts to reset password, try again later.",
-      retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)    });
+      retryAfter: Math.ceil(((req as any).rateLimit.resetTime - Date.now()) / 1000)
+    });
   },
 });
 
