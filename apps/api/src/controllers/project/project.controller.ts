@@ -49,7 +49,17 @@ export const getAllProject = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse(200, result.rows, "fetched all the agencies projects"));
 
-})
+});
+
+export const getAllOwnerProjects = asyncHandler(async (req, res) => {
+
+  const user = (req as any).user;
+
+  const result = await pool.query('SELECT id,name,description,started_at,deadline,project_status FROM project WHERE client_id = $1', [user.id]);
+
+  return res.json(new ApiResponse(200, result.rows, "fetched all the agencies projects"));
+
+});
 
 export const isProjectStatus = (value: any): value is projectStatus => {
   return Object.values(projectStatus).includes(value as projectStatus);
@@ -66,9 +76,9 @@ export const changeStatus = asyncHandler(async (req, res) => {
   if (!isProjectStatus(newStatus)) throw new ApiError(400, "Enter a valid status");
 
   const result = await pool.query('UPDATE project SET project_status = $1 WHERE id = $2 RETURNING *', [newStatus, id]);
-  if(!result.rowCount) throw new ApiError(404 , "Project not found");
-  
-  const data : loggerType = {
+  if (!result.rowCount) throw new ApiError(404, "Project not found");
+
+  const data: loggerType = {
     agency_id: user.agency_id,
     admin_id: user.id,
     action: `Project "${result.rows[0].name}" status changed to "${result.rows[0].project_status}"`,
@@ -111,7 +121,7 @@ export const deleteProject = asyncHandler(async (req, res) => {
   await pool.query('DELETE FROM milestone WHERE project_id = $1', [id]);
   const result = await pool.query('DELETE FROM project WHERE id = $1 RETURNING *', [id]);
 
-  const data : loggerType = {
+  const data: loggerType = {
     agency_id: user.agency_id,
     admin_id: user.id,
     action: `Project "${result.rows[0].name}" has been deleted`,
