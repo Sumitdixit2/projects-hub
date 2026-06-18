@@ -12,6 +12,6 @@ milestoneRouter.route('/createMilestone/:id').post(verifyJWT, requireAdmin, writ
 milestoneRouter.route('/changeMilestoneStatus/:id').patch(verifyJWT, requireAdmin, writeApiRateLimiter, changeMilestoneStatus);
 milestoneRouter.route('/getMilestones/:id').get(verifyJWT, isMyProject, readApiRateLimiter, getMyMilestone);
 milestoneRouter.route('/deleteMilestone/:id').post(verifyJWT, requireAdmin, validateStaff, sensitiveApiRateLimiter, deleteMilestone);
-milestoneRouter.route('/getMilestone/:id').get(verifyJWT, requireAdmin, readApiRateLimiter, getMilestone);
+milestoneRouter.route('/getMilestone/:id').get(verifyJWT, isMyProject, readApiRateLimiter, getMilestone);
 
 export default milestoneRouter;
