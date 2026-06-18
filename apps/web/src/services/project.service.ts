@@ -4,7 +4,16 @@ import { projectStatus, projectType } from "@/types/project.types";
 export const projectService = {
   async getAllProjects() {
     try {
-      const response = await api.get('/project/getAllProjects');
+      const response = await api.get('/project/getAllAgencyProjects');
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || error;
+    }
+  },
+
+  async getOwnerProjects() {
+    try {
+      const response = await api.get('/project/getAllOwnerProjects');
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error;
