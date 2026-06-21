@@ -12,7 +12,9 @@ const verifyCodeSchema = z.object({
   Code: z.string().length(6, "Code must be 6 digits"),
 });
 
-export default function VerifyPage() {
+import { Suspense } from "react";
+
+function VerifyForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -110,7 +112,7 @@ export default function VerifyPage() {
               {[...Array(6)].map((_, index) => (
                 <input
                   key={index}
-                  ref={(el) => (inputs.current[index] = el)}
+                  ref={(el) => { inputs.current[index] = el; }}
                   type="text"
                   inputMode="numeric"
                   maxLength={1}
@@ -143,5 +145,13 @@ export default function VerifyPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={<div className="flex h-screen items-center justify-center font-mono text-sm text-muted-foreground">LOADING...</div>}>
+      <VerifyForm />
+    </Suspense>
   );
 }

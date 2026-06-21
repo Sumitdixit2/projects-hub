@@ -20,9 +20,18 @@ export const projectService = {
     }
   },
 
-  async createProject(data: projectType) {
+  async createProject(data: Partial<projectType> | any) {
     try {
       const response = await api.post('/project/createproject', data);
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || error;
+    }
+  },
+
+  async updateProject(id: string, data: Partial<projectType> | any) {
+    try {
+      const response = await api.patch(`/project/updateProject/${id}`, data);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || error;

@@ -18,22 +18,22 @@ export type clientRegisterDataType = {
 }
 
 export type ownerRegisterDataType = {
-  admin_id: string;
+  admin_id?: string;
   fullname: string;
   admin_role: "owner";
-  agency_password: string;
-  agency_email: string;
+  agency_password?: string;
+  agency_email?: string;
   email: string;
   password: string;
 }
 
 export type memberRegisterDataType = {
-  admin_id: string;
+  admin_id?: string;
   fullname: string;
-  admin_role: "staff" | "dev";
+  admin_role: "staff" | "developer" | "dev";
   email: string;
   password: string;
-  inviteKey: string;
+  inviteKey?: string;
 }
 
 export type adminLoginDataType = {
@@ -49,6 +49,7 @@ export interface User {
   name?: string;
   fullname?: string;
   admin_role?: UserRole;
+  role?: UserRole;
   agency_id: string;
 }
 

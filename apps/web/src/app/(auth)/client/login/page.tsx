@@ -131,7 +131,7 @@ export default function LoginPage() {
             <Combobox
               items={agencies.map((a) => a.name)}
               value={selectedAgencyName}
-              onValueChange={(name: string) => {
+              onValueChange={(name: string | null) => { if(!name) return;
                 setSelectedAgencyName(name);
                 const agency = agencies.find((a) => a.name === name);
                 if (agency) {

@@ -6,7 +6,6 @@ import { useEffect } from "react";
 import AppShell from "@/components/layout/app-shell";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import {
   User,
@@ -21,8 +20,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-export default function SettingsPage() {
-  // ── Auth Guard (PRESERVED EXACTLY) ────────────────────────────────────────
+export default function StaffSettingsPage() {
   const user = useAuthStore((state) => state.user);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const router = useRouter();
@@ -67,7 +65,7 @@ export default function SettingsPage() {
                     value: (
                       <StatusBadge
                         status="info"
-                        label={user.role || "Admin"}
+                        label={user.role || "Staff"}
                         className="text-[10px]"
                       />
                     ),

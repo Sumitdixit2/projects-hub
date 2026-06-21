@@ -5,6 +5,7 @@ interface MetricItem {
   label: string;
   value: string | number;
   isMono?: boolean;
+  icon?: React.ReactNode;
 }
 
 interface MetricStripProps extends React.HTMLAttributes<HTMLDivElement> {

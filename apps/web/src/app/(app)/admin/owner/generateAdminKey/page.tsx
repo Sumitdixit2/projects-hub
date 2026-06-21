@@ -17,7 +17,7 @@ import { Copy, ShieldCheck, Check, AlertTriangle, Lock, Users } from "lucide-rea
 const AdminKeySchema = z.object({
   email: z.string().email("Invalid email address"),
   role: z.enum(["staff", "developer"], {
-    required_error: "Please select a role",
+    error: "Please select a role",
   }),
 });
 

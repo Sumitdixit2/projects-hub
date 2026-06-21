@@ -4,8 +4,8 @@ import React from "react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  title: string;
-  subtitle?: string;
+  title: string | React.ReactNode;
+  subtitle?: React.ReactNode;
   actions?: React.ReactNode;
 }
 

@@ -178,7 +178,8 @@ export default function SignupPage() {
             <Combobox
               items={agencies.map((a) => a.name)}
               value={selectedAgencyName}
-              onValueChange={(name: string) => {
+              onValueChange={(name: string | null) => {
+                if (!name) return;
                 setSelectedAgencyName(name);
                 const agency = agencies.find((a) => a.name === name);
                 if (agency) {
@@ -220,9 +221,9 @@ export default function SignupPage() {
                   className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground" 
                   placeholder="admin@agency.com"
                 />
-                {form.formState.errors.agency_email && (
+                {(form.formState.errors as any).agency_email && (
                   <p className="text-[11px] font-mono text-destructive">
-                    {form.formState.errors.agency_email.message}
+                    {(form.formState.errors as any).agency_email.message}
                   </p>
                 )}
               </div>
@@ -234,9 +235,9 @@ export default function SignupPage() {
                   {...form.register("agency_password")} 
                   className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground" 
                 />
-                {form.formState.errors.agency_password && (
+                {(form.formState.errors as any).agency_password && (
                   <p className="text-[11px] font-mono text-destructive">
-                    {form.formState.errors.agency_password.message}
+                    {(form.formState.errors as any).agency_password.message}
                   </p>
                 )}
               </div>
@@ -244,7 +245,7 @@ export default function SignupPage() {
           )}
 
           {/* Member Fields */}
-          {(role === "staff" || role === "developer" || role === "dev") && (
+          {(role === "staff" || role === "developer") && (
             <div className="flex flex-col gap-1.5">
               <label className="text-[13px] font-medium text-foreground">Invitation Key</label>
               <input 
@@ -252,9 +253,9 @@ export default function SignupPage() {
                 className="w-full bg-black border border-border rounded-md px-3 py-2 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground" 
                 placeholder="XXXX-XXXX-XXXX"
               />
-              {form.formState.errors.inviteKey && (
+              {(form.formState.errors as any).inviteKey && (
                 <p className="text-[11px] font-mono text-destructive">
-                  {form.formState.errors.inviteKey.message}
+                  {(form.formState.errors as any).inviteKey.message}
                 </p>
               )}
             </div>
