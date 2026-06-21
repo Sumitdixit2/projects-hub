@@ -7,5 +7,3 @@ dotenv.config({
     : ".env",
 });
 
-console.log("using env",process.env.DATABASE_URL);
-
