@@ -44,27 +44,30 @@ describe("createMilestones controller", () => {
   test("return 400 if missing id or fields", async () => {
     req.params.id = undefined;
 
-    await expect(createMilestones(req, res, next)).rejects.toMatchObject({
+    await createMilestones(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 400,
       message: "id must be provided"
-    });
+    }));
 
     req.params.id = "proj-1";
     req.body.name = "";
 
-    await expect(createMilestones(req, res, next)).rejects.toMatchObject({
+    await createMilestones(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 400,
       message: "Enter all the required fields"
-    });
+    }));
   });
 
   test("return 404 if project not found", async () => {
     pool.query.mockResolvedValueOnce({ rowCount: 0, rows: [] }); // check project
 
-    await expect(createMilestones(req, res, next)).rejects.toMatchObject({
+    await createMilestones(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 404,
       message: "Project not found"
-    });
+    }));
   });
 
   test("create milestone with initialStatus and log activity", async () => {

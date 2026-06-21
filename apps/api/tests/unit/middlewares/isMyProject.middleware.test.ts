@@ -30,20 +30,22 @@ describe("isMyProject middleware", () => {
   test("admin: return 404 if project not found", async () => {
     pool.query.mockResolvedValue(null);
 
-    await expect(isMyProject(req, res, next)).rejects.toMatchObject({
+    await isMyProject(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 404,
       message: "project not found"
-    });
+    }));
   });
 
   test("admin: return 403 if admin not assigned and not owner", async () => {
     req.user = { id: "user-1", admin_role: "staff" };
     pool.query.mockResolvedValue({ rows: [{ admin_id: "user-2" }] });
 
-    await expect(isMyProject(req, res, next)).rejects.toMatchObject({
+    await isMyProject(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 403,
       message: "don't have the authority to access this project"
-    });
+    }));
   });
 
   test("admin: call next if admin is assigned", async () => {
@@ -52,7 +54,7 @@ describe("isMyProject middleware", () => {
 
     await isMyProject(req, res, next);
 
-    expect(next).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledTimes(1);
   });
 
   test("admin: call next if admin is owner but not assigned", async () => {
@@ -61,17 +63,18 @@ describe("isMyProject middleware", () => {
 
     await isMyProject(req, res, next);
 
-    expect(next).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledTimes(1);
   });
 
   test("client: return 404 if project not found", async () => {
     req.userType = "client";
     pool.query.mockResolvedValue(null);
 
-    await expect(isMyProject(req, res, next)).rejects.toMatchObject({
+    await isMyProject(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 404,
       message: "project not found"
-    });
+    }));
   });
 
   test("client: return 403 if client not assigned", async () => {
@@ -79,10 +82,11 @@ describe("isMyProject middleware", () => {
     req.user = { id: "client-1" };
     pool.query.mockResolvedValue({ rows: [{ client_id: "client-2" }] });
 
-    await expect(isMyProject(req, res, next)).rejects.toMatchObject({
+    await isMyProject(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 403,
       message: "don't have the access for this project"
-    });
+    }));
   });
 
   test("client: call next if client is assigned", async () => {
@@ -92,6 +96,6 @@ describe("isMyProject middleware", () => {
 
     await isMyProject(req, res, next);
 
-    expect(next).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledTimes(1);
   });
 });

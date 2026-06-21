@@ -45,29 +45,32 @@ describe("createProject controller", () => {
   test("return 400 if missing fields", async () => {
     req.body.name = "";
 
-    await expect(createProject(req, res, next)).rejects.toMatchObject({
+    await createProject(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 400,
       message: "Enter all the required fields"
-    });
+    }));
   });
 
   test("return 400 if client not found", async () => {
     pool.query.mockResolvedValueOnce(null); // check client
 
-    await expect(createProject(req, res, next)).rejects.toMatchObject({
+    await createProject(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 400,
       message: "no such client found"
-    });
+    }));
   });
 
   test("return 400 if project name exists for agency", async () => {
     pool.query.mockResolvedValueOnce(true); // check client
     pool.query.mockResolvedValueOnce({ rows: [{ exists: true }] }); // nameCheck
 
-    await expect(createProject(req, res, next)).rejects.toMatchObject({
+    await createProject(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 400,
       message: "another project exists with this email"
-    });
+    }));
   });
 
   test("create project and log activity", async () => {

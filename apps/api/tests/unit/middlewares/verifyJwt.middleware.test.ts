@@ -40,10 +40,13 @@ describe("verifyJwt middleware", () => {
   test("return 401 if no token provided", async () => {
     req.header.mockReturnValue(undefined);
 
-    await expect(verifyJWT(req, res, next)).rejects.toMatchObject({
-      statusCode: 401,
-      message: "Access Denied! No token provided"
-    });
+    await verifyJWT(req, res, next);
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 401,
+        message: "Access Denied! No token provided"
+      })
+    );
   });
 
   test("return 401 if token expired", async () => {
@@ -54,10 +57,13 @@ describe("verifyJwt middleware", () => {
       throw error;
     });
 
-    await expect(verifyJWT(req, res, next)).rejects.toMatchObject({
-      statusCode: 401,
-      message: "Access token expired"
-    });
+    await verifyJWT(req, res, next);
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 401,
+        message: "Access token expired"
+      })
+    );
   });
 
   test("return 401 if DB user token expired or user not found", async () => {
@@ -66,10 +72,13 @@ describe("verifyJwt middleware", () => {
     
     pool.query.mockResolvedValue({ rowCount: 0, rows: [] });
 
-    await expect(verifyJWT(req, res, next)).rejects.toMatchObject({
-      statusCode: 401,
-      message: "Invalid Access Token or token expired"
-    });
+    await verifyJWT(req, res, next);
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statusCode: 401,
+        message: "Invalid Access Token or token expired"
+      })
+    );
   });
 
   test("call next() if token and user are valid", async () => {
@@ -87,6 +96,6 @@ describe("verifyJwt middleware", () => {
     );
     expect(req.user).toEqual(mockUser);
     expect(req.userType).toBe("admin");
-    expect(next).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledTimes(1);
   });
 });

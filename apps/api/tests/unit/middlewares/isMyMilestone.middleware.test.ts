@@ -30,20 +30,22 @@ describe("isMyMilestone middleware", () => {
   test("admin: return 404 if milestone not found", async () => {
     pool.query.mockResolvedValueOnce({ rowCount: 0 });
 
-    await expect(isMyMilestone(req, res, next)).rejects.toMatchObject({
+    await isMyMilestone(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 404,
       message: "Milestone not found"
-    });
+    }));
   });
 
   test("admin: return 404 if project not found", async () => {
     pool.query.mockResolvedValueOnce({ rowCount: 1, rows: [{ project_id: "proj-1" }] });
     pool.query.mockResolvedValueOnce(null);
 
-    await expect(isMyMilestone(req, res, next)).rejects.toMatchObject({
+    await isMyMilestone(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 404,
       message: "project not found"
-    });
+    }));
   });
 
   test("admin: return 403 if admin not assigned and not owner", async () => {
@@ -51,10 +53,11 @@ describe("isMyMilestone middleware", () => {
     pool.query.mockResolvedValueOnce({ rowCount: 1, rows: [{ project_id: "proj-1" }] });
     pool.query.mockResolvedValueOnce({ rows: [{ admin_id: "user-2" }] });
 
-    await expect(isMyMilestone(req, res, next)).rejects.toMatchObject({
+    await isMyMilestone(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 403,
       message: "don't have the authority to access this project"
-    });
+    }));
   });
 
   test("admin: call next if admin is assigned", async () => {
@@ -64,17 +67,18 @@ describe("isMyMilestone middleware", () => {
 
     await isMyMilestone(req, res, next);
 
-    expect(next).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledTimes(1);
   });
 
   test("client: return 404 if milestone not found", async () => {
     req.userType = "client";
     pool.query.mockResolvedValueOnce({ rowCount: 0 });
 
-    await expect(isMyMilestone(req, res, next)).rejects.toMatchObject({
+    await isMyMilestone(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 404,
       message: "Milestone not found"
-    });
+    }));
   });
 
   test("client: return 404 if project not found", async () => {
@@ -82,10 +86,11 @@ describe("isMyMilestone middleware", () => {
     pool.query.mockResolvedValueOnce({ rowCount: 1, rows: [{ project_id: "proj-1" }] });
     pool.query.mockResolvedValueOnce(null);
 
-    await expect(isMyMilestone(req, res, next)).rejects.toMatchObject({
+    await isMyMilestone(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 404,
       message: "project not found"
-    });
+    }));
   });
 
   test("client: return 403 if client not assigned", async () => {
@@ -94,10 +99,11 @@ describe("isMyMilestone middleware", () => {
     pool.query.mockResolvedValueOnce({ rowCount: 1, rows: [{ project_id: "proj-1" }] });
     pool.query.mockResolvedValueOnce({ rows: [{ client_id: "client-2" }] });
 
-    await expect(isMyMilestone(req, res, next)).rejects.toMatchObject({
+    await isMyMilestone(req, res, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
       statusCode: 403,
       message: "don't have the access for this project"
-    });
+    }));
   });
 
   test("client: call next if client is assigned", async () => {
@@ -108,6 +114,6 @@ describe("isMyMilestone middleware", () => {
 
     await isMyMilestone(req, res, next);
 
-    expect(next).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledTimes(1);
   });
 });
