@@ -6,53 +6,55 @@ import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET } from "../../../../src/types/env.config";
 
 describe("PATCH /api/v1/milestone/changeMilestoneStatus Workflow", () => {
-    beforeEach(async () => {
-      await pool.query('DELETE FROM milestone');
-      await pool.query('DELETE FROM project');
-      await pool.query('DELETE FROM admin');
-      await pool.query('DELETE FROM client');
-      await pool.query('DELETE FROM agency');
+  beforeEach(async () => {
+    await pool.query('DELETE FROM activity_log');
+    await pool.query('DELETE FROM milestone');
+    await pool.query('DELETE FROM project');
+    await pool.query('DELETE FROM admin');
+    await pool.query('DELETE FROM client');
+    await pool.query('DELETE FROM key');
+    await pool.query('DELETE FROM agency');
 
-      await pool.query(`
+    await pool.query(`
         INSERT INTO agency (id, name, email, password, is_verified)
-        VALUES ('ag-1', 'Test Agency', 'test@agency.com', 'pass', true)
+        VALUES ('11111111-1111-1111-1111-111111111111', 'Test Agency', 'test@agency.com', 'pass', true)
       `);
 
-      await pool.query(`
+    await pool.query(`
         INSERT INTO admin (id, agency_id, fullname, email, password, admin_role, token_expiry)
-        VALUES ('ad-1', 'ag-1', 'Test Dev', 'dev@agency.com', 'pass', 'staff', NOW() + interval '1 day')
+        VALUES ('22222222-2222-2222-2222-222222222222', '11111111-1111-1111-1111-111111111111', 'Test Dev', 'dev@agency.com', 'pass', 'staff', NOW() + interval '1 day')
       `);
 
-      await pool.query(`
-        INSERT INTO client (id, agency_id, name, email, password, phone, token_expiry)
-        VALUES ('cl-1', 'ag-1', 'Test Client', 'client@test.com', 'pass', '123456789', NOW() + interval '1 day')
+    await pool.query(`
+        INSERT INTO client (id, agency_id, name, email, password, token_expiry)
+        VALUES ('33333333-3333-3333-3333-333333333333', '11111111-1111-1111-1111-111111111111', 'Test Client', 'client@test.com', 'pass', NOW() + interval '1 day')
       `);
 
-      await pool.query(`
+    await pool.query(`
         INSERT INTO project (id, name, description, client_id, admin_id, deadline, agency_id, project_status)
-        VALUES ('proj-1', 'Test Project', 'Desc', 'cl-1', 'ad-1', '2026-12-31', 'ag-1', 'pending')
+        VALUES ('44444444-4444-4444-4444-444444444444', 'Test Project', 'Desc', '33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222', '2026-12-31', '11111111-1111-1111-1111-111111111111', 'pending')
       `);
 
-      await pool.query(`
+    await pool.query(`
         INSERT INTO milestone (id, name, description, due_date, project_id, milestone_status)
-        VALUES ('mile-1', 'Phase 1', 'Desc', '2026-10-10', 'proj-1', 'pending')
+        VALUES ('123e4567-e89b-12d3-a456-426614174000', 'Phase 1', 'Desc', '2026-10-10', '44444444-4444-4444-4444-444444444444', 'pending')
       `);
-    });
+  });
 
-    test("Developer updates milestone status -> status persists", async () => {
-        const token = jwt.sign({ sub: 'ad-1', user_type: 'admin' }, ACCESS_TOKEN_SECRET as string);
+  test("Developer updates milestone status -> status persists", async () => {
+    const token = jwt.sign({ sub: '22222222-2222-2222-2222-222222222222', user_type: 'admin' }, ACCESS_TOKEN_SECRET as string);
 
-        const response = await request(app)
-            .patch("/api/v1/milestone/changeMilestoneStatus/mile-1")
-            .set("Authorization", `Bearer ${token}`)
-            .send({
-                newStatus: "active"
-            });
+    const response = await request(app)
+      .patch("/api/v1/milestone/changeMilestoneStatus/123e4567-e89b-12d3-a456-426614174000")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        newStatus: "active"
+      });
 
-        expect(response.status).toBe(200);
-        expect(response.body.success).toBe(true);
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
 
-        const dbMilestone = await pool.query("SELECT milestone_status FROM milestone WHERE id = $1", ["mile-1"]);
-        expect(dbMilestone.rows[0].milestone_status).toBe("active");
-    });
+    const dbMilestone = await pool.query("SELECT milestone_status FROM milestone WHERE id = $1", ["123e4567-e89b-12d3-a456-426614174000"]);
+    expect(dbMilestone.rows[0].milestone_status).toBe("active");
+  });
 });

@@ -6,6 +6,12 @@ import { pool } from "../../../../postgress-config";
 describe("GET /get-agency",() => {
 
     beforeEach(async() => {
+      await pool.query('DELETE FROM activity_log');
+      await pool.query('DELETE FROM milestone');
+      await pool.query('DELETE FROM project');
+      await pool.query('DELETE FROM admin');
+      await pool.query('DELETE FROM client');
+      await pool.query('DELETE FROM key');
       await pool.query('DELETE FROM agency');
 
       await pool.query(`
