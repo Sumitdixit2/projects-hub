@@ -2,9 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
     "module": "CommonJS",
     "target": "ES2020"
   },
-  "include": ["src"]
+  "include": ["src", "env.ts", "postgress-config.ts"]
 }
