@@ -5,5 +5,4 @@ export const pool = new Pool({
   connectionString: process.env.DATABASE_URL
 })
 
-console.log("using",process.env.DATABASE_URL);
 

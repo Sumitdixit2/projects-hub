@@ -3,35 +3,34 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      
     env_file:
-        - ./apps/api/.env
-
+      - ./apps/api/.env
+    environment:
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres-db:5432/${DB_NAME}
+      REDIS_URL: redis://redis-db:6379
     ports:
       - "4000:4000"
     restart: "unless-stopped"
+    depends_on:
+      - postgres-db
+      - redis-db
 
   redis-db:
     image: redis:latest
-    ports:
-      - "6379:6379"
+    restart: "unless-stopped"
     volumes:
       - redis_data:/data
 
-  postgres-dev:
+  postgres-db:
     image: postgres:16
     restart: unless-stopped
     environment:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-        POSTGRES_DB: devdb
-
-    ports:
-      - "5437:5432"
-
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
-   postgres_data:
-   redis_data:
+  postgres_data:
+  redis_data:
