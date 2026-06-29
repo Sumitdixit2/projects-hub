@@ -10,6 +10,18 @@ const api = axios.create({
   },
 });
 
+api.interceptors.request.use(
+  (config) => {
+    if (config.url && config.url.startsWith("/")) {
+      config.url = config.url.slice(1);
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
