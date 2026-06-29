@@ -10,10 +10,15 @@ const getApiUrl = () => {
 
 const nextConfig: NextConfig = {
   async rewrites() {
+    const apiUrl = getApiUrl().replace(/\/+$/, '');
     return [
       {
+        source: "/api/v1//:path*",
+        destination: `${apiUrl}/:path*`,
+      },
+      {
         source: "/api/v1/:path*",
-        destination: `${getApiUrl()}/:path*`,
+        destination: `${apiUrl}/:path*`,
       },
     ];
   },
